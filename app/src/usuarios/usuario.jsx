@@ -187,7 +187,7 @@ const Usuario = () => {
                     }}
                 >
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <div style={{ 
+                        <div style={{
                             padding: '8px 0',
                             display: 'flex',
                             alignItems: 'center',
@@ -255,7 +255,7 @@ const Usuario = () => {
                                 No hay conversaciones recientes
                             </div>
                         </div>
-
+                        <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
                         <div>
                             <div style={{
                                 padding: '8px 12px',
@@ -345,8 +345,8 @@ const Usuario = () => {
                         alignItems: 'center'
                     }}>
                         {selectedModel ? (
-                            <CodeComparisonView 
-                                model={selectedModel} 
+                            <CodeComparisonView
+                                model={selectedModel}
                                 onBack={handleBackToHome}
                                 userProfile={userProfile}
                             />
@@ -395,7 +395,7 @@ const Usuario = () => {
                 </Layout>
             </Layout>
 
-            <ModalSeleccionIA 
+            <ModalSeleccionIA
                 isVisible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
                 onModelSelect={handleModelSelect}
