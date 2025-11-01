@@ -11,6 +11,8 @@ export const API_ENDPOINTS = {
   USERS: '/app/usuarios/',
   REGISTER: '/app/usuarios/register/',
   // etc...
+  LISTAR_INDIVIDUAL: '/app/usuarios/listar_individual',
+  LISTAR_GRUPAL: '/app/usuarios/listar_grupal',
 };
 
 // Función helper para construir URLs completas

@@ -16,12 +16,13 @@ import {
     PlusOutlined,
     MessageOutlined,
     StarOutlined,
-    ClockCircleOutlined
+    ClockCircleOutlined,
+    FileTextOutlined
 } from '@ant-design/icons';
-import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken } from '../../config';
+import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken, buildApiUrl } from '../../config';
 import logo from '../img/logo.png';
 import CodeComparisonView from './CodeComparisonView';
-import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion'
+import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion';
 
 const { Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -33,6 +34,11 @@ const Usuario = () => {
     const [greeting, setGreeting] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedModel, setSelectedModel] = useState(null);
+    
+    // Estados para las comparaciones
+    const [comparacionesDestacadas, setComparacionesDestacadas] = useState([]);
+    const [comparacionesRecientes, setComparacionesRecientes] = useState([]);
+    const [loadingComparaciones, setLoadingComparaciones] = useState(false);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -70,9 +76,76 @@ const Usuario = () => {
         }
     };
 
+    const fetchComparaciones = async (usuarioId) => {
+        try {
+            setLoadingComparaciones(true);
+            const token = getStoredToken();
+
+            if (!token || !usuarioId) {
+                console.warn('⚠️ No hay token o usuario ID');
+                return;
+            }
+
+            console.log('🔍 Cargando comparaciones para usuario:', usuarioId);
+
+            const endpointIndividual = `${API_ENDPOINTS.LISTAR_INDIVIDUAL}/${usuarioId}/`;
+            const endpointGrupal = `${API_ENDPOINTS.LISTAR_GRUPAL}/${usuarioId}/`;
+
+            console.log('📡 Endpoint Individual:', endpointIndividual);
+            console.log('📡 Endpoint Grupal:', endpointGrupal);
+
+            const [individuales, grupales] = await Promise.all([
+                getWithAuth(endpointIndividual, token).catch(err => {
+                    console.error('❌ Error en individuales:', err);
+                    return { comparaciones: [] };
+                }),
+                getWithAuth(endpointGrupal, token).catch(err => {
+                    console.error('❌ Error en grupales:', err);
+                    return { comparaciones: [] };
+                })
+            ]);
+
+            console.log('✅ Individuales recibidas:', individuales);
+            console.log('✅ Grupales recibidas:', grupales);
+
+            const todasComparaciones = [
+                ...(individuales.comparaciones || []).map(comp => ({ ...comp, tipo: 'individual' })),
+                ...(grupales.comparaciones || []).map(comp => ({ ...comp, tipo: 'grupal' }))
+            ];
+
+            console.log('📊 Total combinadas:', todasComparaciones.length);
+
+            const destacadas = todasComparaciones.filter(comp => 
+                comp.estado && comp.estado.toLowerCase() === 'destacado'
+            );
+
+            const recientes = todasComparaciones.filter(comp => 
+                comp.estado && comp.estado.toLowerCase() === 'reciente'
+            ).sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
+
+            console.log('⭐ Destacadas:', destacadas.length);
+            console.log('🕐 Recientes:', recientes.length);
+
+            setComparacionesDestacadas(destacadas);
+            setComparacionesRecientes(recientes);
+
+        } catch (error) {
+            console.error('❌ Error al cargar comparaciones:', error);
+        } finally {
+            setLoadingComparaciones(false);
+        }
+    };
+
     useEffect(() => {
         fetchUserProfile();
     }, []);
+
+    useEffect(() => {
+        if (userProfile && userProfile.usuario_id) {
+            console.log('👤 Perfil cargado, obteniendo comparaciones...');
+            fetchComparaciones(userProfile.usuario_id);
+        }
+    }, [userProfile]);
 
     const handleLogout = () => {
         removeToken();
@@ -87,7 +160,6 @@ const Usuario = () => {
 
     const handleNewGroupComparison = () => {
         message.info('Comparación grupal - Funcionalidad por implementar');
-        // Aquí irá la lógica diferente para comparación grupal
     };
 
     const handleModelSelect = (model) => {
@@ -99,7 +171,93 @@ const Usuario = () => {
 
     const handleBackToHome = () => {
         setSelectedModel(null);
+        if (userProfile && userProfile.usuario_id) {
+            fetchComparaciones(userProfile.usuario_id);
+        }
     };
+
+    const handleComparacionClick = (comparacion) => {
+        console.log('🔍 Comparación seleccionada:', comparacion);
+        message.info(`Abriendo: ${comparacion.nombre_comparacion}`);
+    };
+
+    const formatFecha = (fecha) => {
+        const date = new Date(fecha);
+        const hoy = new Date();
+        const ayer = new Date(hoy);
+        ayer.setDate(ayer.getDate() - 1);
+
+        hoy.setHours(0, 0, 0, 0);
+        ayer.setHours(0, 0, 0, 0);
+        const dateToCompare = new Date(date);
+        dateToCompare.setHours(0, 0, 0, 0);
+
+        if (dateToCompare.getTime() === hoy.getTime()) {
+            return 'Hoy';
+        } else if (dateToCompare.getTime() === ayer.getTime()) {
+            return 'Ayer';
+        } else {
+            return date.toLocaleDateString('es-ES', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            });
+        }
+    };
+
+    const renderComparacionItem = (comparacion) => (
+        <div
+            key={`${comparacion.tipo}-${comparacion.id}`}
+            onClick={() => handleComparacionClick(comparacion)}
+            style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                borderRadius: '6px',
+                transition: 'all 0.2s ease',
+                background: 'transparent',
+                marginBottom: '4px'
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#2d2d2d';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+            }}
+        >
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                marginBottom: '4px'
+            }}>
+                <FileTextOutlined style={{ color: '#5ebd8f', fontSize: '14px' }} />
+                <Text 
+                    style={{ 
+                        color: '#e8e8e8', 
+                        fontSize: '13px',
+                        flex: 1,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
+                    {comparacion.nombre_comparacion}
+                </Text>
+            </div>
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                paddingLeft: '22px'
+            }}>
+                <Text style={{ color: '#6b6b6b', fontSize: '11px' }}>
+                    {comparacion.tipo === 'individual' ? 'Individual' : 'Grupal'}
+                </Text>
+                <Text style={{ color: '#6b6b6b', fontSize: '11px' }}>
+                    {formatFecha(comparacion.fecha_creacion)}
+                </Text>
+            </div>
+        </div>
+    );
 
     if (loading) {
         return (
@@ -177,16 +335,22 @@ const Usuario = () => {
                     style={{
                         background: '#242424',
                         borderRight: '1px solid #2d2d2d',
-                        padding: '20px 16px',
-                        overflow: 'auto',
                         height: '100vh',
                         position: 'fixed',
                         left: 0,
                         top: 0,
-                        bottom: 0
+                        bottom: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden' // ← Sin scroll en el Sider completo
                     }}
                 >
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    {/* ✨ HEADER FIJO - No se mueve */}
+                    <div style={{
+                        padding: '20px 16px',
+                        flexShrink: 0 // No se comprime
+                    }}>
+                        {/* Logo y Título */}
                         <div style={{
                             padding: '8px 0',
                             display: 'flex',
@@ -218,6 +382,7 @@ const Usuario = () => {
                             </Title>
                         </div>
 
+                        {/* Botones de Nueva Comparación */}
                         <Space direction="vertical" size="small" style={{ width: '100%' }}>
                             <Button
                                 icon={<PlusOutlined />}
@@ -238,9 +403,10 @@ const Usuario = () => {
                             </Button>
                         </Space>
 
-                        <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
+                        <Divider style={{ margin: '16px 0 8px 0', borderColor: '#2d2d2d' }} />
 
-                        <div>
+                        {/* Sección Chats */}
+                        <div style={{ marginTop: '8px' }}>
                             <div style={{
                                 padding: '8px 12px',
                                 color: '#a0a0a0',
@@ -255,84 +421,130 @@ const Usuario = () => {
                                 No hay conversaciones recientes
                             </div>
                         </div>
+
                         <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
+                    </div>
+
+                    {/* ✨ ÁREA SCROLLEABLE - Solo esta parte tiene scroll */}
+                    <div style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        padding: '0 16px',
+                        marginBottom: '120px' // Espacio para el footer
+                    }}>
+                        {/* Sección Destacados */}
+                        <div style={{ marginBottom: '16px' }}>
+                            <div style={{
+                                padding: '8px 12px',
+                                color: '#a0a0a0',
+                                fontSize: '13px',
+                                fontFamily: "'Playfair Display', 'Georgia', serif",
+                                fontWeight: '500',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                            }}>
+                                <span>
+                                    <StarOutlined style={{ marginRight: '8px' }} />
+                                    Destacados
+                                </span>
+                                {loadingComparaciones && <Spin size="small" />}
+                            </div>
+                            {!loadingComparaciones && comparacionesDestacadas.length === 0 ? (
+                                <div style={{ color: '#6b6b6b', fontSize: '13px', padding: '12px 16px' }}>
+                                    Sin elementos destacados
+                                </div>
+                            ) : (
+                                <div style={{ padding: '4px 0' }}>
+                                    {comparacionesDestacadas.map(renderComparacionItem)}
+                                </div>
+                            )}
+                        </div>
+
+                        <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
+
+                        {/* Sección Recientes */}
                         <div>
                             <div style={{
                                 padding: '8px 12px',
                                 color: '#a0a0a0',
                                 fontSize: '13px',
                                 fontFamily: "'Playfair Display', 'Georgia', serif",
-                                fontWeight: '500'
+                                fontWeight: '500',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
                             }}>
-                                <StarOutlined style={{ marginRight: '8px' }} />
-                                Destacados
+                                <span>
+                                    <ClockCircleOutlined style={{ marginRight: '8px' }} />
+                                    Comparaciones recientes
+                                </span>
+                                {loadingComparaciones && <Spin size="small" />}
                             </div>
-                            <div style={{ color: '#6b6b6b', fontSize: '13px', padding: '12px 16px' }}>
-                                Sin elementos destacados
-                            </div>
+                            {!loadingComparaciones && comparacionesRecientes.length === 0 ? (
+                                <div style={{ color: '#6b6b6b', fontSize: '13px', padding: '12px 16px' }}>
+                                    No hay comparaciones recientes
+                                </div>
+                            ) : (
+                                <div style={{ padding: '4px 0' }}>
+                                    {comparacionesRecientes.map(renderComparacionItem)}
+                                </div>
+                            )}
                         </div>
+                    </div>
 
-                        <div>
-                            <div style={{
-                                padding: '8px 12px',
-                                color: '#a0a0a0',
-                                fontSize: '13px',
-                                fontFamily: "'Playfair Display', 'Georgia', serif",
-                                fontWeight: '500'
-                            }}>
-                                <ClockCircleOutlined style={{ marginRight: '8px' }} />
-                                Comparaciones recientes
-                            </div>
-                            <div style={{ color: '#6b6b6b', fontSize: '13px', padding: '12px 16px' }}>
-                                No hay comparaciones recientes
-                            </div>
-                        </div>
+                    {/* ✨ FOOTER FIJO - No se mueve */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        background: '#242424',
+                        padding: '16px',
+                        borderTop: '1px solid #2d2d2d'
+                    }}>
+                        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                            <Button
+                                icon={<UserOutlined />}
+                                block
+                                style={{
+                                    height: '40px',
+                                    borderRadius: '8px',
+                                    background: 'transparent',
+                                    border: '1px solid #3d3d3d',
+                                    color: '#e8e8e8',
+                                    fontSize: '14px',
+                                    fontFamily: "'Playfair Display', 'Georgia', serif",
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-start',
+                                    paddingLeft: '16px'
+                                }}
+                            >
+                                {userProfile.usuario}
+                            </Button>
 
-                        <div style={{ position: 'absolute', bottom: '20px', left: '16px', right: '16px' }}>
-                            <Divider style={{ margin: '16px 0', borderColor: '#2d2d2d' }} />
-
-                            <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                <Button
-                                    icon={<UserOutlined />}
-                                    block
-                                    style={{
-                                        height: '40px',
-                                        borderRadius: '8px',
-                                        background: 'transparent',
-                                        border: '1px solid #3d3d3d',
-                                        color: '#e8e8e8',
-                                        fontSize: '14px',
-                                        fontFamily: "'Playfair Display', 'Georgia', serif",
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-start',
-                                        paddingLeft: '16px'
-                                    }}
-                                >
-                                    {userProfile.usuario}
-                                </Button>
-
-                                <Button
-                                    icon={<LogoutOutlined />}
-                                    onClick={handleLogout}
-                                    block
-                                    danger
-                                    style={{
-                                        height: '40px',
-                                        borderRadius: '8px',
-                                        fontSize: '14px',
-                                        fontFamily: "'Playfair Display', 'Georgia', serif",
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-start',
-                                        paddingLeft: '16px'
-                                    }}
-                                >
-                                    Cerrar sesión
-                                </Button>
-                            </Space>
-                        </div>
-                    </Space>
+                            <Button
+                                icon={<LogoutOutlined />}
+                                onClick={handleLogout}
+                                block
+                                danger
+                                style={{
+                                    height: '40px',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontFamily: "'Playfair Display', 'Georgia', serif",
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'flex-start',
+                                    paddingLeft: '16px'
+                                }}
+                            >
+                                Cerrar sesión
+                            </Button>
+                        </Space>
+                    </div>
                 </Sider>
 
                 <Layout style={{ marginLeft: 280, background: '#1a1a1a' }}>
@@ -401,7 +613,7 @@ const Usuario = () => {
                 onModelSelect={handleModelSelect}
             />
 
-            <style jsx global>{`
+            <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
                 .comparison-button {
