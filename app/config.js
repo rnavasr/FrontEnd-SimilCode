@@ -13,6 +13,12 @@ export const API_ENDPOINTS = {
   // etc...
   LISTAR_INDIVIDUAL: '/app/usuarios/listar_individual',
   LISTAR_GRUPAL: '/app/usuarios/listar_grupal',
+  MARCAR_INDIVIDUAL_RECIENTE: '/app/usuarios/comparacion_individual_reciente',
+  MARCAR_INDIVIDUAL_DESTACADO: '/app/usuarios/comparacion_individual_destacado',
+  MARCAR_INDIVIDUAL_OCULTO: '/app/usuarios/comparacion_individual_oculto',
+  MARCAR_GRUPAL_RECIENTE: '/app/usuarios/comparacion_grupal_reciente',
+  MARCAR_GRUPAL_DESTACADO: '/app/usuarios/comparacion_grupal_destacado',
+  MARCAR_GRUPAL_OCULTO: '/app/usuarios/comparacion_grupal_oculto'
 };
 
 // Función helper para construir URLs completas

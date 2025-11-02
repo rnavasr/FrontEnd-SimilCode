@@ -8,7 +8,9 @@ import {
     message,
     Spin,
     Alert,
-    Card
+    Card,
+    Dropdown,
+    Modal
 } from 'antd';
 import {
     UserOutlined,
@@ -17,7 +19,11 @@ import {
     MessageOutlined,
     StarOutlined,
     ClockCircleOutlined,
-    FileTextOutlined
+    FileTextOutlined,
+    MoreOutlined,
+    StarFilled,
+    DeleteOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken, buildApiUrl } from '../../config';
 import logo from '../img/logo.png';
@@ -39,6 +45,10 @@ const Usuario = () => {
     const [comparacionesDestacadas, setComparacionesDestacadas] = useState([]);
     const [comparacionesRecientes, setComparacionesRecientes] = useState([]);
     const [loadingComparaciones, setLoadingComparaciones] = useState(false);
+
+    // Estado para el modal de confirmación de eliminación
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [comparacionToDelete, setComparacionToDelete] = useState(null);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -181,6 +191,100 @@ const Usuario = () => {
         message.info(`Abriendo: ${comparacion.nombre_comparacion}`);
     };
 
+    // Función para marcar como destacado
+    const marcarComoDestacado = async (comparacion) => {
+        try {
+            const token = getStoredToken();
+            const endpoint = comparacion.tipo === 'individual' 
+                ? `${API_ENDPOINTS.MARCAR_INDIVIDUAL_DESTACADO}/${comparacion.id}/`
+                : `${API_ENDPOINTS.MARCAR_GRUPAL_DESTACADO}/${comparacion.id}/`;
+
+            const response = await fetch(buildApiUrl(endpoint), {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                message.success('Marcado como destacado');
+                fetchComparaciones(userProfile.usuario_id);
+            } else {
+                message.error('Error al marcar como destacado');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            message.error('Error al procesar la solicitud');
+        }
+    };
+
+    // Función para marcar como reciente
+    const marcarComoReciente = async (comparacion) => {
+        try {
+            const token = getStoredToken();
+            const endpoint = comparacion.tipo === 'individual' 
+                ? `${API_ENDPOINTS.MARCAR_INDIVIDUAL_RECIENTE}/${comparacion.id}/`
+                : `${API_ENDPOINTS.MARCAR_GRUPAL_RECIENTE}/${comparacion.id}/`;
+
+            const response = await fetch(buildApiUrl(endpoint), {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                message.success('Marcado como reciente');
+                fetchComparaciones(userProfile.usuario_id);
+            } else {
+                message.error('Error al marcar como reciente');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            message.error('Error al procesar la solicitud');
+        }
+    };
+
+    // Función para eliminar (ocultar)
+    const eliminarComparacion = async () => {
+        if (!comparacionToDelete) return;
+
+        try {
+            const token = getStoredToken();
+            const endpoint = comparacionToDelete.tipo === 'individual' 
+                ? `${API_ENDPOINTS.MARCAR_INDIVIDUAL_OCULTO}/${comparacionToDelete.id}/`
+                : `${API_ENDPOINTS.MARCAR_GRUPAL_OCULTO}/${comparacionToDelete.id}/`;
+
+            const response = await fetch(buildApiUrl(endpoint), {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                message.success('Comparación eliminada');
+                fetchComparaciones(userProfile.usuario_id);
+                setDeleteModalVisible(false);
+                setComparacionToDelete(null);
+            } else {
+                message.error('Error al eliminar la comparación');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            message.error('Error al procesar la solicitud');
+        }
+    };
+
+    // Función para mostrar el modal de confirmación
+    const confirmarEliminacion = (comparacion) => {
+        setComparacionToDelete(comparacion);
+        setDeleteModalVisible(true);
+    };
+
     const formatFecha = (fecha) => {
         const date = new Date(fecha);
         const hoy = new Date();
@@ -205,57 +309,184 @@ const Usuario = () => {
         }
     };
 
+    // Función para generar los items del menú según el estado
+    const getMenuItems = (comparacion) => {
+        const esDestacado = comparacion.estado && comparacion.estado.toLowerCase() === 'destacado';
+
+        if (esDestacado) {
+            // Si está destacado: mostrar opción para marcarlo como reciente
+            return [
+                {
+                    key: 'reciente',
+                    label: (
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '8px',
+                            padding: '4px 0',
+                            color: '#e8e8e8'
+                        }}>
+                            <ClockCircleOutlined style={{ fontSize: '14px' }} />
+                            <span>Marcar como reciente</span>
+                        </div>
+                    ),
+                    onClick: () => marcarComoReciente(comparacion)
+                },
+                {
+                    type: 'divider'
+                },
+                {
+                    key: 'eliminar',
+                    label: (
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '8px',
+                            padding: '4px 0',
+                            color: '#ff6b6b'
+                        }}>
+                            <DeleteOutlined style={{ fontSize: '14px' }} />
+                            <span>Eliminar</span>
+                        </div>
+                    ),
+                    onClick: () => confirmarEliminacion(comparacion)
+                }
+            ];
+        } else {
+            // Si está en recientes: mostrar opción para destacar
+            return [
+                {
+                    key: 'destacar',
+                    label: (
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '8px',
+                            padding: '4px 0',
+                            color: '#e8e8e8'
+                        }}>
+                            <StarFilled style={{ fontSize: '14px', color: '#ffd700' }} />
+                            <span>Destacar</span>
+                        </div>
+                    ),
+                    onClick: () => marcarComoDestacado(comparacion)
+                },
+                {
+                    type: 'divider'
+                },
+                {
+                    key: 'eliminar',
+                    label: (
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '8px',
+                            padding: '4px 0',
+                            color: '#ff6b6b'
+                        }}>
+                            <DeleteOutlined style={{ fontSize: '14px' }} />
+                            <span>Eliminar</span>
+                        </div>
+                    ),
+                    onClick: () => confirmarEliminacion(comparacion)
+                }
+            ];
+        }
+    };
+
     const renderComparacionItem = (comparacion) => (
         <div
             key={`${comparacion.tipo}-${comparacion.id}`}
-            onClick={() => handleComparacionClick(comparacion)}
             style={{
                 padding: '10px 12px',
-                cursor: 'pointer',
                 borderRadius: '6px',
                 transition: 'all 0.2s ease',
                 background: 'transparent',
-                marginBottom: '4px'
+                marginBottom: '4px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px'
             }}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#2d2d2d';
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-            }}
+            className="comparacion-item"
         >
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px',
-                marginBottom: '4px'
-            }}>
-                <FileTextOutlined style={{ color: '#5ebd8f', fontSize: '14px' }} />
-                <Text 
-                    style={{ 
-                        color: '#e8e8e8', 
-                        fontSize: '13px',
-                        flex: 1,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+            <div 
+                onClick={() => handleComparacionClick(comparacion)}
+                style={{
+                    flex: 1,
+                    cursor: 'pointer',
+                    minWidth: 0
+                }}
+            >
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    marginBottom: '4px'
+                }}>
+                    <FileTextOutlined style={{ color: '#5ebd8f', fontSize: '14px' }} />
+                    <Text 
+                        style={{ 
+                            color: '#e8e8e8', 
+                            fontSize: '13px',
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                        }}
+                    >
+                        {comparacion.nombre_comparacion}
+                    </Text>
+                </div>
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    paddingLeft: '22px'
+                }}>
+                    <Text style={{ color: '#6b6b6b', fontSize: '11px' }}>
+                        {comparacion.tipo === 'individual' ? 'Individual' : 'Grupal'}
+                    </Text>
+                    <Text style={{ color: '#6b6b6b', fontSize: '11px' }}>
+                        {formatFecha(comparacion.fecha_creacion)}
+                    </Text>
+                </div>
+            </div>
+
+            <Dropdown
+                menu={{ items: getMenuItems(comparacion) }}
+                trigger={['click']}
+                placement="bottomRight"
+                overlayStyle={{
+                    minWidth: '200px'
+                }}
+                dropdownRender={(menu) => (
+                    <div style={{
+                        background: '#2d2d2d',
+                        borderRadius: '8px',
+                        border: '1px solid #3d3d3d',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+                        padding: '4px'
+                    }}>
+                        {menu}
+                    </div>
+                )}
+            >
+                <Button
+                    type="text"
+                    icon={<MoreOutlined />}
+                    style={{
+                        color: '#6b6b6b',
+                        height: '24px',
+                        width: '24px',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
                     }}
-                >
-                    {comparacion.nombre_comparacion}
-                </Text>
-            </div>
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between',
-                paddingLeft: '22px'
-            }}>
-                <Text style={{ color: '#6b6b6b', fontSize: '11px' }}>
-                    {comparacion.tipo === 'individual' ? 'Individual' : 'Grupal'}
-                </Text>
-                <Text style={{ color: '#6b6b6b', fontSize: '11px' }}>
-                    {formatFecha(comparacion.fecha_creacion)}
-                </Text>
-            </div>
+                    onClick={(e) => e.stopPropagation()}
+                    className="menu-button"
+                />
+            </Dropdown>
         </div>
     );
 
@@ -342,15 +573,14 @@ const Usuario = () => {
                         bottom: 0,
                         display: 'flex',
                         flexDirection: 'column',
-                        overflow: 'hidden' // ← Sin scroll en el Sider completo
+                        overflow: 'hidden'
                     }}
                 >
-                    {/* ✨ HEADER FIJO - No se mueve */}
+                    {/* HEADER FIJO */}
                     <div style={{
                         padding: '20px 16px',
-                        flexShrink: 0 // No se comprime
+                        flexShrink: 0
                     }}>
-                        {/* Logo y Título */}
                         <div style={{
                             padding: '8px 0',
                             display: 'flex',
@@ -382,7 +612,6 @@ const Usuario = () => {
                             </Title>
                         </div>
 
-                        {/* Botones de Nueva Comparación */}
                         <Space direction="vertical" size="small" style={{ width: '100%' }}>
                             <Button
                                 icon={<PlusOutlined />}
@@ -405,7 +634,6 @@ const Usuario = () => {
 
                         <Divider style={{ margin: '16px 0 8px 0', borderColor: '#2d2d2d' }} />
 
-                        {/* Sección Chats */}
                         <div style={{ marginTop: '8px' }}>
                             <div style={{
                                 padding: '8px 12px',
@@ -425,13 +653,13 @@ const Usuario = () => {
                         <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
                     </div>
 
-                    {/* ✨ ÁREA SCROLLEABLE - Solo esta parte tiene scroll */}
+                    {/* ÁREA SCROLLEABLE */}
                     <div style={{
                         flex: 1,
                         overflowY: 'auto',
                         overflowX: 'hidden',
                         padding: '0 16px',
-                        marginBottom: '120px' // Espacio para el footer
+                        marginBottom: '120px'
                     }}>
                         {/* Sección Destacados */}
                         <div style={{ marginBottom: '16px' }}>
@@ -494,7 +722,7 @@ const Usuario = () => {
                         </div>
                     </div>
 
-                    {/* ✨ FOOTER FIJO - No se mueve */}
+                    {/* FOOTER FIJO */}
                     <div style={{
                         position: 'absolute',
                         bottom: 0,
@@ -607,6 +835,46 @@ const Usuario = () => {
                 </Layout>
             </Layout>
 
+            {/* Modal de confirmación de eliminación */}
+            <Modal
+                title={
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e8e8e8' }}>
+                        <ExclamationCircleOutlined style={{ color: '#ff6b6b', fontSize: '20px' }} />
+                        <span>Confirmar eliminación</span>
+                    </div>
+                }
+                open={deleteModalVisible}
+                onOk={eliminarComparacion}
+                onCancel={() => {
+                    setDeleteModalVisible(false);
+                    setComparacionToDelete(null);
+                }}
+                okText="Eliminar"
+                cancelText="Cancelar"
+                okButtonProps={{
+                    danger: true,
+                    style: {
+                        background: '#ff6b6b',
+                        borderColor: '#ff6b6b',
+                        height: '36px',
+                        borderRadius: '6px'
+                    }
+                }}
+                cancelButtonProps={{
+                    style: {
+                        height: '36px',
+                        borderRadius: '6px',
+                        borderColor: '#3d3d3d',
+                        color: '#e8e8e8'
+                    }
+                }}
+            >
+                <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
+                    ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"? 
+                    Esta acción no se puede deshacer.
+                </Text>
+            </Modal>
+
             <ModalSeleccionIA
                 isVisible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
@@ -634,6 +902,24 @@ const Usuario = () => {
                 .comparison-button:hover {
                     background: #6dd4a6 !important;
                     color: #1a1a1a !important;
+                }
+
+                .comparacion-item:hover {
+                    background: #2d2d2d !important;
+                }
+
+                .menu-button {
+                    opacity: 0;
+                    transition: all 0.2s ease !important;
+                }
+
+                .comparacion-item:hover .menu-button {
+                    opacity: 1;
+                }
+
+                .menu-button:hover {
+                    background: #3d3d3d !important;
+                    color: #e8e8e8 !important;
                 }
 
                 ::-webkit-scrollbar {
@@ -670,13 +956,17 @@ const Usuario = () => {
                 }
 
                 .ant-modal-content {
-                    background: #1a1a1a !important;
+                    background: #242424 !important;
                     border: 1px solid #2d2d2d !important;
                 }
 
                 .ant-modal-header {
-                    background: #1a1a1a !important;
+                    background: #242424 !important;
                     border-bottom: 1px solid #2d2d2d !important;
+                }
+
+                .ant-modal-title {
+                    color: #e8e8e8 !important;
                 }
 
                 .ant-modal-close {
@@ -685,6 +975,32 @@ const Usuario = () => {
 
                 .ant-modal-close:hover {
                     color: #e8e8e8 !important;
+                }
+
+                .ant-modal-body {
+                    background: #242424 !important;
+                }
+
+                .ant-modal-footer {
+                    background: #242424 !important;
+                    border-top: 1px solid #2d2d2d !important;
+                }
+
+                .ant-dropdown-menu {
+                    background: #2d2d2d !important;
+                    border: 1px solid #3d3d3d !important;
+                }
+
+                .ant-dropdown-menu-item {
+                    color: #e8e8e8 !important;
+                }
+
+                .ant-dropdown-menu-item:hover {
+                    background: #3d3d3d !important;
+                }
+
+                .ant-dropdown-menu-item-divider {
+                    background: #3d3d3d !important;
                 }
             `}</style>
         </>
