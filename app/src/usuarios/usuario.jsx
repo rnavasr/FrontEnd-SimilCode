@@ -865,14 +865,17 @@ const Usuario = () => {
                         height: '36px',
                         borderRadius: '6px',
                         borderColor: '#3d3d3d',
-                        color: '#e8e8e8'
+                        color: '#a0a0a0',
+                        background: '#242424'
                     }
                 }}
             >
-                <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
-                    ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"? 
-                    Esta acción no se puede deshacer.
-                </Text>
+                <div style={{ marginBottom: '24px' }}>
+                    <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
+                        ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"? 
+                        Esta acción no se puede deshacer.
+                    </Text>
+                </div>
             </Modal>
 
             <ModalSeleccionIA
@@ -984,6 +987,20 @@ const Usuario = () => {
                 .ant-modal-footer {
                     background: #242424 !important;
                     border-top: 1px solid #2d2d2d !important;
+                }
+
+                .ant-modal-footer .ant-btn-default:hover {
+                    background: #2d2d2d !important;
+                    border-color: #5ebd8f !important;
+                    color: #5ebd8f !important;
+                }
+
+                .ant-modal-footer .ant-btn {
+                    margin-left: 12px !important;
+                }
+
+                .ant-modal-footer .ant-btn:first-child {
+                    margin-left: 0 !important;
                 }
 
                 .ant-dropdown-menu {
