@@ -39,11 +39,9 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
         setLoading(true);
         
         try {
-            // Aquí iría la llamada a tu API
             // Simulación de llamada API
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            // Resultado simulado
             const mockResult = {
                 similarity: {
                     similarity_score: Math.floor(Math.random() * 40) + 60,
@@ -111,49 +109,31 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
     };
 
     return (
-        <div style={{ width: '100%', maxWidth: '1400px' }}>
+        <div className="code-comparison-container">
             {/* Header */}
-            <div style={{
-                marginBottom: '32px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-                <Space size="middle">
+            <div className="code-comparison-header">
+                <div className="code-comparison-header-left">
                     <Button
                         icon={<ArrowLeftOutlined />}
                         onClick={onBack}
-                        style={{
-                            background: 'transparent',
-                            border: '1px solid #3d3d3d',
-                            color: '#e8e8e8',
-                            height: '40px',
-                            borderRadius: '8px'
-                        }}
+                        className="code-comparison-back-button"
                     >
                         Volver
                     </Button>
                     <div>
-                        <Title
-                            level={3}
-                            style={{
-                                color: '#e8e8e8',
-                                margin: 0,
-                                fontFamily: "'Playfair Display', 'Georgia', serif"
-                            }}
-                        >
+                        <Title level={3} className="code-comparison-title">
                             Comparación de Código
                         </Title>
-                        <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
+                        <Text className="code-comparison-subtitle">
                             Usando {model.name} {model.icon}
                         </Text>
                     </div>
-                </Space>
+                </div>
 
                 <Select
                     value={language}
                     onChange={setLanguage}
-                    style={{ width: 180 }}
+                    className="code-comparison-language-select"
                     size="large"
                 >
                     {LANGUAGES.map(lang => (
@@ -166,12 +146,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             </div>
 
             {/* Editores de código */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '24px',
-                marginBottom: '24px'
-            }}>
+            <div className="code-editors-grid">
                 {/* Editor 1 */}
                 <Card
                     title={
@@ -180,40 +155,13 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                             <span>Código 1</span>
                         </Space>
                     }
-                    style={{
-                        background: '#242424',
-                        border: '1px solid #3d3d3d',
-                        height: '500px'
-                    }}
-                    headStyle={{
-                        background: '#2d2d2d',
-                        borderBottom: '1px solid #3d3d3d',
-                        color: '#e8e8e8',
-                        fontFamily: "'Playfair Display', 'Georgia', serif"
-                    }}
-                    bodyStyle={{
-                        padding: 0,
-                        height: 'calc(100% - 57px)'
-                    }}
+                    className="code-editor-card"
                 >
                     <textarea
                         value={code1}
                         onChange={(e) => setCode1(e.target.value)}
                         placeholder={`// Pega aquí tu código en ${LANGUAGES.find(l => l.value === language)?.label || 'el lenguaje seleccionado'}...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            background: '#1a1a1a',
-                            border: 'none',
-                            color: '#e8e8e8',
-                            padding: '20px',
-                            fontFamily: "'Fira Code', 'Courier New', monospace",
-                            fontSize: '14px',
-                            lineHeight: '1.6',
-                            resize: 'none',
-                            outline: 'none',
-                            tabSize: 4
-                        }}
+                        className="code-editor-textarea"
                     />
                 </Card>
 
@@ -225,46 +173,19 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                             <span>Código 2</span>
                         </Space>
                     }
-                    style={{
-                        background: '#242424',
-                        border: '1px solid #3d3d3d',
-                        height: '500px'
-                    }}
-                    headStyle={{
-                        background: '#2d2d2d',
-                        borderBottom: '1px solid #3d3d3d',
-                        color: '#e8e8e8',
-                        fontFamily: "'Playfair Display', 'Georgia', serif"
-                    }}
-                    bodyStyle={{
-                        padding: 0,
-                        height: 'calc(100% - 57px)'
-                    }}
+                    className="code-editor-card"
                 >
                     <textarea
                         value={code2}
                         onChange={(e) => setCode2(e.target.value)}
                         placeholder={`// Pega aquí el segundo código para comparar...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            background: '#1a1a1a',
-                            border: 'none',
-                            color: '#e8e8e8',
-                            padding: '20px',
-                            fontFamily: "'Fira Code', 'Courier New', monospace",
-                            fontSize: '14px',
-                            lineHeight: '1.6',
-                            resize: 'none',
-                            outline: 'none',
-                            tabSize: 4
-                        }}
+                        className="code-editor-textarea"
                     />
                 </Card>
             </div>
 
             {/* Botón de comparar */}
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div className="compare-button-container">
                 <Button
                     type="primary"
                     size="large"
@@ -272,16 +193,8 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     onClick={handleCompare}
                     loading={loading}
                     disabled={!code1.trim() || !code2.trim()}
-                    style={{
-                        height: '50px',
-                        padding: '0 48px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        background: model.color,
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontFamily: "'Playfair Display', 'Georgia', serif"
-                    }}
+                    className="compare-button"
+                    style={{ background: model.color }}
                 >
                     {loading ? 'Analizando...' : 'Comparar Códigos'}
                 </Button>
@@ -289,80 +202,59 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
 
             {/* Resultados */}
             {result && (
-                <div style={{ marginTop: '32px' }}>
-                    <Title
-                        level={3}
-                        style={{
-                            color: '#e8e8e8',
-                            marginBottom: '24px',
-                            fontFamily: "'Playfair Display', 'Georgia', serif"
-                        }}
-                    >
+                <div className="results-container">
+                    <Title level={3} className="results-title">
                         Resultados del Análisis
                     </Title>
 
                     {/* Similitud */}
-                    <Card
-                        style={{
-                            background: '#242424',
-                            border: '1px solid #3d3d3d',
-                            marginBottom: '24px'
-                        }}
-                        bodyStyle={{ padding: '24px' }}
-                    >
+                    <Card className="results-card">
                         <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                    fontSize: '64px',
-                                    fontWeight: 'bold',
-                                    color: getSimilarityColor(result.similarity.similarity_score),
-                                    marginBottom: '8px'
-                                }}>
+                            <div className="similarity-score">
+                                <div 
+                                    className="similarity-percentage"
+                                    style={{ color: getSimilarityColor(result.similarity.similarity_score) }}
+                                >
                                     {result.similarity.similarity_score}%
                                 </div>
-                                <Title level={4} style={{ color: '#e8e8e8', margin: 0 }}>
+                                <Title level={4} className="similarity-title">
                                     Similitud Detectada
                                 </Title>
                                 <Tag
                                     color={getPlagiarismColor(result.similarity.plagiarism_likelihood)}
-                                    style={{
-                                        marginTop: '12px',
-                                        padding: '4px 12px',
-                                        fontSize: '14px',
-                                        fontWeight: '600'
-                                    }}
+                                    className="plagiarism-tag"
                                 >
                                     Probabilidad de plagio: {result.similarity.plagiarism_likelihood.toUpperCase()}
                                 </Tag>
                             </div>
 
-                            <Divider style={{ borderColor: '#3d3d3d' }} />
+                            <Divider className="similarity-divider" />
 
                             <div>
-                                <Paragraph style={{ color: '#d0d0d0', fontSize: '15px', lineHeight: '1.6' }}>
+                                <Paragraph className="similarity-explanation">
                                     {result.similarity.explanation}
                                 </Paragraph>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                            <div className="patterns-grid">
                                 <div>
-                                    <Title level={5} style={{ color: '#66bb6a', marginBottom: '12px' }}>
+                                    <Title level={5} className="patterns-section-title common">
                                         <CheckCircleOutlined /> Patrones Comunes
                                     </Title>
-                                    <ul style={{ color: '#d0d0d0', paddingLeft: '20px' }}>
+                                    <ul className="patterns-list">
                                         {result.similarity.common_patterns.map((pattern, idx) => (
-                                            <li key={idx} style={{ marginBottom: '8px' }}>{pattern}</li>
+                                            <li key={idx}>{pattern}</li>
                                         ))}
                                     </ul>
                                 </div>
 
                                 <div>
-                                    <Title level={5} style={{ color: '#ffa726', marginBottom: '12px' }}>
+                                    <Title level={5} className="patterns-section-title differences">
                                         <WarningOutlined /> Diferencias
                                     </Title>
-                                    <ul style={{ color: '#d0d0d0', paddingLeft: '20px' }}>
+                                    <ul className="patterns-list">
                                         {result.similarity.differences.map((diff, idx) => (
-                                            <li key={idx} style={{ marginBottom: '8px' }}>{diff}</li>
+                                            <li key={idx}>{diff}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -371,11 +263,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     </Card>
 
                     {/* Comparación de Eficiencia */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '24px'
-                    }}>
+                    <div className="efficiency-grid">
                         {/* Eficiencia Código 1 */}
                         <Card
                             title={
@@ -384,55 +272,46 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                                     <span>Eficiencia - Código 1</span>
                                 </Space>
                             }
-                            style={{
-                                background: '#242424',
-                                border: '1px solid #3d3d3d'
-                            }}
-                            headStyle={{
-                                background: '#2d2d2d',
-                                borderBottom: '1px solid #3d3d3d',
-                                color: '#e8e8e8',
-                                fontFamily: "'Playfair Display', 'Georgia', serif"
-                            }}
+                            className="efficiency-card"
                         >
                             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                <div>
-                                    <Text strong style={{ color: '#a0a0a0' }}>Puntuación: </Text>
+                                <div className="efficiency-metric">
+                                    <Text className="efficiency-metric-label">Puntuación: </Text>
                                     <Tag color={result.efficiency_code1.efficiency_score >= 80 ? 'success' : 'warning'}>
                                         {result.efficiency_code1.efficiency_score}/100
                                     </Tag>
                                 </div>
 
-                                <div>
-                                    <Text strong style={{ color: '#a0a0a0' }}>Complejidad Temporal: </Text>
+                                <div className="efficiency-metric">
+                                    <Text className="efficiency-metric-label">Complejidad Temporal: </Text>
                                     <Tag color="blue">{result.efficiency_code1.time_complexity}</Tag>
                                 </div>
 
-                                <div>
-                                    <Text strong style={{ color: '#a0a0a0' }}>Complejidad Espacial: </Text>
+                                <div className="efficiency-metric">
+                                    <Text className="efficiency-metric-label">Complejidad Espacial: </Text>
                                     <Tag color="cyan">{result.efficiency_code1.space_complexity}</Tag>
                                 </div>
 
-                                <Divider style={{ margin: '12px 0', borderColor: '#3d3d3d' }} />
+                                <Divider className="efficiency-divider" />
 
                                 <div>
-                                    <Text strong style={{ color: '#ffa726', display: 'block', marginBottom: '8px' }}>
+                                    <Text className="efficiency-section-title bottlenecks">
                                         Cuellos de Botella:
                                     </Text>
-                                    <ul style={{ color: '#d0d0d0', paddingLeft: '20px', margin: 0 }}>
+                                    <ul className="efficiency-list">
                                         {result.efficiency_code1.bottlenecks.map((b, idx) => (
-                                            <li key={idx} style={{ marginBottom: '4px' }}>{b}</li>
+                                            <li key={idx}>{b}</li>
                                         ))}
                                     </ul>
                                 </div>
 
                                 <div>
-                                    <Text strong style={{ color: '#66bb6a', display: 'block', marginBottom: '8px' }}>
+                                    <Text className="efficiency-section-title suggestions">
                                         Sugerencias:
                                     </Text>
-                                    <ul style={{ color: '#d0d0d0', paddingLeft: '20px', margin: 0 }}>
+                                    <ul className="efficiency-list">
                                         {result.efficiency_code1.optimization_suggestions.map((s, idx) => (
-                                            <li key={idx} style={{ marginBottom: '4px' }}>{s}</li>
+                                            <li key={idx}>{s}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -447,55 +326,46 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                                     <span>Eficiencia - Código 2</span>
                                 </Space>
                             }
-                            style={{
-                                background: '#242424',
-                                border: '1px solid #3d3d3d'
-                            }}
-                            headStyle={{
-                                background: '#2d2d2d',
-                                borderBottom: '1px solid #3d3d3d',
-                                color: '#e8e8e8',
-                                fontFamily: "'Playfair Display', 'Georgia', serif"
-                            }}
+                            className="efficiency-card"
                         >
                             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                <div>
-                                    <Text strong style={{ color: '#a0a0a0' }}>Puntuación: </Text>
+                                <div className="efficiency-metric">
+                                    <Text className="efficiency-metric-label">Puntuación: </Text>
                                     <Tag color={result.efficiency_code2.efficiency_score >= 80 ? 'success' : 'warning'}>
                                         {result.efficiency_code2.efficiency_score}/100
                                     </Tag>
                                 </div>
 
-                                <div>
-                                    <Text strong style={{ color: '#a0a0a0' }}>Complejidad Temporal: </Text>
+                                <div className="efficiency-metric">
+                                    <Text className="efficiency-metric-label">Complejidad Temporal: </Text>
                                     <Tag color="blue">{result.efficiency_code2.time_complexity}</Tag>
                                 </div>
 
-                                <div>
-                                    <Text strong style={{ color: '#a0a0a0' }}>Complejidad Espacial: </Text>
+                                <div className="efficiency-metric">
+                                    <Text className="efficiency-metric-label">Complejidad Espacial: </Text>
                                     <Tag color="cyan">{result.efficiency_code2.space_complexity}</Tag>
                                 </div>
 
-                                <Divider style={{ margin: '12px 0', borderColor: '#3d3d3d' }} />
+                                <Divider className="efficiency-divider" />
 
                                 <div>
-                                    <Text strong style={{ color: '#ffa726', display: 'block', marginBottom: '8px' }}>
+                                    <Text className="efficiency-section-title bottlenecks">
                                         Cuellos de Botella:
                                     </Text>
-                                    <ul style={{ color: '#d0d0d0', paddingLeft: '20px', margin: 0 }}>
+                                    <ul className="efficiency-list">
                                         {result.efficiency_code2.bottlenecks.map((b, idx) => (
-                                            <li key={idx} style={{ marginBottom: '4px' }}>{b}</li>
+                                            <li key={idx}>{b}</li>
                                         ))}
                                     </ul>
                                 </div>
 
                                 <div>
-                                    <Text strong style={{ color: '#66bb6a', display: 'block', marginBottom: '8px' }}>
+                                    <Text className="efficiency-section-title suggestions">
                                         Sugerencias:
                                     </Text>
-                                    <ul style={{ color: '#d0d0d0', paddingLeft: '20px', margin: 0 }}>
+                                    <ul className="efficiency-list">
                                         {result.efficiency_code2.optimization_suggestions.map((s, idx) => (
-                                            <li key={idx} style={{ marginBottom: '4px' }}>{s}</li>
+                                            <li key={idx}>{s}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -504,48 +374,19 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     </div>
 
                     {/* Footer de resultados */}
-                    <div style={{
-                        textAlign: 'center',
-                        marginTop: '24px',
-                        padding: '16px',
-                        background: '#242424',
-                        borderRadius: '8px',
-                        border: '1px solid #3d3d3d'
-                    }}>
-                        <Text style={{ color: '#a0a0a0', fontStyle: 'italic' }}>
-                            Análisis realizado con <strong style={{ color: model.color }}>{result.provider_used}</strong>
+                    <div className="results-footer">
+                        <Text className="results-footer-text">
+                            Análisis realizado con{' '}
+                            <strong 
+                                className="results-provider-name"
+                                style={{ color: model.color }}
+                            >
+                                {result.provider_used}
+                            </strong>
                         </Text>
                     </div>
                 </div>
             )}
-
-            {/* Estilos adicionales para el textarea */}
-            <style jsx>{`
-                @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
-                
-                textarea::placeholder {
-                    color: #6b6b6b;
-                    opacity: 1;
-                }
-
-                textarea::-webkit-scrollbar {
-                    width: 8px;
-                    height: 8px;
-                }
-
-                textarea::-webkit-scrollbar-track {
-                    background: #1a1a1a;
-                }
-
-                textarea::-webkit-scrollbar-thumb {
-                    background: #3d3d3d;
-                    border-radius: 4px;
-                }
-
-                textarea::-webkit-scrollbar-thumb:hover {
-                    background: #5ebd8f;
-                }
-            `}</style>
         </div>
     );
 };
