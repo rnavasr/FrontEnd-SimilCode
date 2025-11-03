@@ -319,15 +319,18 @@ const Usuario = () => {
                 {
                     key: 'reciente',
                     label: (
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '8px',
-                            padding: '4px 0',
-                            color: '#e8e8e8'
-                        }}>
-                            <ClockCircleOutlined style={{ fontSize: '14px' }} />
-                            <span>Marcar como reciente</span>
+                        <div 
+                            className="menu-item-reciente"
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '8px',
+                                padding: '4px 0',
+                                color: '#e8e8e8'
+                            }}
+                        >
+                            <ClockCircleOutlined style={{ fontSize: '14px', color: '#6b6b6b' }} />
+                            <span>Quitar de Destacados</span>
                         </div>
                     ),
                     onClick: () => marcarComoReciente(comparacion)
@@ -358,14 +361,17 @@ const Usuario = () => {
                 {
                     key: 'destacar',
                     label: (
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '8px',
-                            padding: '4px 0',
-                            color: '#e8e8e8'
-                        }}>
-                            <StarFilled style={{ fontSize: '14px', color: '#ffd700' }} />
+                        <div 
+                            className="menu-item-destacar"
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '8px',
+                                padding: '4px 0',
+                                color: '#e8e8e8'
+                            }}
+                        >
+                            <StarOutlined style={{ fontSize: '14px', color: '#6b6b6b' }} />
                             <span>Destacar</span>
                         </div>
                     ),
@@ -455,20 +461,6 @@ const Usuario = () => {
                 menu={{ items: getMenuItems(comparacion) }}
                 trigger={['click']}
                 placement="bottomRight"
-                overlayStyle={{
-                    minWidth: '200px'
-                }}
-                dropdownRender={(menu) => (
-                    <div style={{
-                        background: '#2d2d2d',
-                        borderRadius: '8px',
-                        border: '1px solid #3d3d3d',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
-                        padding: '4px'
-                    }}>
-                        {menu}
-                    </div>
-                )}
             >
                 <Button
                     type="text"
@@ -873,7 +865,6 @@ const Usuario = () => {
                 <div style={{ marginBottom: '24px' }}>
                     <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
                         ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"? 
-                        Esta acción no se puede deshacer.
                     </Text>
                 </div>
             </Modal>
@@ -1003,6 +994,14 @@ const Usuario = () => {
                     margin-left: 0 !important;
                 }
 
+                .ant-modal-header {
+                    padding-bottom: 20px !important;
+                }
+
+                .ant-modal-footer {
+                    padding-top: 24px !important;
+                }
+
                 .ant-dropdown-menu {
                     background: #2d2d2d !important;
                     border: 1px solid #3d3d3d !important;
@@ -1018,6 +1017,14 @@ const Usuario = () => {
 
                 .ant-dropdown-menu-item-divider {
                     background: #3d3d3d !important;
+                }
+
+                .menu-item-destacar:hover .anticon-star {
+                    color: #5ebd8f !important;
+                }
+
+                .menu-item-reciente:hover .anticon-clock-circle {
+                    color: #5ebd8f !important;
                 }
             `}</style>
         </>
