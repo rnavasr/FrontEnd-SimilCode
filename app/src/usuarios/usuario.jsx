@@ -15,6 +15,7 @@ import logo from '../img/logo.png';
 import CodeComparisonView from './CompenentesDocente/CodeComparisonView';
 import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion';
 import DocenteSidebar from './CompenentesDocente/DocenteSidebar';
+import ChatManagerView from './CompenentesDocente/GestionDeComparaciones';
 import './globalStyles.css';
 
 const { Content } = Layout;
@@ -27,6 +28,7 @@ const Usuario = () => {
     const [greeting, setGreeting] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedModel, setSelectedModel] = useState(null);
+    const [showChatManager, setShowChatManager] = useState(false);
     
     const [comparacionesDestacadas, setComparacionesDestacadas] = useState([]);
     const [comparacionesRecientes, setComparacionesRecientes] = useState([]);
@@ -133,14 +135,21 @@ const Usuario = () => {
     const handleModelSelect = (model) => {
         setSelectedModel(model);
         setIsModalVisible(false);
+        setShowChatManager(false);
         message.success(`Modelo ${model.name} seleccionado`);
     };
 
     const handleBackToHome = () => {
         setSelectedModel(null);
+        setShowChatManager(false);
         if (userProfile && userProfile.usuario_id) {
             fetchComparaciones(userProfile.usuario_id);
         }
+    };
+
+    const handleSearchChats = () => {
+        setShowChatManager(true);
+        setSelectedModel(null);
     };
 
     const handleComparacionClick = (comparacion) => {
@@ -342,6 +351,7 @@ const Usuario = () => {
                     onMarcarDestacado={marcarComoDestacado}
                     onMarcarReciente={marcarComoReciente}
                     onEliminar={confirmarEliminacion}
+                    onSearchChats={handleSearchChats}
                     onLogout={handleLogout}
                     formatFecha={formatFecha}
                 />
@@ -355,7 +365,17 @@ const Usuario = () => {
                         justifyContent: 'center',
                         alignItems: 'center'
                     }}>
-                        {selectedModel ? (
+                        {showChatManager ? (
+                            <ChatManagerView
+                                comparacionesDestacadas={comparacionesDestacadas}
+                                comparacionesRecientes={comparacionesRecientes}
+                                onBack={handleBackToHome}
+                                onMarcarDestacado={marcarComoDestacado}
+                                onMarcarReciente={marcarComoReciente}
+                                onEliminar={confirmarEliminacion}
+                                formatFecha={formatFecha}
+                            />
+                        ) : selectedModel ? (
                             <CodeComparisonView
                                 model={selectedModel}
                                 onBack={handleBackToHome}

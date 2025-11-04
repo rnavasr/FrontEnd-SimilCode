@@ -13,7 +13,8 @@ import {
     PlusOutlined,
     MessageOutlined,
     StarOutlined,
-    ClockCircleOutlined
+    ClockCircleOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
 import logo from '../../img/logo.png';
 import ComparacionDropdownMenu from './ComparacionDropdownMenu';
@@ -33,6 +34,7 @@ const DocenteSidebar = ({
     onMarcarReciente,
     onEliminar,
     onLogout,
+    onSearchChats,
     formatFecha
 }) => {
     const renderComparacionItem = (comparacion) => (
@@ -171,25 +173,32 @@ const DocenteSidebar = ({
                     </Button>
                 </Space>
 
-                <Divider style={{ margin: '16px 0 8px 0', borderColor: '#2d2d2d' }} />
-
-                <div style={{ marginTop: '8px' }}>
-                    <div style={{
-                        padding: '8px 12px',
-                        color: '#a0a0a0',
-                        fontSize: '13px',
-                        fontFamily: "'Playfair Display', 'Georgia', serif",
-                        fontWeight: '500'
-                    }}>
-                        <MessageOutlined style={{ marginRight: '8px' }} />
-                        Chats
-                    </div>
-                    <div style={{ color: '#6b6b6b', fontSize: '13px', padding: '12px 16px' }}>
-                        No hay conversaciones recientes
-                    </div>
+                <div style={{ marginTop: '22px' }}>
+                    {/* Botón de Búsqueda */}
+                    <Button
+                        icon={<SearchOutlined style={{ color: '#6b6b6b' }} />}
+                        onClick={onSearchChats}
+                        block
+                        style={{
+                            height: '36px',
+                            borderRadius: '6px',
+                            background: 'transparent',
+                            border: '1px solid #3d3d3d',
+                            color: '#6b6b6b',
+                            fontSize: '13px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            paddingLeft: '12px',
+                            marginTop: '8px',
+                            transition: 'all 0.2s ease'
+                        }}
+                        className="search-button"
+                    >
+                        Buscar
+                    </Button>
                 </div>
 
-                <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
             </div>
 
             {/* ÁREA SCROLLEABLE */}
@@ -228,8 +237,6 @@ const DocenteSidebar = ({
                         </div>
                     )}
                 </div>
-
-                <Divider style={{ margin: '8px 0', borderColor: '#2d2d2d' }} />
 
                 {/* Sección Recientes */}
                 <div>
