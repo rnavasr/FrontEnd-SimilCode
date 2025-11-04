@@ -358,11 +358,11 @@ const Usuario = () => {
 
                 <Layout style={{ marginLeft: 280, background: '#1a1a1a' }}>
                     <Content style={{
-                        padding: '60px 80px',
+                        padding: (showChatManager || selectedModel) ? '90px' : '60px 80px',
                         minHeight: '100vh',
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'center',
+                        justifyContent: (showChatManager || selectedModel) ? 'flex-start' : 'center',
                         alignItems: 'center'
                     }}>
                         {showChatManager ? (

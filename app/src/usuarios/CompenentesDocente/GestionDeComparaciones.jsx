@@ -42,9 +42,9 @@ const ChatManagerView = ({
     // Filtrar chats según el texto de búsqueda
     const chatsFiltrados = useMemo(() => {
         if (!searchText.trim()) return todosLosChats;
-        
+
         const searchLower = searchText.toLowerCase();
-        return todosLosChats.filter(chat => 
+        return todosLosChats.filter(chat =>
             chat.nombre_comparacion.toLowerCase().includes(searchLower)
         );
     }, [todosLosChats, searchText]);
@@ -126,10 +126,11 @@ const ChatManagerView = ({
     };
 
     return (
-        <div style={{
+        <div className="chat-manager-container" style={{
             width: '100%',
-            maxWidth: '100%',
-            padding: '0'
+            maxWidth: '800px',
+            padding: '0',
+            margin: '0 auto'
         }}>
             {/* Header */}
             <div style={{
@@ -148,14 +149,14 @@ const ChatManagerView = ({
                     level={2}
                     className="chat-manager-title"
                 >
-                    Gestión de Chats
+                    Historial de Comparaciones
                 </Title>
             </div>
 
             {/* Search Bar */}
             <div style={{ marginBottom: '16px' }}>
                 <Input
-                    placeholder="Buscar en sus chats..."
+                    placeholder="Buscar en sus comparaciones..."
                     prefix={<SearchOutlined style={{ color: '#6b6b6b' }} />}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
@@ -164,53 +165,48 @@ const ChatManagerView = ({
             </div>
 
             {/* Select Button / Action Buttons */}
-            <div style={{ marginBottom: '24px' }}>
-                {!isSelectMode ? (
-                    <Button
-                        onClick={() => setIsSelectMode(true)}
-                        className="chat-manager-select-button"
-                        block
-                    >
-                        Seleccionar
-                    </Button>
-                ) : (
-                    <div style={{
-                        display: 'flex',
-                        gap: '12px',
-                        alignItems: 'center'
-                    }}>
+            <div style={{
+                marginBottom: '24px',
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'center'
+            }}>
+                <Button
+                    onClick={() => {
+                        setIsSelectMode(!isSelectMode);
+                        if (isSelectMode) {
+                            setSelectedChats([]);
+                        }
+                    }}
+                    className={isSelectMode ? "chat-manager-cancel-button-small" : "chat-manager-select-button-small"}
+                >
+                    {isSelectMode ? 'Cancelar' : 'Seleccionar'}
+                </Button>
+
+                {isSelectMode && (
+                    <>
                         <Button
                             type="text"
                             icon={<StarOutlined />}
                             onClick={handleMarcarDestacados}
-                            className="chat-action-button-full star-button"
+                            className="chat-action-button star-button"
                             title="Destacar"
                         />
                         <Button
                             type="text"
                             icon={<ClockCircleOutlined />}
                             onClick={handleQuitarDestacados}
-                            className="chat-action-button-full clock-button"
+                            className="chat-action-button clock-button"
                             title="Quitar de destacados"
                         />
                         <Button
                             type="text"
                             icon={<DeleteOutlined />}
                             onClick={handleEliminarSeleccionados}
-                            className="chat-action-button-full delete-button"
+                            className="chat-action-button delete-button"
                             title="Eliminar"
                         />
-                        <Button
-                            onClick={() => {
-                                setIsSelectMode(false);
-                                setSelectedChats([]);
-                            }}
-                            className="chat-manager-cancel-button"
-                            style={{ marginLeft: 'auto' }}
-                        >
-                            Cancelar
-                        </Button>
-                    </div>
+                    </>
                 )}
             </div>
 
@@ -223,7 +219,7 @@ const ChatManagerView = ({
                 paddingLeft: '4px'
             }}>
                 <Text style={{ color: '#6b6b6b', fontSize: '14px' }}>
-                    {chatsFiltrados.length} chat{chatsFiltrados.length !== 1 ? 's' : ''}
+                    {chatsFiltrados.length} {chatsFiltrados.length === 1 ? 'comparación' : 'comparaciones'}
                 </Text>
                 {isSelectMode && chatsFiltrados.length > 0 && (
                     <Checkbox
