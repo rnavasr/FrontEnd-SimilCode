@@ -10,7 +10,6 @@ export const API_ENDPOINTS = {
   // Puedes agregar más endpoints aquí según necesites
   USERS: '/app/usuarios/',
   REGISTER: '/app/usuarios/register/',
-  // etc...
   LISTAR_INDIVIDUAL: '/app/usuarios/listar_individual',
   LISTAR_GRUPAL: '/app/usuarios/listar_grupal',
   MARCAR_INDIVIDUAL_RECIENTE: '/app/usuarios/comparacion_individual_reciente',
@@ -18,7 +17,9 @@ export const API_ENDPOINTS = {
   MARCAR_INDIVIDUAL_OCULTO: '/app/usuarios/comparacion_individual_oculto',
   MARCAR_GRUPAL_RECIENTE: '/app/usuarios/comparacion_grupal_reciente',
   MARCAR_GRUPAL_DESTACADO: '/app/usuarios/comparacion_grupal_destacado',
-  MARCAR_GRUPAL_OCULTO: '/app/usuarios/comparacion_grupal_oculto'
+  MARCAR_GRUPAL_OCULTO: '/app/usuarios/comparacion_grupal_oculto',
+  LISTAR_MODELOS_ADMIN: '/app/usuarios/listar_modelos_admin/',
+  LISTAR_MODELOS_USUARIO: '/app/usuarios/listar_modelos_usuario'
 };
 
 // Función helper para construir URLs completas
