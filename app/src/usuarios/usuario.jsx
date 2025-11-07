@@ -29,7 +29,7 @@ const Usuario = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedModel, setSelectedModel] = useState(null);
     const [showChatManager, setShowChatManager] = useState(false);
-    
+
     const [comparacionesDestacadas, setComparacionesDestacadas] = useState([]);
     const [comparacionesRecientes, setComparacionesRecientes] = useState([]);
     const [loadingComparaciones, setLoadingComparaciones] = useState(false);
@@ -91,11 +91,11 @@ const Usuario = () => {
                 ...(grupales.comparaciones || []).map(comp => ({ ...comp, tipo: 'grupal' }))
             ];
 
-            const destacadas = todasComparaciones.filter(comp => 
+            const destacadas = todasComparaciones.filter(comp =>
                 comp.estado && comp.estado.toLowerCase() === 'destacado'
             );
 
-            const recientes = todasComparaciones.filter(comp => 
+            const recientes = todasComparaciones.filter(comp =>
                 comp.estado && comp.estado.toLowerCase() === 'reciente'
             ).sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
 
@@ -159,7 +159,7 @@ const Usuario = () => {
     const marcarComoDestacado = async (comparacion) => {
         try {
             const token = getStoredToken();
-            const endpoint = comparacion.tipo === 'individual' 
+            const endpoint = comparacion.tipo === 'individual'
                 ? `${API_ENDPOINTS.MARCAR_INDIVIDUAL_DESTACADO}/${comparacion.id}/`
                 : `${API_ENDPOINTS.MARCAR_GRUPAL_DESTACADO}/${comparacion.id}/`;
 
@@ -186,7 +186,7 @@ const Usuario = () => {
     const marcarComoReciente = async (comparacion) => {
         try {
             const token = getStoredToken();
-            const endpoint = comparacion.tipo === 'individual' 
+            const endpoint = comparacion.tipo === 'individual'
                 ? `${API_ENDPOINTS.MARCAR_INDIVIDUAL_RECIENTE}/${comparacion.id}/`
                 : `${API_ENDPOINTS.MARCAR_GRUPAL_RECIENTE}/${comparacion.id}/`;
 
@@ -215,7 +215,7 @@ const Usuario = () => {
 
         try {
             const token = getStoredToken();
-            const endpoint = comparacionToDelete.tipo === 'individual' 
+            const endpoint = comparacionToDelete.tipo === 'individual'
                 ? `${API_ENDPOINTS.MARCAR_INDIVIDUAL_OCULTO}/${comparacionToDelete.id}/`
                 : `${API_ENDPOINTS.MARCAR_GRUPAL_OCULTO}/${comparacionToDelete.id}/`;
 
@@ -259,11 +259,11 @@ const Usuario = () => {
 
         if (dateToCompare.getTime() === hoy.getTime()) return 'Hoy';
         if (dateToCompare.getTime() === ayer.getTime()) return 'Ayer';
-        
-        return date.toLocaleDateString('es-ES', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric' 
+
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
         });
     };
 
@@ -456,14 +456,14 @@ const Usuario = () => {
                 }}
             >
                 <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
-                    ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"? 
+                    ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"?
                 </Text>
             </Modal>
-
             <ModalSeleccionIA
                 isVisible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
                 onModelSelect={handleModelSelect}
+                usuarioId={userProfile?.usuario_id}
             />
         </>
     );
