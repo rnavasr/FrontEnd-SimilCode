@@ -19,7 +19,9 @@ export const API_ENDPOINTS = {
   MARCAR_GRUPAL_DESTACADO: '/app/usuarios/comparacion_grupal_destacado',
   MARCAR_GRUPAL_OCULTO: '/app/usuarios/comparacion_grupal_oculto',
   LISTAR_MODELOS_ADMIN: '/app/usuarios/listar_modelos_admin/',
-  LISTAR_MODELOS_USUARIO: '/app/usuarios/listar_modelos_usuario'
+  LISTAR_MODELOS_USUARIO: '/app/usuarios/listar_modelos_usuario',
+  LISTAR_LENGUAJES: '/app/usuarios/listar_lenguajes',  // + /{usuario_id}
+  CREAR_COMPARACION_INDIVIDUAL: '/app/usuarios/crear_comparaciones_individuales/'
 };
 
 // Función helper para construir URLs completas

@@ -1,48 +1,175 @@
-import React, { useState } from 'react';
-import { Button, Select, Typography, Space, Card, message, Spin, Divider, Tag } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Select, Typography, Space, Card, message, Spin, Divider, Tag, Upload, Radio, Input } from 'antd';
 import {
     ArrowLeftOutlined,
     PlayCircleOutlined,
     CodeOutlined,
     ThunderboltOutlined,
     CheckCircleOutlined,
-    WarningOutlined
+    WarningOutlined,
+    UploadOutlined,
+    FileTextOutlined
 } from '@ant-design/icons';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
-const LANGUAGES = [
-    { value: 'python', label: 'Python', icon: '🐍' },
-    { value: 'javascript', label: 'JavaScript', icon: '📜' },
-    { value: 'java', label: 'Java', icon: '☕' },
-    { value: 'cpp', label: 'C++', icon: '⚡' },
-    { value: 'csharp', label: 'C#', icon: '🎯' },
-    { value: 'go', label: 'Go', icon: '🔷' },
-    { value: 'rust', label: 'Rust', icon: '🦀' },
-    { value: 'typescript', label: 'TypeScript', icon: '💙' }
-];
-
 const CodeComparisonView = ({ model, onBack, userProfile }) => {
+    // Estados principales
     const [code1, setCode1] = useState('');
     const [code2, setCode2] = useState('');
-    const [language, setLanguage] = useState('python');
+    const [file1, setFile1] = useState(null);
+    const [file2, setFile2] = useState(null);
+    const [inputMode1, setInputMode1] = useState('text');
+    const [inputMode2, setInputMode2] = useState('text');
+    const [languageId, setLanguageId] = useState(null);
+    const [languages, setLanguages] = useState([]);
+    const [loadingLanguages, setLoadingLanguages] = useState(true);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
+    const [comparisonName, setComparisonName] = useState('');
 
+    // Cargar lenguajes disponibles
+    useEffect(() => {
+        const fetchLanguages = async () => {
+            if (!userProfile?.usuario_id) {
+                console.log('No hay usuario_id disponible');
+                setLoadingLanguages(false);
+                return;
+            }
+            
+            try {
+                setLoadingLanguages(true);
+                const token = localStorage.getItem('token');
+                const API_BASE_URL = 'http://localhost:8000';
+                const url = `${API_BASE_URL}/app/usuarios/listar_lenguajes/${userProfile.usuario_id}`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar lenguajes');
+                }
+
+                const data = await response.json();
+                setLanguages(data.lenguajes || []);
+                
+                if (data.lenguajes && data.lenguajes.length > 0) {
+                    setLanguageId(data.lenguajes[0].id);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                message.error('No se pudieron cargar los lenguajes');
+            } finally {
+                setLoadingLanguages(false);
+            }
+        };
+
+        fetchLanguages();
+    }, [userProfile]);
+
+    // Obtener icono del lenguaje
+    const getLanguageIcon = (name) => {
+        const icons = {
+            'python': '🐍',
+            'javascript': '📜',
+            'java': '☕',
+            'cpp': '⚡',
+            'c++': '⚡',
+            'csharp': '🎯',
+            'c#': '🎯',
+            'go': '🔷',
+            'rust': '🦀',
+            'typescript': '💙'
+        };
+        return icons[name.toLowerCase()] || '📝';
+    };
+
+    // Manejar carga de archivo
+    const handleFileUpload = (file, codeNumber) => {
+        if (codeNumber === 1) {
+            setFile1(file);
+            setCode1('');
+        } else {
+            setFile2(file);
+            setCode2('');
+        }
+        return false;
+    };
+
+    // Manejar comparación
     const handleCompare = async () => {
-        if (!code1.trim() || !code2.trim()) {
-            message.warning('Por favor, ingresa ambos códigos para comparar');
+        // Validaciones
+        if (!languageId) {
+            message.warning('Por favor, selecciona un lenguaje de programación');
+            return;
+        }
+
+        const hasCode1 = (inputMode1 === 'text' && code1.trim()) || (inputMode1 === 'file' && file1);
+        const hasCode2 = (inputMode2 === 'text' && code2.trim()) || (inputMode2 === 'file' && file2);
+
+        if (!hasCode1 || !hasCode2) {
+            message.warning('Por favor, proporciona ambos códigos (texto o archivo)');
+            return;
+        }
+
+        if (!model?.id) {
+            message.error('No se ha seleccionado un modelo de IA');
             return;
         }
 
         setLoading(true);
         
         try {
-            // Simulación de llamada API
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            const API_BASE_URL = 'http://localhost:8000';
             
+            formData.append('usuario_id', userProfile.usuario_id);
+            formData.append('modelo_ia_id', model.id);
+            formData.append('lenguaje_id', languageId);
+            
+            if (comparisonName.trim()) {
+                formData.append('nombre_comparacion', comparisonName.trim());
+            }
+            
+            if (inputMode1 === 'text') {
+                formData.append('codigo_1', code1);
+            } else if (file1) {
+                formData.append('archivo_1', file1);
+            }
+            
+            if (inputMode2 === 'text') {
+                formData.append('codigo_2', code2);
+            } else if (file2) {
+                formData.append('archivo_2', file2);
+            }
+
+            const url = `${API_BASE_URL}/app/usuarios/crear_comparaciones_individuales/`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al crear la comparación');
+            }
+
+            message.success('¡Comparación creada exitosamente!');
+            
+            // Simular resultado para mostrar (reemplazar con data real del backend)
             const mockResult = {
+                id: data.id,
+                nombre_comparacion: data.nombre_comparacion,
                 similarity: {
                     similarity_score: Math.floor(Math.random() * 40) + 60,
                     explanation: 'Los códigos muestran una estructura similar con algunas variaciones en la implementación.',
@@ -82,11 +209,10 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             };
 
             setResult(mockResult);
-            message.success('¡Comparación completada!');
             
         } catch (error) {
             console.error('Error:', error);
-            message.error('Error al comparar códigos. Por favor, intenta nuevamente.');
+            message.error(error.message || 'Error al comparar códigos. Por favor, intenta nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -131,18 +257,39 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                 </div>
 
                 <Select
-                    value={language}
-                    onChange={setLanguage}
+                    value={languageId}
+                    onChange={setLanguageId}
                     className="code-comparison-language-select"
                     size="large"
+                    loading={loadingLanguages}
+                    placeholder="Selecciona lenguaje"
+                    disabled={loadingLanguages}
                 >
-                    {LANGUAGES.map(lang => (
-                        <Option key={lang.value} value={lang.value}>
-                            <span style={{ marginRight: '8px' }}>{lang.icon}</span>
-                            {lang.label}
+                    {languages.map(lang => (
+                        <Option key={lang.id} value={lang.id}>
+                            <span style={{ marginRight: '8px' }}>{getLanguageIcon(lang.nombre)}</span>
+                            {lang.nombre}
                         </Option>
                     ))}
                 </Select>
+            </div>
+
+            {/* Campo de nombre de comparación */}
+            <div style={{ marginBottom: '24px' }}>
+                <Card className="code-editor-card" style={{ borderRadius: '12px' }}>
+                    <Space direction="vertical" style={{ width: '100%' }} size="small">
+                        <Text strong style={{ fontSize: '14px', color: '#262626' }}>
+                            Nombre de la comparación (opcional)
+                        </Text>
+                        <Input
+                            value={comparisonName}
+                            onChange={(e) => setComparisonName(e.target.value)}
+                            placeholder="Ej: Comparación algoritmos de búsqueda"
+                            size="large"
+                            style={{ borderRadius: '8px' }}
+                        />
+                    </Space>
+                </Card>
             </div>
 
             {/* Editores de código */}
@@ -157,12 +304,52 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     }
                     className="code-editor-card"
                 >
-                    <textarea
-                        value={code1}
-                        onChange={(e) => setCode1(e.target.value)}
-                        placeholder={`// Pega aquí tu código en ${LANGUAGES.find(l => l.value === language)?.label || 'el lenguaje seleccionado'}...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
-                        className="code-editor-textarea"
-                    />
+                    <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                        <Radio.Group 
+                            value={inputMode1} 
+                            onChange={(e) => {
+                                setInputMode1(e.target.value);
+                                if (e.target.value === 'text') {
+                                    setFile1(null);
+                                } else {
+                                    setCode1('');
+                                }
+                            }}
+                            buttonStyle="solid"
+                            style={{ width: '100%' }}
+                        >
+                            <Radio.Button value="text" style={{ width: '50%', textAlign: 'center' }}>
+                                <FileTextOutlined /> Pegar Texto
+                            </Radio.Button>
+                            <Radio.Button value="file" style={{ width: '50%', textAlign: 'center' }}>
+                                <UploadOutlined /> Subir Archivo
+                            </Radio.Button>
+                        </Radio.Group>
+
+                        {inputMode1 === 'text' ? (
+                            <textarea
+                                value={code1}
+                                onChange={(e) => setCode1(e.target.value)}
+                                placeholder={`// Pega aquí tu código en ${languages.find(l => l.id === languageId)?.nombre || 'el lenguaje seleccionado'}...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
+                                className="code-editor-textarea"
+                            />
+                        ) : (
+                            <Upload
+                                beforeUpload={(file) => handleFileUpload(file, 1)}
+                                onRemove={() => setFile1(null)}
+                                maxCount={1}
+                                fileList={file1 ? [{ uid: '1', name: file1.name, status: 'done' }] : []}
+                            >
+                                <Button 
+                                    icon={<UploadOutlined />} 
+                                    style={{ width: '100%', height: '45px', borderRadius: '8px' }}
+                                    size="large"
+                                >
+                                    {file1 ? `📄 ${file1.name}` : 'Seleccionar archivo de código'}
+                                </Button>
+                            </Upload>
+                        )}
+                    </Space>
                 </Card>
 
                 {/* Editor 2 */}
@@ -175,12 +362,52 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     }
                     className="code-editor-card"
                 >
-                    <textarea
-                        value={code2}
-                        onChange={(e) => setCode2(e.target.value)}
-                        placeholder={`// Pega aquí el segundo código para comparar...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
-                        className="code-editor-textarea"
-                    />
+                    <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                        <Radio.Group 
+                            value={inputMode2} 
+                            onChange={(e) => {
+                                setInputMode2(e.target.value);
+                                if (e.target.value === 'text') {
+                                    setFile2(null);
+                                } else {
+                                    setCode2('');
+                                }
+                            }}
+                            buttonStyle="solid"
+                            style={{ width: '100%' }}
+                        >
+                            <Radio.Button value="text" style={{ width: '50%', textAlign: 'center' }}>
+                                <FileTextOutlined /> Pegar Texto
+                            </Radio.Button>
+                            <Radio.Button value="file" style={{ width: '50%', textAlign: 'center' }}>
+                                <UploadOutlined /> Subir Archivo
+                            </Radio.Button>
+                        </Radio.Group>
+
+                        {inputMode2 === 'text' ? (
+                            <textarea
+                                value={code2}
+                                onChange={(e) => setCode2(e.target.value)}
+                                placeholder={`// Pega aquí el segundo código para comparar...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
+                                className="code-editor-textarea"
+                            />
+                        ) : (
+                            <Upload
+                                beforeUpload={(file) => handleFileUpload(file, 2)}
+                                onRemove={() => setFile2(null)}
+                                maxCount={1}
+                                fileList={file2 ? [{ uid: '2', name: file2.name, status: 'done' }] : []}
+                            >
+                                <Button 
+                                    icon={<UploadOutlined />} 
+                                    style={{ width: '100%', height: '45px', borderRadius: '8px' }}
+                                    size="large"
+                                >
+                                    {file2 ? `📄 ${file2.name}` : 'Seleccionar archivo de código'}
+                                </Button>
+                            </Upload>
+                        )}
+                    </Space>
                 </Card>
             </div>
 
@@ -192,9 +419,16 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     icon={loading ? <Spin /> : <PlayCircleOutlined />}
                     onClick={handleCompare}
                     loading={loading}
-                    disabled={!code1.trim() || !code2.trim()}
+                    disabled={loadingLanguages || !languageId}
                     className="compare-button"
-                    style={{ background: model.color }}
+                    style={{ 
+                        background: model.color,
+                        borderColor: model.color,
+                        height: '48px',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        borderRadius: '10px'
+                    }}
                 >
                     {loading ? 'Analizando...' : 'Comparar Códigos'}
                 </Button>
@@ -206,6 +440,14 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     <Title level={3} className="results-title">
                         Resultados del Análisis
                     </Title>
+
+                    {result.nombre_comparacion && (
+                        <Card style={{ marginBottom: '24px', borderRadius: '12px' }}>
+                            <Text strong style={{ fontSize: '15px' }}>
+                                📋 {result.nombre_comparacion}
+                            </Text>
+                        </Card>
+                    )}
 
                     {/* Similitud */}
                     <Card className="results-card">
@@ -223,6 +465,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                                 <Tag
                                     color={getPlagiarismColor(result.similarity.plagiarism_likelihood)}
                                     className="plagiarism-tag"
+                                    style={{ fontSize: '13px', padding: '4px 12px' }}
                                 >
                                     Probabilidad de plagio: {result.similarity.plagiarism_likelihood.toUpperCase()}
                                 </Tag>
