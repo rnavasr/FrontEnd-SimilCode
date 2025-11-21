@@ -9,6 +9,7 @@ import {
     EditOutlined
 } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
+import '../Estilos/CodeComparisonView.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -77,23 +78,6 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             titleInputRef.current.select();
         }
     }, [isEditingTitle]);
-
-    // Obtener icono del lenguaje
-    const getLanguageIcon = (name) => {
-        const icons = {
-            'python': '🐍',
-            'javascript': '📜',
-            'java': '☕',
-            'cpp': '⚡',
-            'c++': '⚡',
-            'csharp': '🎯',
-            'c#': '🎯',
-            'go': '🔷',
-            'rust': '🦀',
-            'typescript': '💙'
-        };
-        return icons[name.toLowerCase()] || '📝';
-    };
 
     // Obtener lenguaje de Monaco
     const getMonacoLanguage = (languageId) => {
