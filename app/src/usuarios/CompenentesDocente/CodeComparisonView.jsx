@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Select, Typography, Space, Card, message, Spin, Divider, Tag, Upload, Radio, Input } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, Select, Typography, Space, Card, message, Spin, Divider, Tag } from 'antd';
 import {
     ArrowLeftOutlined,
     PlayCircleOutlined,
-    CodeOutlined,
     ThunderboltOutlined,
     CheckCircleOutlined,
     WarningOutlined,
-    UploadOutlined,
-    FileTextOutlined
+    EditOutlined
 } from '@ant-design/icons';
+import Editor from '@monaco-editor/react';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -18,16 +17,16 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
     // Estados principales
     const [code1, setCode1] = useState('');
     const [code2, setCode2] = useState('');
-    const [file1, setFile1] = useState(null);
-    const [file2, setFile2] = useState(null);
-    const [inputMode1, setInputMode1] = useState('text');
-    const [inputMode2, setInputMode2] = useState('text');
     const [languageId, setLanguageId] = useState(null);
     const [languages, setLanguages] = useState([]);
     const [loadingLanguages, setLoadingLanguages] = useState(true);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
     const [comparisonName, setComparisonName] = useState('');
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [dragOver1, setDragOver1] = useState(false);
+    const [dragOver2, setDragOver2] = useState(false);
+    const titleInputRef = useRef(null);
 
     // Cargar lenguajes disponibles
     useEffect(() => {
@@ -71,6 +70,14 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
         fetchLanguages();
     }, [userProfile]);
 
+    // Focus en input de título cuando se activa edición
+    useEffect(() => {
+        if (isEditingTitle && titleInputRef.current) {
+            titleInputRef.current.focus();
+            titleInputRef.current.select();
+        }
+    }, [isEditingTitle]);
+
     // Obtener icono del lenguaje
     const getLanguageIcon = (name) => {
         const icons = {
@@ -88,16 +95,101 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
         return icons[name.toLowerCase()] || '📝';
     };
 
-    // Manejar carga de archivo
-    const handleFileUpload = (file, codeNumber) => {
+    // Obtener lenguaje de Monaco
+    const getMonacoLanguage = (languageId) => {
+        const lang = languages.find(l => l.id === languageId);
+        if (!lang) return 'plaintext';
+        
+        const mapping = {
+            'python': 'python',
+            'javascript': 'javascript',
+            'typescript': 'typescript',
+            'java': 'java',
+            'cpp': 'cpp',
+            'c++': 'cpp',
+            'csharp': 'csharp',
+            'c#': 'csharp',
+            'go': 'go',
+            'rust': 'rust',
+            'html': 'html',
+            'css': 'css',
+            'json': 'json',
+            'sql': 'sql'
+        };
+        
+        return mapping[lang.nombre.toLowerCase()] || 'plaintext';
+    };
+
+    // Manejar drag & drop
+    const handleDragOver = (e, codeNumber) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (codeNumber === 1) {
-            setFile1(file);
-            setCode1('');
+            setDragOver1(true);
         } else {
-            setFile2(file);
-            setCode2('');
+            setDragOver2(true);
         }
-        return false;
+    };
+
+    const handleDragLeave = (e, codeNumber) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (codeNumber === 1) {
+            setDragOver1(false);
+        } else {
+            setDragOver2(false);
+        }
+    };
+
+    const handleDrop = async (e, codeNumber) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (codeNumber === 1) {
+            setDragOver1(false);
+        } else {
+            setDragOver2(false);
+        }
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            const reader = new FileReader();
+            
+            reader.onload = (event) => {
+                const content = event.target.result;
+                if (codeNumber === 1) {
+                    setCode1(content);
+                } else {
+                    setCode2(content);
+                }
+                message.success(`Archivo "${file.name}" cargado exitosamente`);
+            };
+            
+            reader.onerror = () => {
+                message.error('Error al leer el archivo');
+            };
+            
+            reader.readAsText(file);
+        }
+    };
+
+    // Manejar título
+    const handleTitleClick = () => {
+        setIsEditingTitle(true);
+    };
+
+    const handleTitleBlur = () => {
+        setIsEditingTitle(false);
+        if (!comparisonName.trim()) {
+            setComparisonName('Sin título');
+        }
+    };
+
+    const handleTitleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.target.blur();
+        }
     };
 
     // Manejar comparación
@@ -108,11 +200,8 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             return;
         }
 
-        const hasCode1 = (inputMode1 === 'text' && code1.trim()) || (inputMode1 === 'file' && file1);
-        const hasCode2 = (inputMode2 === 'text' && code2.trim()) || (inputMode2 === 'file' && file2);
-
-        if (!hasCode1 || !hasCode2) {
-            message.warning('Por favor, proporciona ambos códigos (texto o archivo)');
+        if (!code1.trim() || !code2.trim()) {
+            message.warning('Por favor, proporciona ambos códigos');
             return;
         }
 
@@ -132,21 +221,10 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             formData.append('modelo_ia_id', model.id);
             formData.append('lenguaje_id', languageId);
             
-            if (comparisonName.trim()) {
-                formData.append('nombre_comparacion', comparisonName.trim());
-            }
-            
-            if (inputMode1 === 'text') {
-                formData.append('codigo_1', code1);
-            } else if (file1) {
-                formData.append('archivo_1', file1);
-            }
-            
-            if (inputMode2 === 'text') {
-                formData.append('codigo_2', code2);
-            } else if (file2) {
-                formData.append('archivo_2', file2);
-            }
+            const finalName = comparisonName.trim() || 'Sin título';
+            formData.append('nombre_comparacion', finalName);
+            formData.append('codigo_1', code1);
+            formData.append('codigo_2', code2);
 
             const url = `${API_BASE_URL}/app/usuarios/crear_comparaciones_individuales/`;
 
@@ -166,10 +244,10 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
 
             message.success('¡Comparación creada exitosamente!');
             
-            // Simular resultado para mostrar (reemplazar con data real del backend)
+            // Simular resultado para mostrar
             const mockResult = {
                 id: data.id,
-                nombre_comparacion: data.nombre_comparacion,
+                nombre_comparacion: finalName,
                 similarity: {
                     similarity_score: Math.floor(Math.random() * 40) + 60,
                     explanation: 'Los códigos muestran una estructura similar con algunas variaciones en la implementación.',
@@ -238,18 +316,39 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
         <div className="code-comparison-container">
             {/* Header */}
             <div className="code-comparison-header">
-                <div className="code-comparison-header-left">
+                <div className="code-comparison-header-content">
                     <Button
                         icon={<ArrowLeftOutlined />}
                         onClick={onBack}
                         className="code-comparison-back-button"
+                        type="text"
                     >
                         Volver
                     </Button>
-                    <div>
-                        <Title level={3} className="code-comparison-title">
-                            Comparación de Código
-                        </Title>
+
+                    <div className="code-comparison-title-section">
+                        {isEditingTitle ? (
+                            <input
+                                ref={titleInputRef}
+                                type="text"
+                                value={comparisonName}
+                                onChange={(e) => setComparisonName(e.target.value)}
+                                onBlur={handleTitleBlur}
+                                onKeyDown={handleTitleKeyDown}
+                                className="code-comparison-title-input"
+                                placeholder="Sin título"
+                            />
+                        ) : (
+                            <div 
+                                className="code-comparison-title-display"
+                                onClick={handleTitleClick}
+                            >
+                                <span className="code-comparison-title-text">
+                                    {comparisonName || 'Sin título'}
+                                </span>
+                                <EditOutlined className="code-comparison-title-icon" />
+                            </div>
+                        )}
                         <Text className="code-comparison-subtitle">
                             Usando {model.name} {model.icon}
                         </Text>
@@ -267,148 +366,93 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                 >
                     {languages.map(lang => (
                         <Option key={lang.id} value={lang.id}>
-                            <span style={{ marginRight: '8px' }}>{getLanguageIcon(lang.nombre)}</span>
                             {lang.nombre}
                         </Option>
                     ))}
                 </Select>
             </div>
 
-            {/* Campo de nombre de comparación */}
-            <div style={{ marginBottom: '24px' }}>
-                <Card className="code-editor-card" style={{ borderRadius: '12px' }}>
-                    <Space direction="vertical" style={{ width: '100%' }} size="small">
-                        <Text strong style={{ fontSize: '14px', color: '#262626' }}>
-                            Nombre de la comparación (opcional)
-                        </Text>
-                        <Input
-                            value={comparisonName}
-                            onChange={(e) => setComparisonName(e.target.value)}
-                            placeholder="Ej: Comparación algoritmos de búsqueda"
-                            size="large"
-                            style={{ borderRadius: '8px' }}
-                        />
-                    </Space>
-                </Card>
-            </div>
-
-            {/* Editores de código */}
+            {/* Editores de código con Monaco */}
             <div className="code-editors-grid">
                 {/* Editor 1 */}
-                <Card
-                    title={
-                        <Space>
-                            <CodeOutlined />
-                            <span>Código 1</span>
-                        </Space>
-                    }
-                    className="code-editor-card"
+                <div 
+                    className={`code-editor-wrapper ${dragOver1 ? 'drag-over' : ''}`}
+                    onDragOver={(e) => handleDragOver(e, 1)}
+                    onDragLeave={(e) => handleDragLeave(e, 1)}
+                    onDrop={(e) => handleDrop(e, 1)}
                 >
-                    <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                        <Radio.Group 
-                            value={inputMode1} 
-                            onChange={(e) => {
-                                setInputMode1(e.target.value);
-                                if (e.target.value === 'text') {
-                                    setFile1(null);
-                                } else {
-                                    setCode1('');
-                                }
+                    <div className="code-editor-header">
+                        <span className="code-editor-label">Código 1</span>
+                        <span className="code-editor-hint">Arrastra un archivo o escribe código</span>
+                    </div>
+                    <div className="monaco-editor-container">
+                        <Editor
+                            height="400px"
+                            language={getMonacoLanguage(languageId)}
+                            value={code1}
+                            onChange={(value) => setCode1(value || '')}
+                            theme="vs-dark"
+                            options={{
+                                minimap: { enabled: false },
+                                fontSize: 14,
+                                lineNumbers: 'on',
+                                roundedSelection: true,
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true,
+                                tabSize: 2,
+                                wordWrap: 'on'
                             }}
-                            buttonStyle="solid"
-                            style={{ width: '100%' }}
-                        >
-                            <Radio.Button value="text" style={{ width: '50%', textAlign: 'center' }}>
-                                <FileTextOutlined /> Pegar Texto
-                            </Radio.Button>
-                            <Radio.Button value="file" style={{ width: '50%', textAlign: 'center' }}>
-                                <UploadOutlined /> Subir Archivo
-                            </Radio.Button>
-                        </Radio.Group>
-
-                        {inputMode1 === 'text' ? (
-                            <textarea
-                                value={code1}
-                                onChange={(e) => setCode1(e.target.value)}
-                                placeholder={`// Pega aquí tu código en ${languages.find(l => l.id === languageId)?.nombre || 'el lenguaje seleccionado'}...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
-                                className="code-editor-textarea"
-                            />
-                        ) : (
-                            <Upload
-                                beforeUpload={(file) => handleFileUpload(file, 1)}
-                                onRemove={() => setFile1(null)}
-                                maxCount={1}
-                                fileList={file1 ? [{ uid: '1', name: file1.name, status: 'done' }] : []}
-                            >
-                                <Button 
-                                    icon={<UploadOutlined />} 
-                                    style={{ width: '100%', height: '45px', borderRadius: '8px' }}
-                                    size="large"
-                                >
-                                    {file1 ? `📄 ${file1.name}` : 'Seleccionar archivo de código'}
-                                </Button>
-                            </Upload>
-                        )}
-                    </Space>
-                </Card>
+                        />
+                    </div>
+                    {dragOver1 && (
+                        <div className="drag-overlay">
+                            <div className="drag-overlay-content">
+                                <div className="drag-overlay-icon">📁</div>
+                                <div className="drag-overlay-text">Suelta el archivo aquí</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 {/* Editor 2 */}
-                <Card
-                    title={
-                        <Space>
-                            <CodeOutlined />
-                            <span>Código 2</span>
-                        </Space>
-                    }
-                    className="code-editor-card"
+                <div 
+                    className={`code-editor-wrapper ${dragOver2 ? 'drag-over' : ''}`}
+                    onDragOver={(e) => handleDragOver(e, 2)}
+                    onDragLeave={(e) => handleDragLeave(e, 2)}
+                    onDrop={(e) => handleDrop(e, 2)}
                 >
-                    <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                        <Radio.Group 
-                            value={inputMode2} 
-                            onChange={(e) => {
-                                setInputMode2(e.target.value);
-                                if (e.target.value === 'text') {
-                                    setFile2(null);
-                                } else {
-                                    setCode2('');
-                                }
+                    <div className="code-editor-header">
+                        <span className="code-editor-label">Código 2</span>
+                        <span className="code-editor-hint">Arrastra un archivo o escribe código</span>
+                    </div>
+                    <div className="monaco-editor-container">
+                        <Editor
+                            height="400px"
+                            language={getMonacoLanguage(languageId)}
+                            value={code2}
+                            onChange={(value) => setCode2(value || '')}
+                            theme="vs-dark"
+                            options={{
+                                minimap: { enabled: false },
+                                fontSize: 14,
+                                lineNumbers: 'on',
+                                roundedSelection: true,
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true,
+                                tabSize: 2,
+                                wordWrap: 'on'
                             }}
-                            buttonStyle="solid"
-                            style={{ width: '100%' }}
-                        >
-                            <Radio.Button value="text" style={{ width: '50%', textAlign: 'center' }}>
-                                <FileTextOutlined /> Pegar Texto
-                            </Radio.Button>
-                            <Radio.Button value="file" style={{ width: '50%', textAlign: 'center' }}>
-                                <UploadOutlined /> Subir Archivo
-                            </Radio.Button>
-                        </Radio.Group>
-
-                        {inputMode2 === 'text' ? (
-                            <textarea
-                                value={code2}
-                                onChange={(e) => setCode2(e.target.value)}
-                                placeholder={`// Pega aquí el segundo código para comparar...\n\nfunction ejemplo() {\n    // Tu código aquí\n}`}
-                                className="code-editor-textarea"
-                            />
-                        ) : (
-                            <Upload
-                                beforeUpload={(file) => handleFileUpload(file, 2)}
-                                onRemove={() => setFile2(null)}
-                                maxCount={1}
-                                fileList={file2 ? [{ uid: '2', name: file2.name, status: 'done' }] : []}
-                            >
-                                <Button 
-                                    icon={<UploadOutlined />} 
-                                    style={{ width: '100%', height: '45px', borderRadius: '8px' }}
-                                    size="large"
-                                >
-                                    {file2 ? `📄 ${file2.name}` : 'Seleccionar archivo de código'}
-                                </Button>
-                            </Upload>
-                        )}
-                    </Space>
-                </Card>
+                        />
+                    </div>
+                    {dragOver2 && (
+                        <div className="drag-overlay">
+                            <div className="drag-overlay-content">
+                                <div className="drag-overlay-icon">📁</div>
+                                <div className="drag-overlay-text">Suelta el archivo aquí</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Botón de comparar */}
@@ -440,14 +484,6 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     <Title level={3} className="results-title">
                         Resultados del Análisis
                     </Title>
-
-                    {result.nombre_comparacion && (
-                        <Card style={{ marginBottom: '24px', borderRadius: '12px' }}>
-                            <Text strong style={{ fontSize: '15px' }}>
-                                📋 {result.nombre_comparacion}
-                            </Text>
-                        </Card>
-                    )}
 
                     {/* Similitud */}
                     <Card className="results-card">
