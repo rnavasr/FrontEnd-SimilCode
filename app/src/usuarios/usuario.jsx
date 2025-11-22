@@ -358,12 +358,21 @@ const Usuario = () => {
 
                 <Layout style={{ marginLeft: 280, background: '#1a1a1a' }}>
                     <Content style={{
-                        padding: (showChatManager || selectedModel) ? '90px' : '60px 80px',
+                        // Padding dinámico según la vista
+                        padding: selectedModel 
+                            ? '0'  // Sin padding para CodeComparisonView
+                            : showChatManager 
+                                ? '40px 60px'  // Padding reducido para ChatManager
+                                : '60px 80px',  // Padding normal para Home
                         minHeight: '100vh',
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: (showChatManager || selectedModel) ? 'flex-start' : 'center',
-                        alignItems: 'center'
+                        justifyContent: selectedModel ? 'flex-start' : showChatManager ? 'flex-start' : 'center',
+                        alignItems: selectedModel ? 'stretch' : 'center',
+                        // Ancho completo cuando hay CodeComparisonView
+                        width: '100%',
+                        maxWidth: '100%',
+                        overflow: selectedModel ? 'auto' : 'visible'
                     }}>
                         {showChatManager ? (
                             <ChatManagerView
@@ -376,11 +385,18 @@ const Usuario = () => {
                                 formatFecha={formatFecha}
                             />
                         ) : selectedModel ? (
-                            <CodeComparisonView
-                                model={selectedModel}
-                                onBack={handleBackToHome}
-                                userProfile={userProfile}
-                            />
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column'
+                            }}>
+                                <CodeComparisonView
+                                    model={selectedModel}
+                                    onBack={handleBackToHome}
+                                    userProfile={userProfile}
+                                />
+                            </div>
                         ) : (
                             <div style={{
                                 maxWidth: '900px',
