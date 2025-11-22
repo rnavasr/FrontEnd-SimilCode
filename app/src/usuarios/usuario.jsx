@@ -108,6 +108,14 @@ const Usuario = () => {
         }
     };
 
+    // Función para refrescar comparaciones desde componentes hijos
+    const refreshComparaciones = () => {
+        if (userProfile && userProfile.usuario_id) {
+            console.log('🔄 Actualizando lista de comparaciones...');
+            fetchComparaciones(userProfile.usuario_id);
+        }
+    };
+
     useEffect(() => {
         fetchUserProfile();
     }, []);
@@ -142,9 +150,8 @@ const Usuario = () => {
     const handleBackToHome = () => {
         setSelectedModel(null);
         setShowChatManager(false);
-        if (userProfile && userProfile.usuario_id) {
-            fetchComparaciones(userProfile.usuario_id);
-        }
+        // Refrescar comparaciones al volver al home
+        refreshComparaciones();
     };
 
     const handleSearchChats = () => {
@@ -173,7 +180,7 @@ const Usuario = () => {
 
             if (response.ok) {
                 message.success('Marcado como destacado');
-                fetchComparaciones(userProfile.usuario_id);
+                refreshComparaciones();
             } else {
                 message.error('Error al marcar como destacado');
             }
@@ -200,7 +207,7 @@ const Usuario = () => {
 
             if (response.ok) {
                 message.success('Marcado como reciente');
-                fetchComparaciones(userProfile.usuario_id);
+                refreshComparaciones();
             } else {
                 message.error('Error al marcar como reciente');
             }
@@ -229,7 +236,7 @@ const Usuario = () => {
 
             if (response.ok) {
                 message.success('Comparación eliminada');
-                fetchComparaciones(userProfile.usuario_id);
+                refreshComparaciones();
                 setDeleteModalVisible(false);
                 setComparacionToDelete(null);
             } else {
@@ -395,6 +402,7 @@ const Usuario = () => {
                                     model={selectedModel}
                                     onBack={handleBackToHome}
                                     userProfile={userProfile}
+                                    refreshComparaciones={refreshComparaciones}
                                 />
                             </div>
                         ) : (

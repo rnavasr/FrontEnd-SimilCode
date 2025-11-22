@@ -9,12 +9,13 @@ import {
     EditOutlined
 } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
+import { API_ENDPOINTS, getStoredToken, buildApiUrl } from '../../../config';
 import '../Estilos/Css_Comparacion_Individual/CodeComparisonView.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
-const CodeComparisonView = ({ model, onBack, userProfile }) => {
+const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }) => {
     // Estados principales
     const [code1, setCode1] = useState('');
     const [code2, setCode2] = useState('');
@@ -27,6 +28,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [dragOver1, setDragOver1] = useState(false);
     const [dragOver2, setDragOver2] = useState(false);
+    const [isLocked, setIsLocked] = useState(false); // Estado de bloqueo
     const titleInputRef = useRef(null);
 
     // Cargar lenguajes disponibles
@@ -37,13 +39,12 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                 setLoadingLanguages(false);
                 return;
             }
-            
+
             try {
                 setLoadingLanguages(true);
-                const token = localStorage.getItem('token');
-                const API_BASE_URL = 'http://localhost:8000';
-                const url = `${API_BASE_URL}/app/usuarios/listar_lenguajes/${userProfile.usuario_id}`;
-                
+                const token = getStoredToken();
+                const url = buildApiUrl(`${API_ENDPOINTS.LISTAR_LENGUAJES}/${userProfile.usuario_id}`);
+
                 const response = await fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -56,10 +57,11 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
 
                 const data = await response.json();
                 setLanguages(data.lenguajes || []);
-                
-                if (data.lenguajes && data.lenguajes.length > 0) {
-                    setLanguageId(data.lenguajes[0].id);
-                }
+
+                // No seleccionar ningún lenguaje por defecto
+                // if (data.lenguajes && data.lenguajes.length > 0) {
+                //     setLanguageId(data.lenguajes[0].id);
+                // }
             } catch (error) {
                 console.error('Error:', error);
                 message.error('No se pudieron cargar los lenguajes');
@@ -73,17 +75,17 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
 
     // Focus en input de título cuando se activa edición
     useEffect(() => {
-        if (isEditingTitle && titleInputRef.current) {
+        if (isEditingTitle && titleInputRef.current && !isLocked) {
             titleInputRef.current.focus();
             titleInputRef.current.select();
         }
-    }, [isEditingTitle]);
+    }, [isEditingTitle, isLocked]);
 
     // Obtener lenguaje de Monaco
     const getMonacoLanguage = (languageId) => {
         const lang = languages.find(l => l.id === languageId);
         if (!lang) return 'plaintext';
-        
+
         const mapping = {
             'python': 'python',
             'javascript': 'javascript',
@@ -100,12 +102,13 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             'json': 'json',
             'sql': 'sql'
         };
-        
+
         return mapping[lang.nombre.toLowerCase()] || 'plaintext';
     };
 
     // Manejar drag & drop
     const handleDragOver = (e, codeNumber) => {
+        if (isLocked) return;
         e.preventDefault();
         e.stopPropagation();
         if (codeNumber === 1) {
@@ -116,6 +119,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
     };
 
     const handleDragLeave = (e, codeNumber) => {
+        if (isLocked) return;
         e.preventDefault();
         e.stopPropagation();
         if (codeNumber === 1) {
@@ -126,9 +130,10 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
     };
 
     const handleDrop = async (e, codeNumber) => {
+        if (isLocked) return;
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (codeNumber === 1) {
             setDragOver1(false);
         } else {
@@ -139,7 +144,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
         if (files.length > 0) {
             const file = files[0];
             const reader = new FileReader();
-            
+
             reader.onload = (event) => {
                 const content = event.target.result;
                 if (codeNumber === 1) {
@@ -149,18 +154,20 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                 }
                 message.success(`Archivo "${file.name}" cargado exitosamente`);
             };
-            
+
             reader.onerror = () => {
                 message.error('Error al leer el archivo');
             };
-            
+
             reader.readAsText(file);
         }
     };
 
     // Manejar título
     const handleTitleClick = () => {
-        setIsEditingTitle(true);
+        if (!isLocked) {
+            setIsEditingTitle(true);
+        }
     };
 
     const handleTitleBlur = () => {
@@ -195,22 +202,21 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
         }
 
         setLoading(true);
-        
+
         try {
-            const token = localStorage.getItem('token');
+            const token = getStoredToken();
             const formData = new FormData();
-            const API_BASE_URL = 'http://localhost:8000';
-            
+
             formData.append('usuario_id', userProfile.usuario_id);
             formData.append('modelo_ia_id', model.id);
             formData.append('lenguaje_id', languageId);
-            
+
             const finalName = comparisonName.trim() || 'Sin título';
             formData.append('nombre_comparacion', finalName);
             formData.append('codigo_1', code1);
             formData.append('codigo_2', code2);
 
-            const url = `${API_BASE_URL}/app/usuarios/crear_comparaciones_individuales/`;
+            const url = buildApiUrl(API_ENDPOINTS.CREAR_COMPARACION_INDIVIDUAL);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -227,7 +233,15 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             }
 
             message.success('¡Comparación creada exitosamente!');
-            
+
+            // Bloquear el componente
+            setIsLocked(true);
+
+            // Actualizar lista de comparaciones
+            if (refreshComparaciones) {
+                refreshComparaciones();
+            }
+
             // Simular resultado para mostrar
             const mockResult = {
                 id: data.id,
@@ -271,7 +285,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             };
 
             setResult(mockResult);
-            
+
         } catch (error) {
             console.error('Error:', error);
             message.error(error.message || 'Error al comparar códigos. Por favor, intenta nuevamente.');
@@ -311,7 +325,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     </Button>
 
                     <div className="code-comparison-title-section">
-                        {isEditingTitle ? (
+                        {isEditingTitle && !isLocked ? (
                             <input
                                 ref={titleInputRef}
                                 type="text"
@@ -323,14 +337,15 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                                 placeholder="Sin título"
                             />
                         ) : (
-                            <div 
+                            <div
                                 className="code-comparison-title-display"
                                 onClick={handleTitleClick}
+                                style={{ cursor: isLocked ? 'default' : 'pointer' }}
                             >
                                 <span className="code-comparison-title-text">
                                     {comparisonName || 'Sin título'}
                                 </span>
-                                <EditOutlined className="code-comparison-title-icon" />
+                                {!isLocked && <EditOutlined className="code-comparison-title-icon" />}
                             </div>
                         )}
                         <Text className="code-comparison-subtitle">
@@ -345,8 +360,8 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     className="code-comparison-language-select"
                     size="large"
                     loading={loadingLanguages}
-                    placeholder="Selecciona lenguaje"
-                    disabled={loadingLanguages}
+                    placeholder="Selecciona un lenguaje"
+                    disabled={loadingLanguages || isLocked}
                 >
                     {languages.map(lang => (
                         <Option key={lang.id} value={lang.id}>
@@ -359,22 +374,25 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             {/* Editores de código con Monaco */}
             <div className="code-editors-grid">
                 {/* Editor 1 */}
-                <div 
-                    className={`code-editor-wrapper ${dragOver1 ? 'drag-over' : ''}`}
+                <div
+                    className={`code-editor-wrapper ${dragOver1 ? 'drag-over' : ''} ${isLocked ? 'locked' : ''}`}
                     onDragOver={(e) => handleDragOver(e, 1)}
                     onDragLeave={(e) => handleDragLeave(e, 1)}
                     onDrop={(e) => handleDrop(e, 1)}
+                    style={{ opacity: isLocked ? 0.7 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}
                 >
                     <div className="code-editor-header">
                         <span className="code-editor-label">Código 1</span>
-                        <span className="code-editor-hint">Arrastra un archivo o escribe código</span>
+                        <span className="code-editor-hint">
+                            Arrastra un archivo o escribe código
+                        </span>
                     </div>
                     <div className="monaco-editor-container">
                         <Editor
                             height="400px"
                             language={getMonacoLanguage(languageId)}
                             value={code1}
-                            onChange={(value) => setCode1(value || '')}
+                            onChange={(value) => !isLocked && setCode1(value || '')}
                             theme="vs-dark"
                             options={{
                                 minimap: { enabled: false },
@@ -384,11 +402,12 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                                 scrollBeyondLastLine: false,
                                 automaticLayout: true,
                                 tabSize: 2,
-                                wordWrap: 'on'
+                                wordWrap: 'on',
+                                readOnly: isLocked
                             }}
                         />
                     </div>
-                    {dragOver1 && (
+                    {dragOver1 && !isLocked && (
                         <div className="drag-overlay">
                             <div className="drag-overlay-content">
                                 <div className="drag-overlay-icon">📁</div>
@@ -399,22 +418,25 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                 </div>
 
                 {/* Editor 2 */}
-                <div 
-                    className={`code-editor-wrapper ${dragOver2 ? 'drag-over' : ''}`}
+                <div
+                    className={`code-editor-wrapper ${dragOver2 ? 'drag-over' : ''} ${isLocked ? 'locked' : ''}`}
                     onDragOver={(e) => handleDragOver(e, 2)}
                     onDragLeave={(e) => handleDragLeave(e, 2)}
                     onDrop={(e) => handleDrop(e, 2)}
+                    style={{ opacity: isLocked ? 0.7 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}
                 >
                     <div className="code-editor-header">
                         <span className="code-editor-label">Código 2</span>
-                        <span className="code-editor-hint">Arrastra un archivo o escribe código</span>
+                        <span className="code-editor-hint">
+                            Arrastra un archivo o escribe código
+                        </span>
                     </div>
                     <div className="monaco-editor-container">
                         <Editor
                             height="400px"
                             language={getMonacoLanguage(languageId)}
                             value={code2}
-                            onChange={(value) => setCode2(value || '')}
+                            onChange={(value) => !isLocked && setCode2(value || '')}
                             theme="vs-dark"
                             options={{
                                 minimap: { enabled: false },
@@ -424,11 +446,12 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                                 scrollBeyondLastLine: false,
                                 automaticLayout: true,
                                 tabSize: 2,
-                                wordWrap: 'on'
+                                wordWrap: 'on',
+                                readOnly: isLocked
                             }}
                         />
                     </div>
-                    {dragOver2 && (
+                    {dragOver2 && !isLocked && (
                         <div className="drag-overlay">
                             <div className="drag-overlay-content">
                                 <div className="drag-overlay-icon">📁</div>
@@ -440,27 +463,29 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
             </div>
 
             {/* Botón de comparar */}
-            <div className="compare-button-container">
-                <Button
-                    type="primary"
-                    size="large"
-                    icon={loading ? <Spin /> : <PlayCircleOutlined />}
-                    onClick={handleCompare}
-                    loading={loading}
-                    disabled={loadingLanguages || !languageId}
-                    className="compare-button"
-                    style={{ 
-                        background: model.color,
-                        borderColor: model.color,
-                        height: '48px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        borderRadius: '10px'
-                    }}
-                >
-                    {loading ? 'Analizando...' : 'Comparar Códigos'}
-                </Button>
-            </div>
+            {!isLocked && (
+                <div className="compare-button-container">
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={loading ? <Spin /> : <PlayCircleOutlined />}
+                        onClick={handleCompare}
+                        loading={loading}
+                        disabled={loadingLanguages || !languageId}
+                        className="compare-button"
+                        style={{
+                            background: model.color,
+                            borderColor: model.color,
+                            height: '48px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            borderRadius: '10px'
+                        }}
+                    >
+                        {loading ? 'Analizando...' : 'Comparar Códigos'}
+                    </Button>
+                </div>
+            )}
 
             {/* Resultados */}
             {result && (
@@ -473,7 +498,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     <Card className="results-card">
                         <Space direction="vertical" size="large" style={{ width: '100%' }}>
                             <div className="similarity-score">
-                                <div 
+                                <div
                                     className="similarity-percentage"
                                     style={{ color: getSimilarityColor(result.similarity.similarity_score) }}
                                 >
@@ -640,7 +665,7 @@ const CodeComparisonView = ({ model, onBack, userProfile }) => {
                     <div className="results-footer">
                         <Text className="results-footer-text">
                             Análisis realizado con{' '}
-                            <strong 
+                            <strong
                                 className="results-provider-name"
                                 style={{ color: model.color }}
                             >
