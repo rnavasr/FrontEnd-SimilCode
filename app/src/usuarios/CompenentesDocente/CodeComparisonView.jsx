@@ -9,7 +9,7 @@ import {
     EditOutlined
 } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
-import '../Estilos/CodeComparisonView.css';
+import '../Estilos/Css_Comparacion_Individual/CodeComparisonView.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;

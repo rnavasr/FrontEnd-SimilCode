@@ -33,7 +33,8 @@
   align-items: center;
   gap: 24px;
   flex: 1;
-  min-width: 300px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .code-comparison-back-button {
@@ -51,6 +52,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .code-comparison-back-button:hover {
@@ -67,6 +69,8 @@
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .code-comparison-title-display {
@@ -94,6 +98,11 @@
   color: #c0c0c0;
   line-height: 1.3;
   letter-spacing: -0.3px;
+  max-width: 600px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .code-comparison-title-icon {
@@ -101,6 +110,7 @@
   color: #909090;
   opacity: 0;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .code-comparison-title-display:hover .code-comparison-title-icon {
@@ -118,9 +128,13 @@
   outline: none;
   background: rgba(40, 40, 40, 0.6);
   transition: all 0.3s ease;
-  max-width: 500px;
+  width: 100%;
+  max-width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   letter-spacing: -0.3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .code-comparison-title-input:focus {
@@ -140,6 +154,7 @@
 
 .code-comparison-language-select {
   min-width: 200px;
+  flex-shrink: 0;
 }
 
 .code-comparison-language-select .ant-select-selector {

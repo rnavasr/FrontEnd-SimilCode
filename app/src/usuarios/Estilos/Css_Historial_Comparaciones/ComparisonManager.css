@@ -1,0 +1,278 @@
+/* Botón de búsqueda en sidebar */
+.search-button {
+    height: 36px !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    border: 1px solid #3d3d3d !important;
+    color: #6b6b6b !important;
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding-left: 12px !important;
+    margin-top: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.search-button:hover {
+    background: #2d2d2d !important;
+    border-color: #5ebd8f !important;
+    color: #5ebd8f !important;
+}
+
+.search-button:hover .anticon {
+    color: #5ebd8f !important;
+}
+
+
+
+/* Chat Manager - Back Button */
+.chat-manager-back-button {
+    color: #a0a0a0 !important;
+    font-size: 20px !important;
+    height: 40px !important;
+    width: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.chat-manager-back-button:hover {
+    color: #5ebd8f !important;
+    background: #2d2d2d !important;
+}
+
+/* Chat Manager - Title */
+.chat-manager-title {
+    color: #e8e8e8 !important;
+    margin: 0 !important;
+    font-family: 'Playfair Display', 'Georgia', serif !important;
+    font-size: 32px !important;
+    font-weight: 500 !important;
+}
+
+/* Chat Manager - Select Button Small (Nuevo) */
+.chat-manager-select-button-small {
+    background: #5ebd8f !important;
+    border: none !important;
+    color: #1a1a1a !important;
+    height: 36px !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    padding: 0 16px !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+}
+
+.chat-manager-select-button-small:hover {
+    background: #6dd4a6 !important;
+    color: #1a1a1a !important;
+}
+
+/* Chat Manager - Cancel Button Small (Nuevo) */
+.chat-manager-cancel-button-small {
+    background: transparent !important;
+    border: 1px solid #3d3d3d !important;
+    color: #a0a0a0 !important;
+    height: 36px !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    padding: 0 16px !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+}
+
+.chat-manager-cancel-button-small:hover {
+    border-color: #5ebd8f !important;
+    color: #5ebd8f !important;
+}
+
+/* Chat Manager - Select Button (Original - puede eliminarse si no se usa) */
+.chat-manager-select-button {
+    background: #5ebd8f !important;
+    border: none !important;
+    color: #1a1a1a !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 0 24px !important;
+    transition: all 0.2s ease !important;
+}
+
+.chat-manager-select-button:hover {
+    background: #6dd4a6 !important;
+    color: #1a1a1a !important;
+}
+
+/* Chat Manager - Cancel Button (Original - puede eliminarse si no se usa) */
+.chat-manager-cancel-button {
+    background: transparent !important;
+    border: 1px solid #3d3d3d !important;
+    color: #a0a0a0 !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 0 24px !important;
+    transition: all 0.2s ease !important;
+}
+
+.chat-manager-cancel-button:hover {
+    border-color: #5ebd8f !important;
+    color: #5ebd8f !important;
+}
+
+/* Chat Manager - Search Input */
+.chat-manager-search-input {
+    background: #242424 !important;
+    border: 1px solid #3d3d3d !important;
+    border-radius: 8px !important;
+    height: 48px !important;
+    color: #e8e8e8 !important;
+    font-size: 15px !important;
+    transition: all 0.2s ease !important;
+}
+
+.chat-manager-search-input:hover,
+.chat-manager-search-input:focus {
+    border-color: #5ebd8f !important;
+}
+
+.chat-manager-search-input .ant-input {
+    background: transparent !important;
+    color: #e8e8e8 !important;
+}
+
+.chat-manager-search-input .ant-input::placeholder {
+    color: #6b6b6b !important;
+}
+
+/* Chat Manager - Actions Bar */
+.chat-manager-actions-bar {
+    background: #242424;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Chat Manager - Action Buttons */
+.chat-action-button {
+    height: 36px !important;
+    width: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Botón de estrella - Modificado para que se ponga gris */
+.star-button {
+    color: #6b6b6b !important;
+}
+
+.star-button:hover {
+    background: #2d2d2d !important;
+    color: #5ebd8f !important;
+}
+
+.star-button .anticon {
+    font-size: 18px !important;
+}
+
+.clock-button {
+    color: #6b6b6b !important;
+}
+
+.clock-button:hover {
+    background: #2d2d2d !important;
+    color: #5ebd8f !important;
+}
+
+.clock-button .anticon {
+    font-size: 18px !important;
+}
+
+.delete-button {
+    color: #ff6b6b !important;
+}
+
+.delete-button:hover {
+    background: rgba(255, 107, 107, 0.1) !important;
+    color: #ff8787 !important;
+}
+
+.delete-button .anticon {
+    font-size: 18px !important;
+}
+
+/* Chat Manager - List Container */
+.chat-manager-list-container {
+    background: #242424;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Chat Manager - Item */
+.chat-manager-item {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    background: transparent;
+    cursor: pointer;
+}
+
+.chat-manager-item:hover {
+    background: #2a2a2a !important;
+}
+
+.chat-manager-item.selected {
+    background: #2d2d2d !important;
+}
+
+/* Chat Manager - Item Title */
+.chat-manager-item-title {
+    color: #e8e8e8;
+    font-size: 15px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+/* Chat Manager - Item Meta */
+.chat-manager-item-meta {
+    color: #6b6b6b;
+    font-size: 13px;
+}
+
+/* Checkbox personalizado */
+.ant-checkbox-wrapper {
+    color: #a0a0a0 !important;
+}
+
+.ant-checkbox-inner {
+    background-color: transparent !important;
+    border-color: #3d3d3d !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #5ebd8f !important;
+    border-color: #5ebd8f !important;
+}
+
+.ant-checkbox:hover .ant-checkbox-inner {
+    border-color: #5ebd8f !important;
+}
+
+/* Empty state */
+.ant-empty-description {
+    color: #6b6b6b !important;
+}

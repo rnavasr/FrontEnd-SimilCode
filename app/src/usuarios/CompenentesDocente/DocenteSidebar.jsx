@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
     Layout,
     Typography,
@@ -18,6 +18,7 @@ import {
 } from '@ant-design/icons';
 import logo from '../../img/logo.png';
 import ComparacionDropdownMenu from './ComparacionDropdownMenu';
+import '../Estilos/Css_SideBar_Principal/CssSideBarDocente.css'
 
 const { Sider } = Layout;
 const { Title, Text } = Typography;
@@ -37,6 +38,37 @@ const DocenteSidebar = ({
     onSearchChats,
     formatFecha
 }) => {
+    const scrollContainerRef = useRef(null);
+    const scrollTimeoutRef = useRef(null);
+
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (!scrollContainer) return;
+
+        const handleScroll = () => {
+            // Agregar clase cuando se está scrolleando
+            scrollContainer.classList.add('is-scrolling');
+
+            // Limpiar timeout anterior
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+
+            // Remover clase después de 1 segundo de inactividad
+            scrollTimeoutRef.current = setTimeout(() => {
+                scrollContainer.classList.remove('is-scrolling');
+            }, 1000);
+        };
+
+        scrollContainer.addEventListener('scroll', handleScroll);
+
+        return () => {
+            scrollContainer.removeEventListener('scroll', handleScroll);
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+        };
+    }, []);
     const renderComparacionItem = (comparacion) => (
         <div
             key={`${comparacion.tipo}-${comparacion.id}`}
@@ -104,24 +136,10 @@ const DocenteSidebar = ({
     return (
         <Sider
             width={280}
-            style={{
-                background: '#242424',
-                borderRight: '1px solid #2d2d2d',
-                height: '100vh',
-                position: 'fixed',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden'
-            }}
+            className="docente-sidebar"
         >
             {/* HEADER FIJO */}
-            <div style={{
-                padding: '20px 16px',
-                flexShrink: 0
-            }}>
+            <div className="sidebar-header">
                 <div style={{
                     padding: '8px 0',
                     display: 'flex',
@@ -198,17 +216,10 @@ const DocenteSidebar = ({
                         Buscar
                     </Button>
                 </div>
-
             </div>
 
             {/* ÁREA SCROLLEABLE */}
-            <div style={{
-                flex: 1,
-                overflowY: 'auto',
-                overflowX: 'hidden',
-                padding: '0 16px',
-                marginBottom: '120px'
-            }}>
+            <div className="sidebar-content" ref={scrollContainerRef}>
                 {/* Sección Destacados */}
                 <div style={{ marginBottom: '16px' }}>
                     <div style={{
@@ -269,15 +280,7 @@ const DocenteSidebar = ({
             </div>
 
             {/* FOOTER FIJO */}
-            <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background: '#242424',
-                padding: '16px',
-                borderTop: '1px solid #2d2d2d'
-            }}>
+            <div className="sidebar-footer">
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                     <Button
                         icon={<UserOutlined />}
