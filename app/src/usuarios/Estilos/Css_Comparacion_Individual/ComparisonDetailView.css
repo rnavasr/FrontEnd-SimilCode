@@ -34,30 +34,15 @@
 .comparison-detail-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 40px;
   gap: 24px;
   padding: 24px 28px;
-  background: linear-gradient(135deg, rgba(40, 40, 40, 0.6) 0%, rgba(35, 35, 35, 0.5) 100%);
+  background: rgba(40, 40, 40, 0.8);
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.comparison-detail-header:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 3px 10px rgba(0, 0, 0, 0.25);
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.comparison-detail-header-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  flex: 1;
-  min-width: 0;
+  transition: all 0.3s ease;
 }
 
 /* Botón Volver */
@@ -70,7 +55,7 @@
   height: 40px !important;
   border-radius: 10px !important;
   background: rgba(50, 50, 50, 0.6) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.3s ease !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -81,7 +66,6 @@
   color: #5ebd8f !important;
   background: rgba(60, 60, 60, 0.8) !important;
   border-color: #5ebd8f !important;
-  transform: translateX(-3px) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -89,15 +73,9 @@
 .comparison-detail-title-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
-}
-
-.comparison-detail-title-display {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 
 .comparison-detail-title-text {
@@ -117,25 +95,27 @@
 
 .comparison-detail-meta-item {
   color: #909090 !important;
-  font-size: 13px;
+  font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 0;
   font-weight: 500;
+  letter-spacing: -0.1px;
 }
-
-.comparison-detail-meta-item .anticon {
-  color: #5ebd8f;
-  font-size: 14px;
-}
-
-/* Model Badge */
-.comparison-detail-model-badge {
-  padding: 12px 20px;
+/* Language Badge */
+.comparison-detail-language-badge {
+  padding: 10px;
   background: rgba(50, 50, 50, 0.6);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  min-width: 200px;
 }
 
 /* ============================================
@@ -300,6 +280,7 @@
 
   .comparison-detail-header {
     flex-direction: column;
+    align-items: flex-start;
     gap: 16px;
   }
 

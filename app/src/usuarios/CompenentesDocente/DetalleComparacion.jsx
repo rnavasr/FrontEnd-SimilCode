@@ -134,34 +134,30 @@ const ComparisonDetailView = ({ comparacionId, onBack }) => {
         <div className="comparison-detail-container">
             {/* Header */}
             <div className="comparison-detail-header">
-                <div className="comparison-detail-header-content">
-                    <Button
-                        icon={<ArrowLeftOutlined />}
-                        onClick={onBack}
-                        className="comparison-detail-back-button"
-                        type="text"
-                    >
-                        Volver
-                    </Button>
+                <Button
+                    icon={<ArrowLeftOutlined />}
+                    onClick={onBack}
+                    className="comparison-detail-back-button"
+                    type="text"
+                >
+                    Volver
+                </Button>
 
-                    <div className="comparison-detail-title-section">
-                        <div className="comparison-detail-title-display">
-                            <span className="comparison-detail-title-text">
-                                {comparacion.nombre_comparacion || 'Sin título'}
-                            </span>
-                        </div>
-                        <div className="comparison-detail-meta">
-                            <Text className="comparison-detail-meta-item">
-                                Usando <strong style={{ color: '#c0c0c0' }}>{comparacion.modelo_ia?.nombre || 'N/A'}</strong>
-                            </Text>
-                        </div>
+                <div className="comparison-detail-title-section">
+                    <div className="comparison-detail-title-text">
+                        {comparacion.nombre_comparacion || 'Sin título'}
+                    </div>
+                    <div className="comparison-detail-meta">
+                        <Text className="comparison-detail-meta-item">
+                            Usando {comparacion.modelo_ia?.nombre || 'N/A'}
+                        </Text>
                     </div>
                 </div>
 
                 {comparacion.lenguaje && (
-                    <div className="comparison-detail-model-badge">
-                        <Text style={{ color: '#909090', fontSize: '14px' }}>
-                            Lenguaje: <strong style={{ color: '#c0c0c0' }}>{comparacion.lenguaje.nombre}</strong>
+                    <div className="comparison-detail-language-badge">
+                        <Text style={{ color: '#b0b0b0', fontSize: '15px', fontWeight: '500' }}>
+                            {comparacion.lenguaje.nombre}
                         </Text>
                     </div>
                 )}
@@ -172,12 +168,6 @@ const ComparisonDetailView = ({ comparacionId, onBack }) => {
                 <div className="code-editor-wrapper">
                     <div className="code-editor-header">
                         <span className="code-editor-label">Código 1</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <FileOutlined style={{ color: '#5ebd8f' }} />
-                            <span className="code-editor-hint" style={{ color: '#5ebd8f' }}>
-                                Código Original
-                            </span>
-                        </div>
                     </div>
                     <div className="monaco-editor-container">
                         <Editor
@@ -203,12 +193,6 @@ const ComparisonDetailView = ({ comparacionId, onBack }) => {
                 <div className="code-editor-wrapper">
                     <div className="code-editor-header">
                         <span className="code-editor-label">Código 2</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <FileOutlined style={{ color: '#5ebd8f' }} />
-                            <span className="code-editor-hint" style={{ color: '#5ebd8f' }}>
-                                Código Comparado
-                            </span>
-                        </div>
                     </div>
                     <div className="monaco-editor-container">
                         <Editor
@@ -232,65 +216,7 @@ const ComparisonDetailView = ({ comparacionId, onBack }) => {
                 </div>
             </div>
 
-            {/* Info Card */}
-            <Card className="comparison-info-card">
-                <Title level={4} style={{ color: '#d0d0d0', marginBottom: '24px' }}>
-                    Información de la Comparación
-                </Title>
-                <div className="comparison-info-grid">
-                    <div className="comparison-info-item">
-                        <Text className="comparison-info-label">ID de Comparación:</Text>
-                        <Text className="comparison-info-value">{comparacion.id}</Text>
-                    </div>
-                    
-                    {comparacion.usuario && (
-                        <>
-                            <div className="comparison-info-item">
-                                <Text className="comparison-info-label">Usuario:</Text>
-                                <Text className="comparison-info-value">
-                                    {comparacion.usuario.nombre || 'N/A'}
-                                </Text>
-                            </div>
-                            <div className="comparison-info-item">
-                                <Text className="comparison-info-label">Email:</Text>
-                                <Text className="comparison-info-value">
-                                    {comparacion.usuario.email || 'N/A'}
-                                </Text>
-                            </div>
-                        </>
-                    )}
 
-                    {comparacion.lenguaje && (
-                        <div className="comparison-info-item">
-                            <Text className="comparison-info-label">Lenguaje:</Text>
-                            <Text className="comparison-info-value">
-                                {comparacion.lenguaje.nombre}
-                            </Text>
-                        </div>
-                    )}
-
-                    {comparacion.modelo_ia && (
-                        <div className="comparison-info-item">
-                            <Text className="comparison-info-label">Modelo IA:</Text>
-                            <Text className="comparison-info-value">
-                                {comparacion.modelo_ia.nombre}
-                            </Text>
-                        </div>
-                    )}
-
-                    <div className="comparison-info-item">
-                        <Text className="comparison-info-label">Fecha de Creación:</Text>
-                        <Text className="comparison-info-value">
-                            {formatDate(comparacion.fecha_creacion)}
-                        </Text>
-                    </div>
-
-                    <div className="comparison-info-item">
-                        <Text className="comparison-info-label">Estado:</Text>
-                        {getEstadoTag(comparacion.estado)}
-                    </div>
-                </div>
-            </Card>
         </div>
     );
 };
