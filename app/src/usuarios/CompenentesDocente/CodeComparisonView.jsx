@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Select, Typography, Space, Card, message, Spin, Divider, Tag } from 'antd';
+import { Button, Select, Typography, Space, Card, notification, Spin, Divider, Tag } from 'antd';
 import {
     ArrowLeftOutlined,
     PlayCircleOutlined,
     ThunderboltOutlined,
     CheckCircleOutlined,
     WarningOutlined,
-    EditOutlined
+    EditOutlined,
+    CheckCircleFilled,
+    InfoCircleFilled,
+    FileOutlined
 } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
 import { API_ENDPOINTS, getStoredToken, buildApiUrl } from '../../../config';
@@ -19,6 +22,8 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
     // Estados principales
     const [code1, setCode1] = useState('');
     const [code2, setCode2] = useState('');
+    const [file1Name, setFile1Name] = useState('');
+    const [file2Name, setFile2Name] = useState('');
     const [languageId, setLanguageId] = useState(null);
     const [languages, setLanguages] = useState([]);
     const [loadingLanguages, setLoadingLanguages] = useState(true);
@@ -28,8 +33,10 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [dragOver1, setDragOver1] = useState(false);
     const [dragOver2, setDragOver2] = useState(false);
-    const [isLocked, setIsLocked] = useState(false); // Estado de bloqueo
+    const [dragOverContainer, setDragOverContainer] = useState(false);
+    const [isLocked, setIsLocked] = useState(false);
     const titleInputRef = useRef(null);
+    const containerRef = useRef(null);
 
     // Cargar lenguajes disponibles
     useEffect(() => {
@@ -57,14 +64,14 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
 
                 const data = await response.json();
                 setLanguages(data.lenguajes || []);
-
-                // No seleccionar ningún lenguaje por defecto
-                // if (data.lenguajes && data.lenguajes.length > 0) {
-                //     setLanguageId(data.lenguajes[0].id);
-                // }
             } catch (error) {
                 console.error('Error:', error);
-                message.error('No se pudieron cargar los lenguajes');
+                notification.error({
+                    message: 'Error al cargar lenguajes',
+                    description: 'No se pudieron cargar los lenguajes de programación. Por favor, intenta nuevamente.',
+                    placement: 'topRight',
+                    duration: 4
+                });
             } finally {
                 setLoadingLanguages(false);
             }
@@ -81,32 +88,106 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         }
     }, [isEditingTitle, isLocked]);
 
-    // Obtener lenguaje de Monaco
-    const getMonacoLanguage = (languageId) => {
-        const lang = languages.find(l => l.id === languageId);
-        if (!lang) return 'plaintext';
+    // Event listeners para drag & drop en el contenedor completo
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container || isLocked) return;
 
-        const mapping = {
-            'python': 'python',
-            'javascript': 'javascript',
-            'typescript': 'typescript',
-            'java': 'java',
-            'cpp': 'cpp',
-            'c++': 'cpp',
-            'csharp': 'csharp',
-            'c#': 'csharp',
-            'go': 'go',
-            'rust': 'rust',
-            'html': 'html',
-            'css': 'css',
-            'json': 'json',
-            'sql': 'sql'
+        const handleContainerDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragOverContainer(true);
         };
 
-        return mapping[lang.nombre.toLowerCase()] || 'plaintext';
+        const handleContainerDragLeave = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.target === container) {
+                setDragOverContainer(false);
+            }
+        };
+
+        const handleContainerDrop = async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragOverContainer(false);
+
+            const files = Array.from(e.dataTransfer.files);
+            
+            if (files.length === 2) {
+                await loadFile(files[0], 1);
+                await loadFile(files[1], 2);
+            } else if (files.length === 1) {
+                if (!code1) {
+                    await loadFile(files[0], 1);
+                } else if (!code2) {
+                    await loadFile(files[0], 2);
+                } else {
+                    notification.warning({
+                        message: 'Editores completos',
+                        description: 'Ambos editores ya tienen código. Elimina uno primero.',
+                        placement: 'topRight',
+                        duration: 3
+                    });
+                }
+            } else if (files.length > 2) {
+                notification.warning({
+                    message: 'Demasiados archivos',
+                    description: 'Solo puedes cargar hasta 2 archivos. Se cargarán los primeros 2.',
+                    placement: 'topRight',
+                    duration: 3
+                });
+                await loadFile(files[0], 1);
+                await loadFile(files[1], 2);
+            }
+        };
+
+        container.addEventListener('dragover', handleContainerDragOver);
+        container.addEventListener('dragleave', handleContainerDragLeave);
+        container.addEventListener('drop', handleContainerDrop);
+
+        return () => {
+            container.removeEventListener('dragover', handleContainerDragOver);
+            container.removeEventListener('dragleave', handleContainerDragLeave);
+            container.removeEventListener('drop', handleContainerDrop);
+        };
+    }, [isLocked, code1, code2]);
+
+    // Cargar archivo
+    const loadFile = async (file, codeNumber) => {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const content = event.target.result;
+            if (codeNumber === 1) {
+                setCode1(content);
+                setFile1Name(file.name);
+            } else {
+                setCode2(content);
+                setFile2Name(file.name);
+            }
+            notification.success({
+                message: 'Archivo cargado',
+                description: `"${file.name}" cargado en el Código ${codeNumber}`,
+                placement: 'topRight',
+                duration: 3,
+                icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
+            });
+        };
+
+        reader.onerror = () => {
+            notification.error({
+                message: 'Error al leer archivo',
+                description: 'No se pudo leer el contenido del archivo. Por favor, intenta con otro archivo.',
+                placement: 'topRight',
+                duration: 4
+            });
+        };
+
+        reader.readAsText(file);
     };
 
-    // Manejar drag & drop
+    // Manejar drag & drop individual
     const handleDragOver = (e, codeNumber) => {
         if (isLocked) return;
         e.preventDefault();
@@ -142,24 +223,19 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
 
         const files = e.dataTransfer.files;
         if (files.length > 0) {
-            const file = files[0];
-            const reader = new FileReader();
+            await loadFile(files[0], codeNumber);
+        }
+    };
 
-            reader.onload = (event) => {
-                const content = event.target.result;
-                if (codeNumber === 1) {
-                    setCode1(content);
-                } else {
-                    setCode2(content);
-                }
-                message.success(`Archivo "${file.name}" cargado exitosamente`);
-            };
-
-            reader.onerror = () => {
-                message.error('Error al leer el archivo');
-            };
-
-            reader.readAsText(file);
+    // Eliminar archivo
+    const handleRemoveFile = (codeNumber) => {
+        if (isLocked) return;
+        if (codeNumber === 1) {
+            setCode1('');
+            setFile1Name('');
+        } else {
+            setCode2('');
+            setFile2Name('');
         }
     };
 
@@ -185,19 +261,35 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
 
     // Manejar comparación
     const handleCompare = async () => {
-        // Validaciones
         if (!languageId) {
-            message.warning('Por favor, selecciona un lenguaje de programación');
+            notification.warning({
+                message: 'Lenguaje no seleccionado',
+                description: 'Por favor, selecciona un lenguaje de programación antes de continuar.',
+                placement: 'topRight',
+                duration: 3,
+                icon: <InfoCircleFilled style={{ color: '#ffa726' }} />
+            });
             return;
         }
 
         if (!code1.trim() || !code2.trim()) {
-            message.warning('Por favor, proporciona ambos códigos');
+            notification.warning({
+                message: 'Códigos incompletos',
+                description: 'Por favor, carga ambos archivos de código para poder realizar la comparación.',
+                placement: 'topRight',
+                duration: 3,
+                icon: <InfoCircleFilled style={{ color: '#ffa726' }} />
+            });
             return;
         }
 
         if (!model?.id) {
-            message.error('No se ha seleccionado un modelo de IA');
+            notification.error({
+                message: 'Modelo no seleccionado',
+                description: 'No se ha seleccionado un modelo de IA. Por favor, recarga la página.',
+                placement: 'topRight',
+                duration: 4
+            });
             return;
         }
 
@@ -232,17 +324,20 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 throw new Error(data.error || 'Error al crear la comparación');
             }
 
-            message.success('¡Comparación creada exitosamente!');
+            notification.success({
+                message: '¡Comparación creada!',
+                description: `La comparación "${finalName}" se ha creado y guardado exitosamente.`,
+                placement: 'topRight',
+                duration: 4,
+                icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
+            });
 
-            // Bloquear el componente
             setIsLocked(true);
 
-            // Actualizar lista de comparaciones
             if (refreshComparaciones) {
                 refreshComparaciones();
             }
 
-            // Simular resultado para mostrar
             const mockResult = {
                 id: data.id,
                 nombre_comparacion: finalName,
@@ -288,7 +383,12 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
 
         } catch (error) {
             console.error('Error:', error);
-            message.error(error.message || 'Error al comparar códigos. Por favor, intenta nuevamente.');
+            notification.error({
+                message: 'Error al crear comparación',
+                description: error.message || 'Ocurrió un error al comparar los códigos. Por favor, intenta nuevamente.',
+                placement: 'topRight',
+                duration: 5
+            });
         } finally {
             setLoading(false);
         }
@@ -310,9 +410,51 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         return colors[likelihood] || '#a0a0a0';
     };
 
+const getMonacoLanguage = (languageId) => {
+        const lang = languages.find(l => l.id === languageId);
+        if (!lang) return 'plaintext';
+
+        const mapping = {
+            'python': 'python',
+            'javascript': 'javascript',
+            'typescript': 'typescript',
+            'java': 'java',
+            'cpp': 'cpp',
+            'c++': 'cpp',
+            'csharp': 'csharp',
+            'c#': 'csharp',
+            'go': 'go',
+            'rust': 'rust',
+            'html': 'html',
+            'css': 'css',
+            'json': 'json',
+            'sql': 'sql'
+        };
+
+        return mapping[lang.nombre.toLowerCase()] || 'plaintext';
+    };
+
     return (
-        <div className="code-comparison-container">
-            {/* Header */}
+        <div 
+            ref={containerRef}
+            className={`code-comparison-container ${dragOverContainer ? 'drag-over-container' : ''}`}
+        >
+            {dragOverContainer && !isLocked && (
+                <div className="global-drag-overlay">
+                    <div className="global-drag-content">
+                        <FileOutlined style={{ fontSize: '80px', color: '#5ebd8f', marginBottom: '20px' }} />
+                        <div style={{ fontSize: '24px', fontWeight: '600', color: '#c0c0c0', marginBottom: '8px' }}>
+                            Suelta los archivos aquí
+                        </div>
+                        <div style={{ fontSize: '16px', color: '#909090' }}>
+                            {!code1 && !code2 && 'Puedes soltar 2 archivos a la vez'}
+                            {(code1 && !code2) && 'Se cargará en el Código 2'}
+                            {(!code1 && code2) && 'Se cargará en el Código 1'}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="code-comparison-header">
                 <div className="code-comparison-header-content">
                     <Button
@@ -371,21 +513,36 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 </Select>
             </div>
 
-            {/* Editores de código con Monaco */}
             <div className="code-editors-grid">
-                {/* Editor 1 */}
                 <div
                     className={`code-editor-wrapper ${dragOver1 ? 'drag-over' : ''} ${isLocked ? 'locked' : ''}`}
                     onDragOver={(e) => handleDragOver(e, 1)}
                     onDragLeave={(e) => handleDragLeave(e, 1)}
                     onDrop={(e) => handleDrop(e, 1)}
-                    style={{ opacity: isLocked ? 0.7 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}
+                    style={{ opacity: isLocked ? 0.7 : 1 }}
                 >
                     <div className="code-editor-header">
                         <span className="code-editor-label">Código 1</span>
-                        <span className="code-editor-hint">
-                            Arrastra un archivo o escribe código
-                        </span>
+                        {file1Name ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FileOutlined style={{ color: '#5ebd8f' }} />
+                                <span className="code-editor-hint" style={{ color: '#5ebd8f' }}>
+                                    {file1Name}
+                                </span>
+                                {!isLocked && (
+                                    <Button
+                                        type="text"
+                                        size="small"
+                                        onClick={() => handleRemoveFile(1)}
+                                        style={{ color: '#ff6b6b', padding: '0 4px' }}
+                                    >
+                                        ✕
+                                    </Button>
+                                )}
+                            </div>
+                        ) : (
+                            <span className="code-editor-hint">Arrastra un archivo o escribe código</span>
+                        )}
                     </div>
                     <div className="monaco-editor-container">
                         <Editor
@@ -417,19 +574,35 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                     )}
                 </div>
 
-                {/* Editor 2 */}
                 <div
                     className={`code-editor-wrapper ${dragOver2 ? 'drag-over' : ''} ${isLocked ? 'locked' : ''}`}
                     onDragOver={(e) => handleDragOver(e, 2)}
                     onDragLeave={(e) => handleDragLeave(e, 2)}
                     onDrop={(e) => handleDrop(e, 2)}
-                    style={{ opacity: isLocked ? 0.7 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}
+                    style={{ opacity: isLocked ? 0.7 : 1 }}
                 >
                     <div className="code-editor-header">
                         <span className="code-editor-label">Código 2</span>
-                        <span className="code-editor-hint">
-                            Arrastra un archivo o escribe código
-                        </span>
+                        {file2Name ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FileOutlined style={{ color: '#5ebd8f' }} />
+                                <span className="code-editor-hint" style={{ color: '#5ebd8f' }}>
+                                    {file2Name}
+                                </span>
+                                {!isLocked && (
+                                    <Button
+                                        type="text"
+                                        size="small"
+                                        onClick={() => handleRemoveFile(2)}
+                                        style={{ color: '#ff6b6b', padding: '0 4px' }}
+                                    >
+                                        ✕
+                                    </Button>
+                                )}
+                            </div>
+                        ) : (
+                            <span className="code-editor-hint">Arrastra un archivo o escribe código</span>
+                        )}
                     </div>
                     <div className="monaco-editor-container">
                         <Editor
@@ -462,7 +635,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 </div>
             </div>
 
-            {/* Botón de comparar */}
             {!isLocked && (
                 <div className="compare-button-container">
                     <Button
@@ -471,7 +643,7 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                         icon={loading ? <Spin /> : <PlayCircleOutlined />}
                         onClick={handleCompare}
                         loading={loading}
-                        disabled={loadingLanguages || !languageId}
+                        disabled={loadingLanguages || !languageId || !code1.trim() || !code2.trim()}
                         className="compare-button"
                         style={{
                             background: model.color,
@@ -487,14 +659,12 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 </div>
             )}
 
-            {/* Resultados */}
             {result && (
                 <div className="results-container">
                     <Title level={3} className="results-title">
                         Resultados del Análisis
                     </Title>
 
-                    {/* Similitud */}
                     <Card className="results-card">
                         <Space direction="vertical" size="large" style={{ width: '100%' }}>
                             <div className="similarity-score">
@@ -510,7 +680,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                                 <Tag
                                     color={getPlagiarismColor(result.similarity.plagiarism_likelihood)}
                                     className="plagiarism-tag"
-                                    style={{ fontSize: '13px', padding: '4px 12px' }}
                                 >
                                     Probabilidad de plagio: {result.similarity.plagiarism_likelihood.toUpperCase()}
                                 </Tag>
@@ -550,9 +719,7 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                         </Space>
                     </Card>
 
-                    {/* Comparación de Eficiencia */}
                     <div className="efficiency-grid">
-                        {/* Eficiencia Código 1 */}
                         <Card
                             title={
                                 <Space>
@@ -606,7 +773,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                             </Space>
                         </Card>
 
-                        {/* Eficiencia Código 2 */}
                         <Card
                             title={
                                 <Space>
@@ -661,7 +827,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                         </Card>
                     </div>
 
-                    {/* Footer de resultados */}
                     <div className="results-footer">
                         <Text className="results-footer-text">
                             Análisis realizado con{' '}

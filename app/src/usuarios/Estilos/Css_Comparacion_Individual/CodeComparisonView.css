@@ -824,3 +824,93 @@
 .code-comparison-language-select.ant-select-disabled .ant-select-selection-placeholder {
   color: #6b6b6b !important;
 }
+
+/* ============================================
+   DRAG & DROP GLOBAL Y PLACEHOLDERS
+   ============================================ */
+
+.code-comparison-container.drag-over-container {
+  position: relative;
+}
+
+.global-drag-overlay {
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+  pointer-events: none;
+}
+
+.global-drag-content {
+  text-align: center;
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.file-loaded-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 30, 30, 0.8);
+  border: 2px dashed rgba(94, 189, 143, 0.3);
+  border-radius: 8px;
+  padding: 40px;
+  transition: all 0.3s ease;
+}
+
+.file-loaded-placeholder:hover {
+  border-color: rgba(94, 189, 143, 0.5);
+  background: rgba(30, 30, 30, 0.9);
+}
+
+.file-empty-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 30, 30, 0.4);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 40px;
+  transition: all 0.3s ease;
+}
+
+.file-empty-placeholder:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(30, 30, 30, 0.6);
+}
+
+.code-editor-wrapper:not(.locked) {
+  cursor: pointer;
+}
+
+.code-editor-wrapper.locked {
+  cursor: not-allowed;
+}
+
+.file-empty-placeholder .drag-overlay-icon {
+  animation: float 2s ease-in-out infinite;
+}
+
+.code-editor-header .ant-btn-text {
+  height: 20px;
+  line-height: 20px;
+  min-width: 20px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.code-editor-header .ant-btn-text:hover {
+  background: rgba(255, 107, 107, 0.1) !important;
+  transform: scale(1.2);
+}
