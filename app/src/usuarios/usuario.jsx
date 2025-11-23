@@ -13,6 +13,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken, buildApiUrl } from '../../config';
 import logo from '../img/logo.png';
 import CodeComparisonView from './CompenentesDocente/CodeComparisonView';
+import ComparisonDetailView from './CompenentesDocente/DetalleComparacion';
 import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion';
 import DocenteSidebar from './CompenentesDocente/DocenteSidebar';
 import ChatManagerView from './CompenentesDocente/GestionDeComparaciones';
@@ -29,6 +30,9 @@ const Usuario = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedModel, setSelectedModel] = useState(null);
     const [showChatManager, setShowChatManager] = useState(false);
+    
+    // Estado para manejar la comparación seleccionada
+    const [selectedComparacion, setSelectedComparacion] = useState(null);
 
     const [comparacionesDestacadas, setComparacionesDestacadas] = useState([]);
     const [comparacionesRecientes, setComparacionesRecientes] = useState([]);
@@ -108,7 +112,6 @@ const Usuario = () => {
         }
     };
 
-    // Función para refrescar comparaciones desde componentes hijos
     const refreshComparaciones = () => {
         if (userProfile && userProfile.usuario_id) {
             console.log('🔄 Actualizando lista de comparaciones...');
@@ -144,23 +147,28 @@ const Usuario = () => {
         setSelectedModel(model);
         setIsModalVisible(false);
         setShowChatManager(false);
+        setSelectedComparacion(null);
         message.success(`Modelo ${model.name} seleccionado`);
     };
 
     const handleBackToHome = () => {
         setSelectedModel(null);
         setShowChatManager(false);
-        // Refrescar comparaciones al volver al home
+        setSelectedComparacion(null);
         refreshComparaciones();
     };
 
     const handleSearchChats = () => {
         setShowChatManager(true);
         setSelectedModel(null);
+        setSelectedComparacion(null);
     };
 
     const handleComparacionClick = (comparacion) => {
-        message.info(`Abriendo: ${comparacion.nombre_comparacion}`);
+        console.log('📋 Comparación seleccionada:', comparacion);
+        setSelectedComparacion(comparacion);
+        setSelectedModel(null);
+        setShowChatManager(false);
     };
 
     const marcarComoDestacado = async (comparacion) => {
@@ -239,6 +247,11 @@ const Usuario = () => {
                 refreshComparaciones();
                 setDeleteModalVisible(false);
                 setComparacionToDelete(null);
+                
+                // Si la comparación eliminada es la que está siendo vista, volver al home
+                if (selectedComparacion && selectedComparacion.id === comparacionToDelete.id) {
+                    setSelectedComparacion(null);
+                }
             } else {
                 message.error('Error al eliminar la comparación');
             }
@@ -365,27 +378,38 @@ const Usuario = () => {
 
                 <Layout style={{ marginLeft: 280, background: '#1a1a1a' }}>
                     <Content style={{
-                        // Padding dinámico según la vista
-                        padding: selectedModel 
-                            ? '0'  // Sin padding para CodeComparisonView
+                        padding: selectedModel || selectedComparacion
+                            ? '0'
                             : showChatManager 
-                                ? '40px 60px'  // Padding reducido para ChatManager
-                                : '60px 80px',  // Padding normal para Home
+                                ? '40px 60px'
+                                : '60px 80px',
                         minHeight: '100vh',
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: selectedModel ? 'flex-start' : showChatManager ? 'flex-start' : 'center',
-                        alignItems: selectedModel ? 'stretch' : 'center',
-                        // Ancho completo cuando hay CodeComparisonView
+                        justifyContent: selectedModel || selectedComparacion ? 'flex-start' : showChatManager ? 'flex-start' : 'center',
+                        alignItems: selectedModel || selectedComparacion ? 'stretch' : 'center',
                         width: '100%',
                         maxWidth: '100%',
-                        overflow: selectedModel ? 'auto' : 'visible'
+                        overflow: selectedModel || selectedComparacion ? 'auto' : 'visible'
                     }}>
-                        {showChatManager ? (
+                        {selectedComparacion ? (
+                            <div style={{ 
+                                width: '100%', 
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column'
+                            }}>
+                                <ComparisonDetailView
+                                    comparacionId={selectedComparacion.id}
+                                    onBack={handleBackToHome}
+                                />
+                            </div>
+                        ) : showChatManager ? (
                             <ChatManagerView
                                 comparacionesDestacadas={comparacionesDestacadas}
                                 comparacionesRecientes={comparacionesRecientes}
                                 onBack={handleBackToHome}
+                                onComparacionClick={handleComparacionClick}
                                 onMarcarDestacado={marcarComoDestacado}
                                 onMarcarReciente={marcarComoReciente}
                                 onEliminar={confirmarEliminacion}
@@ -483,6 +507,7 @@ const Usuario = () => {
                     ¿Estás seguro de que deseas eliminar "{comparacionToDelete?.nombre_comparacion}"?
                 </Text>
             </Modal>
+            
             <ModalSeleccionIA
                 isVisible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}

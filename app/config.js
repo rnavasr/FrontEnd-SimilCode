@@ -21,7 +21,8 @@ export const API_ENDPOINTS = {
   LISTAR_MODELOS_ADMIN: '/app/usuarios/listar_modelos_admin/',
   LISTAR_MODELOS_USUARIO: '/app/usuarios/listar_modelos_usuario',
   LISTAR_LENGUAJES: '/app/usuarios/listar_lenguajes',  // + /{usuario_id}
-  CREAR_COMPARACION_INDIVIDUAL: '/app/usuarios/crear_comparaciones_individuales/'
+  CREAR_COMPARACION_INDIVIDUAL: '/app/usuarios/crear_comparaciones_individuales/',
+  OBTENER_COMPARACION_INDIVIDUAL: '/app/usuarios/mostrar_datos_comparacion_individual'
 };
 
 // Función helper para construir URLs completas

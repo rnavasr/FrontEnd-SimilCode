@@ -23,6 +23,7 @@ const ChatManagerView = ({
     comparacionesDestacadas,
     comparacionesRecientes,
     onBack,
+    onComparacionClick, // NUEVO: función para manejar clic en comparación
     onMarcarDestacado,
     onMarcarReciente,
     onEliminar,
@@ -70,6 +71,15 @@ const ChatManagerView = ({
 
     const isSelected = (chat) => {
         return selectedChats.includes(`${chat.tipo}-${chat.id}`);
+    };
+
+    // NUEVO: Manejar clic en comparación
+    const handleChatClick = (chat) => {
+        if (!isSelectMode && onComparacionClick) {
+            onComparacionClick(chat);
+        } else if (isSelectMode) {
+            handleSelectChat(chat, !isSelected(chat));
+        }
     };
 
     const handleMarcarDestacados = () => {
@@ -254,13 +264,10 @@ const ChatManagerView = ({
                             key={`${chat.tipo}-${chat.id}`}
                             className={`chat-manager-item ${isSelected(chat) ? 'selected' : ''}`}
                             style={{
-                                borderBottom: index < chatsFiltrados.length - 1 ? '1px solid #2d2d2d' : 'none'
+                                borderBottom: index < chatsFiltrados.length - 1 ? '1px solid #2d2d2d' : 'none',
+                                cursor: 'pointer'
                             }}
-                            onClick={() => {
-                                if (isSelectMode) {
-                                    handleSelectChat(chat, !isSelected(chat));
-                                }
-                            }}
+                            onClick={() => handleChatClick(chat)}
                         >
                             {isSelectMode && (
                                 <Checkbox
