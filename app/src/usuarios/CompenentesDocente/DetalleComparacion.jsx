@@ -151,30 +151,17 @@ const ComparisonDetailView = ({ comparacionId, onBack }) => {
                             </span>
                         </div>
                         <div className="comparison-detail-meta">
-                            <Space size="large" wrap>
-                                <Text className="comparison-detail-meta-item">
-                                    <CalendarOutlined /> {formatDate(comparacion.fecha_creacion)}
-                                </Text>
-                                {comparacion.usuario && (
-                                    <Text className="comparison-detail-meta-item">
-                                        <UserOutlined /> {comparacion.usuario.nombre || comparacion.usuario.email}
-                                    </Text>
-                                )}
-                                {comparacion.lenguaje && (
-                                    <Text className="comparison-detail-meta-item">
-                                        <CodeOutlined /> {comparacion.lenguaje.nombre}
-                                    </Text>
-                                )}
-                                {getEstadoTag(comparacion.estado)}
-                            </Space>
+                            <Text className="comparison-detail-meta-item">
+                                Usando <strong style={{ color: '#c0c0c0' }}>{comparacion.modelo_ia?.nombre || 'N/A'}</strong>
+                            </Text>
                         </div>
                     </div>
                 </div>
 
-                {comparacion.modelo_ia && (
+                {comparacion.lenguaje && (
                     <div className="comparison-detail-model-badge">
                         <Text style={{ color: '#909090', fontSize: '14px' }}>
-                            Modelo: <strong style={{ color: '#c0c0c0' }}>{comparacion.modelo_ia.nombre}</strong>
+                            Lenguaje: <strong style={{ color: '#c0c0c0' }}>{comparacion.lenguaje.nombre}</strong>
                         </Text>
                     </div>
                 )}
