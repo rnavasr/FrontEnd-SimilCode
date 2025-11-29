@@ -113,7 +113,7 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
             setDragOverContainer(false);
 
             const files = Array.from(e.dataTransfer.files);
-            
+
             if (files.length === 2) {
                 await loadFile(files[0], 1);
                 await loadFile(files[1], 2);
@@ -294,11 +294,13 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         }
 
         setLoading(true);
+        setResult(null); // Limpiar resultados anteriores
 
         try {
             const token = getStoredToken();
-            const formData = new FormData();
 
+            // Paso 1: Crear la comparación
+            const formData = new FormData();
             formData.append('usuario_id', userProfile.usuario_id);
             formData.append('modelo_ia_id', model.id);
             formData.append('lenguaje_id', languageId);
@@ -308,9 +310,9 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
             formData.append('codigo_1', code1);
             formData.append('codigo_2', code2);
 
-            const url = buildApiUrl(API_ENDPOINTS.CREAR_COMPARACION_INDIVIDUAL);
+            const createUrl = buildApiUrl(API_ENDPOINTS.CREAR_COMPARACION_INDIVIDUAL);
 
-            const response = await fetch(url, {
+            const createResponse = await fetch(createUrl, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -318,73 +320,76 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 body: formData
             });
 
-            const data = await response.json();
+            const createData = await createResponse.json();
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Error al crear la comparación');
+            if (!createResponse.ok) {
+                throw new Error(createData.error || 'Error al crear la comparación');
             }
+
+            const comparacionId = createData.id;
 
             notification.success({
                 message: '¡Comparación creada!',
-                description: `La comparación "${finalName}" se ha creado y guardado exitosamente.`,
+                description: `La comparación "${finalName}" se ha creado. Ejecutando análisis con IA...`,
+                placement: 'topRight',
+                duration: 3,
+                icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
+            });
+
+            // Paso 2: Ejecutar el análisis con la IA
+            const executeUrl = buildApiUrl(`${API_ENDPOINTS.EJECUTAR_COMPARACION_IA}/${comparacionId}/`);
+
+            const executeResponse = await fetch(executeUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const executeData = await executeResponse.json();
+
+            if (!executeResponse.ok) {
+                throw new Error(executeData.error || 'Error al ejecutar el análisis de IA');
+            }
+
+            // Procesar los resultados de la IA
+            const iaResult = {
+                id: comparacionId,
+                nombre_comparacion: finalName,
+                similarity: {
+                    similarity_score: executeData.porcentaje_similitud || 0,
+                    explanation: executeData.respuesta_ia || 'No se pudo obtener explicación',
+                    plagiarism_likelihood: executeData.porcentaje_similitud >= 80 ? 'alto' :
+                        executeData.porcentaje_similitud >= 60 ? 'medio' : 'bajo'
+                },
+                metadata: {
+                    provider: executeData.proveedor || model.name,
+                    model_name: executeData.model_name || 'Desconocido',
+                    tiempo_respuesta: executeData.tiempo_respuesta_segundos || 0,
+                    tokens_usados: executeData.tokens_usados || 0
+                }
+            };
+
+            setResult(iaResult);
+            setIsLocked(true);
+
+            notification.success({
+                message: '¡Análisis completado!',
+                description: `El análisis se completó exitosamente en ${iaResult.metadata.tiempo_respuesta}s`,
                 placement: 'topRight',
                 duration: 4,
                 icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
             });
 
-            setIsLocked(true);
-
             if (refreshComparaciones) {
                 refreshComparaciones();
             }
 
-            const mockResult = {
-                id: data.id,
-                nombre_comparacion: finalName,
-                similarity: {
-                    similarity_score: Math.floor(Math.random() * 40) + 60,
-                    explanation: 'Los códigos muestran una estructura similar con algunas variaciones en la implementación.',
-                    common_patterns: [
-                        'Uso de bucles for para iteración',
-                        'Manejo similar de variables',
-                        'Estructura de funciones comparable'
-                    ],
-                    differences: [
-                        'Diferentes nombres de variables',
-                        'Orden de operaciones distinto',
-                        'Comentarios adicionales en el código 2'
-                    ],
-                    plagiarism_likelihood: 'medio'
-                },
-                efficiency_code1: {
-                    time_complexity: 'O(n²)',
-                    space_complexity: 'O(n)',
-                    efficiency_score: 75,
-                    bottlenecks: ['Bucle anidado innecesario', 'Asignación de memoria repetida'],
-                    optimization_suggestions: [
-                        'Considerar usar un algoritmo de búsqueda más eficiente',
-                        'Reutilizar estructuras de datos existentes'
-                    ]
-                },
-                efficiency_code2: {
-                    time_complexity: 'O(n)',
-                    space_complexity: 'O(1)',
-                    efficiency_score: 88,
-                    bottlenecks: ['Posible optimización en validaciones'],
-                    optimization_suggestions: [
-                        'Agregar más manejo de casos edge',
-                        'Considerar caché para resultados frecuentes'
-                    ]
-                },
-                provider_used: model.name
-            };
-
-            setResult(mockResult);
-
         } catch (error) {
             console.error('Error:', error);
             notification.error({
-                message: 'Error al crear comparación',
+                message: 'Error al comparar códigos',
                 description: error.message || 'Ocurrió un error al comparar los códigos. Por favor, intenta nuevamente.',
                 placement: 'topRight',
                 duration: 5
@@ -410,7 +415,7 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         return colors[likelihood] || '#a0a0a0';
     };
 
-const getMonacoLanguage = (languageId) => {
+    const getMonacoLanguage = (languageId) => {
         const lang = languages.find(l => l.id === languageId);
         if (!lang) return 'plaintext';
 
@@ -434,8 +439,84 @@ const getMonacoLanguage = (languageId) => {
         return mapping[lang.nombre.toLowerCase()] || 'plaintext';
     };
 
+    // Función para parsear la respuesta de la IA
+    const parseIAResponse = (text) => {
+        const sections = [];
+
+        // Primero, separamos por el patrón "SIMILITUD [TIPO]:"
+        // Usamos un regex más flexible que capture todo hasta el siguiente "SIMILITUD"
+
+        const patterns = [
+            {
+                key: 'lexica',
+                title: 'Similitud Léxica',
+                color: '#3b82f6',
+                // Busca "SIMILITUD LÉXICA: XX" y captura todo hasta "SIMILITUD" o "Justificación:"
+                regex: /SIMILITUD\s+LÉXICA:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
+            },
+            {
+                key: 'estructural',
+                title: 'Similitud Estructural',
+                color: '#8b5cf6',
+                regex: /SIMILITUD\s+ESTRUCTURAL:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
+            },
+            {
+                key: 'estilo',
+                title: 'Similitud de Estilo',
+                color: '#ec4899',
+                regex: /SIMILITUD\s+DE\s+ESTILO:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
+            },
+            {
+                key: 'funcional',
+                title: 'Similitud Funcional',
+                color: '#f59e0b',
+                regex: /SIMILITUD\s+FUNCIONAL:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
+            },
+            {
+                key: 'general',
+                title: 'Similitud General',
+                color: '#10b981',
+                regex: /SIMILITUD\s+GENERAL:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)$/is
+            }
+        ];
+
+        patterns.forEach(pattern => {
+            const match = text.match(pattern.regex);
+            if (match) {
+                // Limpiamos la justificación
+                let justification = match[2]
+                    .trim()
+                    // Elimina espacios extras
+                    .replace(/\s+/g, ' ')
+                    // Elimina posibles tags o caracteres especiales
+                    .replace(/[\n\r\t]/g, ' ')
+                    .trim();
+
+                // Si la justificación es muy larga, la cortamos en puntos lógicos
+                if (justification.length > 500) {
+                    const sentences = justification.split('.');
+                    if (sentences.length > 1) {
+                        // Tomamos las primeras 2-3 oraciones
+                        justification = sentences.slice(0, 3).join('.').trim();
+                        if (!justification.endsWith('.')) justification += '.';
+                    }
+                }
+
+                sections.push({
+                    key: pattern.key,
+                    title: pattern.title,
+                    color: pattern.color,
+                    percentage: parseInt(match[1]),
+                    justification: justification
+                });
+            }
+        });
+
+        return sections;
+    };
+
     return (
-        <div 
+        <div
             ref={containerRef}
             className={`code-comparison-container ${dragOverContainer ? 'drag-over-container' : ''}`}
         >
@@ -659,185 +740,89 @@ const getMonacoLanguage = (languageId) => {
                 </div>
             )}
 
-            {result && (
+            {loading && (
+                <div className="loading-message">
+                    <Spin size="large" />
+                    <div className="loading-message-icon">🤖</div>
+                    <div className="loading-message-text">
+                        Analizando códigos con {model.name}...
+                    </div>
+                    <div className="loading-message-subtext">
+                        Esto puede tomar unos segundos
+                    </div>
+                </div>
+            )}
+
+            {result && !loading && (
                 <div className="results-container">
                     <Title level={3} className="results-title">
                         Resultados del Análisis
                     </Title>
-
                     <Card className="results-card">
-                        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                            <div className="similarity-score">
-                                <div
-                                    className="similarity-percentage"
-                                    style={{ color: getSimilarityColor(result.similarity.similarity_score) }}
-                                >
-                                    {result.similarity.similarity_score}%
-                                </div>
-                                <Title level={4} className="similarity-title">
-                                    Similitud Detectada
-                                </Title>
-                                <Tag
-                                    color={getPlagiarismColor(result.similarity.plagiarism_likelihood)}
-                                    className="plagiarism-tag"
-                                >
-                                    Probabilidad de plagio: {result.similarity.plagiarism_likelihood.toUpperCase()}
-                                </Tag>
-                            </div>
-
-                            <Divider className="similarity-divider" />
-
-                            <div>
-                                <Paragraph className="similarity-explanation">
-                                    {result.similarity.explanation}
-                                </Paragraph>
-                            </div>
-
-                            <div className="patterns-grid">
-                                <div>
-                                    <Title level={5} className="patterns-section-title common">
-                                        <CheckCircleOutlined /> Patrones Comunes
-                                    </Title>
-                                    <ul className="patterns-list">
-                                        {result.similarity.common_patterns.map((pattern, idx) => (
-                                            <li key={idx}>{pattern}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                <div>
-                                    <Title level={5} className="patterns-section-title differences">
-                                        <WarningOutlined /> Diferencias
-                                    </Title>
-                                    <ul className="patterns-list">
-                                        {result.similarity.differences.map((diff, idx) => (
-                                            <li key={idx}>{diff}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </Space>
-                    </Card>
-
-                    <div className="efficiency-grid">
-                        <Card
-                            title={
-                                <Space>
-                                    <ThunderboltOutlined />
-                                    <span>Eficiencia - Código 1</span>
-                                </Space>
-                            }
-                            className="efficiency-card"
-                        >
-                            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                <div className="efficiency-metric">
-                                    <Text className="efficiency-metric-label">Puntuación: </Text>
-                                    <Tag color={result.efficiency_code1.efficiency_score >= 80 ? 'success' : 'warning'}>
-                                        {result.efficiency_code1.efficiency_score}/100
-                                    </Tag>
-                                </div>
-
-                                <div className="efficiency-metric">
-                                    <Text className="efficiency-metric-label">Complejidad Temporal: </Text>
-                                    <Tag color="blue">{result.efficiency_code1.time_complexity}</Tag>
-                                </div>
-
-                                <div className="efficiency-metric">
-                                    <Text className="efficiency-metric-label">Complejidad Espacial: </Text>
-                                    <Tag color="cyan">{result.efficiency_code1.space_complexity}</Tag>
-                                </div>
-
-                                <Divider className="efficiency-divider" />
-
-                                <div>
-                                    <Text className="efficiency-section-title bottlenecks">
-                                        Cuellos de Botella:
-                                    </Text>
-                                    <ul className="efficiency-list">
-                                        {result.efficiency_code1.bottlenecks.map((b, idx) => (
-                                            <li key={idx}>{b}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                <div>
-                                    <Text className="efficiency-section-title suggestions">
-                                        Sugerencias:
-                                    </Text>
-                                    <ul className="efficiency-list">
-                                        {result.efficiency_code1.optimization_suggestions.map((s, idx) => (
-                                            <li key={idx}>{s}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </Space>
-                        </Card>
-
-                        <Card
-                            title={
-                                <Space>
-                                    <ThunderboltOutlined />
-                                    <span>Eficiencia - Código 2</span>
-                                </Space>
-                            }
-                            className="efficiency-card"
-                        >
-                            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                <div className="efficiency-metric">
-                                    <Text className="efficiency-metric-label">Puntuación: </Text>
-                                    <Tag color={result.efficiency_code2.efficiency_score >= 80 ? 'success' : 'warning'}>
-                                        {result.efficiency_code2.efficiency_score}/100
-                                    </Tag>
-                                </div>
-
-                                <div className="efficiency-metric">
-                                    <Text className="efficiency-metric-label">Complejidad Temporal: </Text>
-                                    <Tag color="blue">{result.efficiency_code2.time_complexity}</Tag>
-                                </div>
-
-                                <div className="efficiency-metric">
-                                    <Text className="efficiency-metric-label">Complejidad Espacial: </Text>
-                                    <Tag color="cyan">{result.efficiency_code2.space_complexity}</Tag>
-                                </div>
-
-                                <Divider className="efficiency-divider" />
-
-                                <div>
-                                    <Text className="efficiency-section-title bottlenecks">
-                                        Cuellos de Botella:
-                                    </Text>
-                                    <ul className="efficiency-list">
-                                        {result.efficiency_code2.bottlenecks.map((b, idx) => (
-                                            <li key={idx}>{b}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                <div>
-                                    <Text className="efficiency-section-title suggestions">
-                                        Sugerencias:
-                                    </Text>
-                                    <ul className="efficiency-list">
-                                        {result.efficiency_code2.optimization_suggestions.map((s, idx) => (
-                                            <li key={idx}>{s}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </Space>
-                        </Card>
-                    </div>
-
-                    <div className="results-footer">
-                        <Text className="results-footer-text">
-                            Análisis realizado con{' '}
-                            <strong
-                                className="results-provider-name"
-                                style={{ color: model.color }}
+                        {/* Card de resumen principal */}
+                        <div className="similarity-summary-header">
+                            <div
+                                className="similarity-summary-percentage"
+                                style={{
+                                    background: `linear-gradient(135deg, ${getSimilarityColor(result.similarity.similarity_score)} 0%, ${getSimilarityColor(result.similarity.similarity_score)}dd 100%)`,
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text'
+                                }}
                             >
-                                {result.provider_used}
-                            </strong>
-                        </Text>
-                    </div>
+                                {result.similarity.similarity_score}%
+                            </div>
+                            <h3 className="similarity-summary-title">
+                                Similitud detectada
+                            </h3>
+                        </div>
+
+                        {/* Lista de similitud en lugar de mosaico */}
+                        <div className="similarity-list">
+                            {parseIAResponse(result.similarity.explanation).map((section, index) => {
+                                const getPercentageClass = (percentage) => {
+                                    if (percentage >= 80) return 'percentage-high';
+                                    if (percentage >= 60) return 'percentage-medium';
+                                    if (percentage >= 40) return 'percentage-low';
+                                    return 'percentage-very-low';
+                                };
+
+                                return (
+                                    <div key={section.key} className="similarity-list-item">
+                                        <div className="similarity-list-header">
+                                            <div className="similarity-list-title">
+                                                <h4 className="similarity-list-title-text">
+                                                    {section.title}
+                                                </h4>
+                                            </div>
+                                            <div
+                                                className={`similarity-list-percentage ${getPercentageClass(section.percentage)}`}
+                                                style={{ color: section.color }}
+                                            >
+                                                {section.percentage}%
+                                            </div>
+                                        </div>
+
+                                        <div className="similarity-list-progress">
+                                            <div
+                                                className="similarity-list-progress-fill"
+                                                style={{
+                                                    width: `${section.percentage}%`,
+                                                    background: section.color
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="similarity-list-body">
+                                            <p className="similarity-list-justification">
+                                                {section.justification}
+                                            </p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </Card>
                 </div>
             )}
         </div>

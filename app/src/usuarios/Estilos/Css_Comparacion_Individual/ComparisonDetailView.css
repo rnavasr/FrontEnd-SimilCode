@@ -330,3 +330,238 @@
 .comparison-detail-container .ant-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Animaciones */
+/* Animaciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes progressAnimation {
+  from {
+    width: 0%;
+  }
+}
+
+.results-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.results-card {
+  animation: scaleIn 0.5s ease-out 0.2s both;
+  background: #252525;
+  border-radius: 12px;
+  border: 1px solid #3a3a3a;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.loading-message-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #5ebd8f;
+}
+
+.loading-message-text {
+  font-size: 18px;
+  color: #c0c0c0;
+  margin-bottom: 8px;
+}
+
+.loading-message-subtext {
+  font-size: 14px;
+  color: #909090;
+}
+
+/* ========== LISTA DE SIMILITUD ========== */
+.similarity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.similarity-list-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #3a3a3a;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.similarity-list-item:nth-child(1) { animation-delay: 0.1s; }
+.similarity-list-item:nth-child(2) { animation-delay: 0.2s; }
+.similarity-list-item:nth-child(3) { animation-delay: 0.3s; }
+.similarity-list-item:nth-child(4) { animation-delay: 0.4s; }
+.similarity-list-item:nth-child(5) { animation-delay: 0.5s; }
+
+.similarity-list-item:hover {
+  transform: translateX(4px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.similarity-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.similarity-list-title {
+  flex: 1;
+}
+
+.similarity-list-title-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e0e0e0;
+  margin: 0;
+}
+
+.similarity-list-percentage {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+  min-width: 60px;
+  margin-left: 20px;
+}
+
+.similarity-list-item:nth-child(1) .similarity-list-percentage { color: #3b82f6; }
+.similarity-list-item:nth-child(2) .similarity-list-percentage { color: #8b5cf6; }
+.similarity-list-item:nth-child(3) .similarity-list-percentage { color: #ec4899; }
+.similarity-list-item:nth-child(4) .similarity-list-percentage { color: #f59e0b; }
+.similarity-list-item:nth-child(5) .similarity-list-percentage { color: #10b981; }
+
+/* Barra de progreso */
+.similarity-list-progress {
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.similarity-list-progress-fill {
+  height: 100%;
+  transition: width 1s ease-out;
+  animation: progressAnimation 1.5s ease-out;
+  border-radius: 3px;
+}
+
+/* Cuerpo con justificación */
+.similarity-list-body {
+  padding: 0;
+}
+
+.similarity-list-justification {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b0b0b0;
+  margin: 0;
+}
+
+/* Card principal de resumen */
+.similarity-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.similarity-summary-percentage {
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.similarity-summary-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #e0e0e0;
+  margin: 0;
+}
+
+.similarity-divider {
+  margin: 0 !important;
+}
+
+/* Título de resultados */
+.results-title {
+  color: #a0a0a0 !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  margin-bottom: 20px !important;
+}
+
+/* Footer */
+.results-footer {
+  animation: fadeInUp 0.5s ease-out 1s both;
+  padding-top: 20px;
+  border-top: 1px solid #3a3a3a;
+  margin-top: 20px !important;
+}
+
+.results-footer-text {
+  font-size: 13px;
+  color: #b0b0b0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .similarity-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .similarity-list-percentage {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+
+  .similarity-summary-percentage {
+    font-size: 56px;
+  }
+
+  .similarity-summary-title {
+    font-size: 20px;
+  }
+}

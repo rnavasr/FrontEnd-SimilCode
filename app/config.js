@@ -20,9 +20,10 @@ export const API_ENDPOINTS = {
   MARCAR_GRUPAL_OCULTO: '/app/usuarios/comparacion_grupal_oculto',
   LISTAR_MODELOS_ADMIN: '/app/usuarios/listar_modelos_admin/',
   LISTAR_MODELOS_USUARIO: '/app/usuarios/listar_modelos_usuario',
-  LISTAR_LENGUAJES: '/app/usuarios/listar_lenguajes',  // + /{usuario_id}
+  LISTAR_LENGUAJES: '/app/usuarios/listar_lenguajes',
   CREAR_COMPARACION_INDIVIDUAL: '/app/usuarios/crear_comparaciones_individuales/',
-  OBTENER_COMPARACION_INDIVIDUAL: '/app/usuarios/mostrar_datos_comparacion_individual'
+  OBTENER_COMPARACION_INDIVIDUAL: '/app/usuarios/mostrar_datos_comparacion_individual',
+  EJECUTAR_COMPARACION_IA: '/app/usuarios/crear_comparacion_ia'
 };
 
 // Función helper para construir URLs completas
