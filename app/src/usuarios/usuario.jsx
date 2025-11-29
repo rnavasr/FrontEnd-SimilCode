@@ -12,8 +12,7 @@ import {
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken, buildApiUrl } from '../../config';
 import logo from '../img/logo.png';
-import CodeComparisonView from './CompenentesDocente/CodeComparisonView';
-import ComparisonDetailView from './CompenentesDocente/DetalleComparacion';
+import CodeComparisonView from './CompenentesDocente/ModuloDeComparacionIndividual/CodeComparisonView';
 import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion';
 import DocenteSidebar from './CompenentesDocente/DocenteSidebar';
 import ChatManagerView from './CompenentesDocente/GestionDeComparaciones';

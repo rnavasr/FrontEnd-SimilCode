@@ -1,24 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Select, Typography, Space, Card, notification, Spin, Divider, Tag } from 'antd';
+import { Button, Select, Typography, notification, Spin } from 'antd';
 import {
     ArrowLeftOutlined,
     PlayCircleOutlined,
-    ThunderboltOutlined,
-    CheckCircleOutlined,
-    WarningOutlined,
     EditOutlined,
     CheckCircleFilled,
     InfoCircleFilled,
     FileOutlined
 } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
-import { API_ENDPOINTS, getStoredToken, buildApiUrl } from '../../../config';
-import '../Estilos/Css_Comparacion_Individual/CodeComparisonView.css';
+import { API_ENDPOINTS, getStoredToken, buildApiUrl } from '../../../../config';
+import '../../Estilos/Css_Comparacion_Individual/CodeComparisonView.css';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
-const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }) => {
+const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones, onAnalysisComplete }) => {
     // Estados principales
     const [code1, setCode1] = useState('');
     const [code2, setCode2] = useState('');
@@ -28,7 +25,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
     const [languages, setLanguages] = useState([]);
     const [loadingLanguages, setLoadingLanguages] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState(null);
     const [comparisonName, setComparisonName] = useState('');
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [dragOver1, setDragOver1] = useState(false);
@@ -294,7 +290,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         }
 
         setLoading(true);
-        setResult(null); // Limpiar resultados anteriores
 
         try {
             const token = getStoredToken();
@@ -371,8 +366,8 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 }
             };
 
-            setResult(iaResult);
             setIsLocked(true);
+            console.log('🔒 isLocked establecido a true');
 
             notification.success({
                 message: '¡Análisis completado!',
@@ -382,8 +377,19 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                 icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
             });
 
+            console.log('🔄 Llamando refreshComparaciones');
             if (refreshComparaciones) {
                 refreshComparaciones();
+            }
+
+            // Llamar al callback para pasar el resultado al componente padre
+            console.log('📤 onAnalysisComplete existe?', !!onAnalysisComplete);
+            console.log('📦 iaResult:', iaResult);
+            if (onAnalysisComplete) {
+                console.log('✅ Enviando resultado al componente padre:', iaResult);
+                onAnalysisComplete(iaResult);
+            } else {
+                console.error('❌ onAnalysisComplete NO ESTÁ DEFINIDO');
             }
 
         } catch (error) {
@@ -397,22 +403,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         } finally {
             setLoading(false);
         }
-    };
-
-    const getSimilarityColor = (score) => {
-        if (score >= 80) return '#ff6b6b';
-        if (score >= 60) return '#ffa726';
-        if (score >= 40) return '#66bb6a';
-        return '#5ebd8f';
-    };
-
-    const getPlagiarismColor = (likelihood) => {
-        const colors = {
-            'alto': '#ff6b6b',
-            'medio': '#ffa726',
-            'bajo': '#66bb6a'
-        };
-        return colors[likelihood] || '#a0a0a0';
     };
 
     const getMonacoLanguage = (languageId) => {
@@ -437,82 +427,6 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
         };
 
         return mapping[lang.nombre.toLowerCase()] || 'plaintext';
-    };
-
-    // Función para parsear la respuesta de la IA
-    const parseIAResponse = (text) => {
-        const sections = [];
-
-        // Primero, separamos por el patrón "SIMILITUD [TIPO]:"
-        // Usamos un regex más flexible que capture todo hasta el siguiente "SIMILITUD"
-
-        const patterns = [
-            {
-                key: 'lexica',
-                title: 'Similitud Léxica',
-                color: '#3b82f6',
-                // Busca "SIMILITUD LÉXICA: XX" y captura todo hasta "SIMILITUD" o "Justificación:"
-                regex: /SIMILITUD\s+LÉXICA:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
-            },
-            {
-                key: 'estructural',
-                title: 'Similitud Estructural',
-                color: '#8b5cf6',
-                regex: /SIMILITUD\s+ESTRUCTURAL:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
-            },
-            {
-                key: 'estilo',
-                title: 'Similitud de Estilo',
-                color: '#ec4899',
-                regex: /SIMILITUD\s+DE\s+ESTILO:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
-            },
-            {
-                key: 'funcional',
-                title: 'Similitud Funcional',
-                color: '#f59e0b',
-                regex: /SIMILITUD\s+FUNCIONAL:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)(?=SIMILITUD\s+|$)/is
-            },
-            {
-                key: 'general',
-                title: 'Similitud General',
-                color: '#10b981',
-                regex: /SIMILITUD\s+GENERAL:\s*(\d+)(?:\s+Justificación:)?\s*(.+?)$/is
-            }
-        ];
-
-        patterns.forEach(pattern => {
-            const match = text.match(pattern.regex);
-            if (match) {
-                // Limpiamos la justificación
-                let justification = match[2]
-                    .trim()
-                    // Elimina espacios extras
-                    .replace(/\s+/g, ' ')
-                    // Elimina posibles tags o caracteres especiales
-                    .replace(/[\n\r\t]/g, ' ')
-                    .trim();
-
-                // Si la justificación es muy larga, la cortamos en puntos lógicos
-                if (justification.length > 500) {
-                    const sentences = justification.split('.');
-                    if (sentences.length > 1) {
-                        // Tomamos las primeras 2-3 oraciones
-                        justification = sentences.slice(0, 3).join('.').trim();
-                        if (!justification.endsWith('.')) justification += '.';
-                    }
-                }
-
-                sections.push({
-                    key: pattern.key,
-                    title: pattern.title,
-                    color: pattern.color,
-                    percentage: parseInt(match[1]),
-                    justification: justification
-                });
-            }
-        });
-
-        return sections;
     };
 
     return (
@@ -752,81 +666,8 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                     </div>
                 </div>
             )}
-
-            {result && !loading && (
-                <div className="results-container">
-                    <Title level={3} className="results-title">
-                        Resultados del Análisis
-                    </Title>
-                    <Card className="results-card">
-                        {/* Card de resumen principal */}
-                        <div className="similarity-summary-header">
-                            <div
-                                className="similarity-summary-percentage"
-                                style={{
-                                    background: `linear-gradient(135deg, ${getSimilarityColor(result.similarity.similarity_score)} 0%, ${getSimilarityColor(result.similarity.similarity_score)}dd 100%)`,
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text'
-                                }}
-                            >
-                                {result.similarity.similarity_score}%
-                            </div>
-                            <h3 className="similarity-summary-title">
-                                Similitud detectada
-                            </h3>
-                        </div>
-
-                        {/* Lista de similitud en lugar de mosaico */}
-                        <div className="similarity-list">
-                            {parseIAResponse(result.similarity.explanation).map((section, index) => {
-                                const getPercentageClass = (percentage) => {
-                                    if (percentage >= 80) return 'percentage-high';
-                                    if (percentage >= 60) return 'percentage-medium';
-                                    if (percentage >= 40) return 'percentage-low';
-                                    return 'percentage-very-low';
-                                };
-
-                                return (
-                                    <div key={section.key} className="similarity-list-item">
-                                        <div className="similarity-list-header">
-                                            <div className="similarity-list-title">
-                                                <h4 className="similarity-list-title-text">
-                                                    {section.title}
-                                                </h4>
-                                            </div>
-                                            <div
-                                                className={`similarity-list-percentage ${getPercentageClass(section.percentage)}`}
-                                                style={{ color: section.color }}
-                                            >
-                                                {section.percentage}%
-                                            </div>
-                                        </div>
-
-                                        <div className="similarity-list-progress">
-                                            <div
-                                                className="similarity-list-progress-fill"
-                                                style={{
-                                                    width: `${section.percentage}%`,
-                                                    background: section.color
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="similarity-list-body">
-                                            <p className="similarity-list-justification">
-                                                {section.justification}
-                                            </p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </Card>
-                </div>
-            )}
         </div>
     );
 };
 
-export default CodeComparisonView;
+export default CodeComparisonInput;
