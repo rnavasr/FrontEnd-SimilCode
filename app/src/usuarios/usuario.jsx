@@ -16,6 +16,7 @@ import CodeComparisonView from './CompenentesDocente/ModuloDeComparacionIndividu
 import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion';
 import DocenteSidebar from './CompenentesDocente/DocenteSidebar';
 import ChatManagerView from './CompenentesDocente/GestionDeComparaciones';
+import ComparisonDetailView from './CompenentesDocente/MostrarDatosComparacionesIndividualesCreadas/DetalleComparacion';
 import './globalStyles.css';
 
 const { Content } = Layout;
