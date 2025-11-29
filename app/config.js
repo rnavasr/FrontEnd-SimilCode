@@ -23,7 +23,8 @@ export const API_ENDPOINTS = {
   LISTAR_LENGUAJES: '/app/usuarios/listar_lenguajes',
   CREAR_COMPARACION_INDIVIDUAL: '/app/usuarios/crear_comparaciones_individuales/',
   OBTENER_COMPARACION_INDIVIDUAL: '/app/usuarios/mostrar_datos_comparacion_individual',
-  EJECUTAR_COMPARACION_IA: '/app/usuarios/crear_comparacion_ia'
+  EJECUTAR_COMPARACION_IA: '/app/usuarios/crear_comparacion_ia',
+  OBTENER_RESULTADO_COMPARACION_IA: '/app/usuarios/mostrar_resultados_similitud_individual/'
 };
 
 // Función helper para construir URLs completas
