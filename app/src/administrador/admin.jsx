@@ -2,30 +2,16 @@ import React, { useState, useEffect } from 'react';
 import {
     Card,
     Typography,
-    Space,
-    Row,
-    Col,
-    Avatar,
-    Divider,
     Button,
     message,
     Spin,
-    Tag,
     Alert,
-    Statistic,
-    Badge,
     Layout
 } from 'antd';
 import {
     UserOutlined,
     LogoutOutlined,
-    IdcardOutlined,
-    CrownOutlined,
-    ReloadOutlined,
-    DashboardOutlined,
-    TeamOutlined,
-    SettingOutlined,
-    SafetyOutlined
+    ReloadOutlined
 } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken } from '../../config';
 import logoImage from '../img/logo.png';
@@ -87,29 +73,51 @@ const Admin = () => {
         fetchUserProfile();
     };
 
-    const handleAdminAction = (action) => {
-        message.info(`Funcionalidad de ${action} en desarrollo...`);
-    };
-
     if (loading) {
-        return (
-            <div style={{
-                minHeight: '100vh',
-                background: 'linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '20px'
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: '#1a1a1a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <Card style={{
+          textAlign: 'center',
+          minWidth: '300px',
+          background: '#242424',
+          border: '1px solid #2d2d2d',
+          borderRadius: '12px'
+        }}>
+          <Spin size="large" />
+          <div style={{ marginTop: '16px' }}>
+            <Text style={{ 
+              color: '#a0a0a0',
+              fontSize: '16px',
+              fontFamily: "'Playfair Display', 'Georgia', serif"
             }}>
-                <Card style={{ textAlign: 'center', minWidth: '300px' }}>
-                    <Spin size="large" />
-                    <div style={{ marginTop: '16px' }}>
-                        <Text>Cargando panel de administración...</Text>
-                    </div>
-                </Card>
-            </div>
-        );
-    }
+              Verificando autenticación...
+            </Text>
+          </div>
+        </Card>
+
+        {/* Estilos globales para el spinner */}
+        <style jsx global>{`
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+          .ant-spin-dot-item {
+            background-color: #5ebd8f !important;
+          }
+
+          .ant-card {
+            background: #242424 !important;
+            border: 1px solid #2d2d2d !important;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
     if (error) {
         return (
@@ -204,31 +212,95 @@ const Admin = () => {
                                 SimilCode
                             </Title>
                         </div>
+
+                        {/* Sección de opciones de administración */}
+                        <div style={{ marginTop: '20px' }}>
+                            <div 
+                                className="admin-menu-item"
+                                style={{
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    marginBottom: '8px',
+                                    cursor: 'pointer',
+                                    transition: 'background 0.2s ease'
+                                }}
+                                onClick={() => message.info('Gestión de usuarios')}
+                            >
+                                <Text strong style={{ 
+                                    color: '#e8e8e8', 
+                                    display: 'block',
+                                    fontSize: '14px',
+                                    marginBottom: '4px'
+                                }}>
+                                    <UserOutlined style={{ marginRight: '8px' }} />
+                                    Usuarios
+                                </Text>
+                            </div>
+
+                            <div 
+                                className="admin-menu-item"
+                                style={{
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    marginBottom: '8px',
+                                    cursor: 'pointer',
+                                    transition: 'background 0.2s ease'
+                                }}
+                                onClick={() => message.info('Gestión de lenguajes')}
+                            >
+                                <Text strong style={{ 
+                                    color: '#e8e8e8', 
+                                    display: 'block',
+                                    fontSize: '14px',
+                                    marginBottom: '4px'
+                                }}>
+                                    <svg 
+                                        style={{ 
+                                            width: '14px', 
+                                            height: '14px', 
+                                            marginRight: '8px',
+                                            verticalAlign: 'middle'
+                                        }} 
+                                        viewBox="0 0 24 24" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        strokeWidth="2"
+                                    >
+                                        <polyline points="16 18 22 12 16 6"></polyline>
+                                        <polyline points="8 6 2 12 8 18"></polyline>
+                                    </svg>
+                                    Lenguajes
+                                </Text>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Usuario y cerrar sesión en la parte inferior */}
                     <div style={{
-                        padding: '24px',
+                        padding: '16px',
                         borderTop: '1px solid #404040'
                     }}>
-                        <div style={{
-                            height: '40px',
-                            borderRadius: '8px',
-                            background: 'transparent',
-                            border: '1px solid #3d3d3d',
-                            color: '#e8e8e8',
-                            fontSize: '14px',
-                            fontFamily: "'Playfair Display', 'Georgia', serif",
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            paddingLeft: '16px'
-                        }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                        <div 
+                            className="admin-user-button"
+                            style={{
+                                height: '40px',
+                                borderRadius: '8px',
+                                background: 'transparent',
+                                border: '1px solid #3d3d3d',
+                                color: '#e8e8e8',
+                                fontSize: '14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                paddingLeft: '16px',
+                                gap: '12px',
+                                marginBottom: '10px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
                         >
-                            <UserOutlined style={{ fontSize: '20px', color: '#ffffff' }} />
-                            <Text strong style={{ color: '#ffffff', fontSize: '15px' }}>
+                            <UserOutlined style={{ fontSize: '18px', color: '#e8e8e8' }} />
+                            <Text style={{ color: '#e8e8e8', fontSize: '14px' }}>
                                 {userProfile?.nombre || 'admin'}
                             </Text>
                         </div>
@@ -237,23 +309,19 @@ const Admin = () => {
                             icon={<LogoutOutlined />}
                             onClick={handleLogout}
                             block
+                            className="logout-button"
                             style={{
                                 borderRadius: '8px',
                                 background: 'transparent',
-                                border: '1px solid #ff4d4f',
-                                color: '#ff4d4f',
+                                border: '1px solid #5c3535',
+                                color: '#ff6b6b',
                                 height: '40px',
                                 fontSize: '14px',
                                 fontWeight: 500,
-                                transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = '#ff4d4f';
-                                e.currentTarget.style.color = '#e8e8e8';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'transparent';
-                                e.currentTarget.style.color = '#ff4d4f';
+                                transition: 'all 0.2s',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}
                         >
                             Cerrar sesión
@@ -305,6 +373,30 @@ const Admin = () => {
                     </div>
                 </Content>
             </Layout>
+
+            <style>{`
+                /* Botón de usuario con hover */
+                .admin-user-button:hover {
+                    background: rgba(255,255,255,0.05) !important;
+                    border-color: #5ebd8f !important;
+                }
+
+                /* Botón de cerrar sesión */
+                .logout-button:hover {
+                    background: rgba(255, 107, 107, 0.1) !important;
+                    border-color: #ff6b6b !important;
+                    color: #ff8787 !important;
+                }
+
+                /* Items del menú de administración */
+                .admin-menu-item {
+                    transition: all 0.2s ease;
+                }
+
+                .admin-menu-item:hover {
+                    background: #2d2d2d !important;
+                }
+            `}</style>
         </Layout>
     );
 };
