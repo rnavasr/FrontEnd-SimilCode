@@ -13,7 +13,8 @@ import {
     Tag,
     Alert,
     Statistic,
-    Badge
+    Badge,
+    Layout
 } from 'antd';
 import {
     UserOutlined,
@@ -27,8 +28,10 @@ import {
     SafetyOutlined
 } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken } from '../../config';
+import logoImage from '../img/logo.png';
 
 const { Title, Text } = Typography;
+const { Sider, Content } = Layout;
 
 const Admin = () => {
     const [userProfile, setUserProfile] = useState(null);
@@ -148,268 +151,161 @@ const Admin = () => {
     }
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%)',
-            padding: '20px'
-        }}>
-            <Row gutter={[20, 20]} justify="center">
-
-                {/* Panel Principal del Admin */}
-                <Col xs={24} lg={16}>
-                    <Card
-                        style={{
-                            borderRadius: '16px',
-                            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
-                            border: 'none',
-                            background: 'rgba(255, 255, 255, 0.95)',
-                            backdropFilter: 'blur(10px)'
-                        }}
-                        styles={{
-                            body: { padding: '32px' }
-                        }}
-                    >
-                        {/* Header Admin */}
-                        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                            <Badge.Ribbon text="ADMIN" color="gold">
-                                <Avatar
-                                    size={120}
-                                    style={{
-                                        background: 'linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%)',
-                                        border: '4px solid #fff',
-                                        boxShadow: '0 8px 25px rgba(255, 107, 107, 0.3)'
-                                    }}
-                                    icon={<CrownOutlined />}
-                                />
-                            </Badge.Ribbon>
-
-                            <Title level={1} style={{ margin: '20px 0 8px 0', color: '#1a1a1a' }}>
-                                Panel de Administrador
+        <Layout style={{ minHeight: '100vh' }}>
+            {/* Sidebar */}
+            <Sider
+                width={280}
+                style={{
+                    background: '#2b2b2b',
+                    position: 'fixed',
+                    height: '100vh',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    overflow: 'auto',
+                    boxShadow: '2px 0 8px rgba(0,0,0,0.15)'
+                }}
+            >
+                <div style={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
+                }}>
+                    {/* Logo en la parte superior */}
+                    <div style={{ padding: '15px 16px' }}>
+                        <div style={{
+                            padding: '8px 0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            marginBottom: '24px'
+                        }}>
+                            <img
+                                src={logoImage}
+                                alt="SimiliCode Logo"
+                                style={{
+                                    width: '30px',
+                                    height: '30px',
+                                    objectFit: 'contain',
+                                    filter: 'brightness(1.1)'
+                                }}
+                            />
+                            <Title
+                                level={4}
+                                style={{
+                                    color: '#e8e8e8',
+                                    margin: 0,
+                                    fontFamily: "'Playfair Display', 'Georgia', serif",
+                                    fontSize: '20px',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                SimilCode
                             </Title>
+                        </div>
+                    </div>
 
-                            <Title level={3} style={{ margin: '0 0 8px 0', color: '#333' }}>
-                                {userProfile.nombre} {userProfile.apellido}
-                            </Title>
-
-                            <Text type="secondary" style={{ fontSize: '18px' }}>
-                                @{userProfile.usuario}
+                    {/* Usuario y cerrar sesión en la parte inferior */}
+                    <div style={{
+                        padding: '24px',
+                        borderTop: '1px solid #404040'
+                    }}>
+                        <div style={{
+                            height: '40px',
+                            borderRadius: '8px',
+                            background: 'transparent',
+                            border: '1px solid #3d3d3d',
+                            color: '#e8e8e8',
+                            fontSize: '14px',
+                            fontFamily: "'Playfair Display', 'Georgia', serif",
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            paddingLeft: '16px'
+                        }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                        >
+                            <UserOutlined style={{ fontSize: '20px', color: '#ffffff' }} />
+                            <Text strong style={{ color: '#ffffff', fontSize: '15px' }}>
+                                {userProfile?.nombre || 'admin'}
                             </Text>
+                        </div>
 
-                            <div style={{ marginTop: '16px' }}>
-                                <Tag
-                                    icon={<SafetyOutlined />}
-                                    color="red"
-                                    style={{ fontSize: '16px', padding: '8px 16px', fontWeight: 'bold' }}
-                                >
-                                    ADMINISTRADOR DEL SISTEMA
-                                </Tag>
+                        <Button
+                            icon={<LogoutOutlined />}
+                            onClick={handleLogout}
+                            block
+                            style={{
+                                borderRadius: '8px',
+                                background: 'transparent',
+                                border: '1px solid #ff4d4f',
+                                color: '#ff4d4f',
+                                height: '40px',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#ff4d4f';
+                                e.currentTarget.style.color = '#e8e8e8';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = '#ff4d4f';
+                            }}
+                        >
+                            Cerrar sesión
+                        </Button>
+                    </div>
+                </div>
+            </Sider>
+
+            {/* Contenido principal */}
+            <Layout style={{ marginLeft: 280 }}>
+                <Content style={{
+                    background: '#1a1a1a',
+                    minHeight: '100vh',
+                    padding: '0'
+                }}>
+                    <div style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '40px 20px'
+                    }}>
+                        <div style={{ textAlign: 'center', maxWidth: '800px' }}>
+                            {/* Logo/Icono central */}
+                            <div style={{ marginBottom: '32px' }}>
+                                <img
+                                    src={logoImage}
+                                    alt="SimiliCode"
+                                    style={{
+                                        width: '120px',
+                                        height: '120px',
+                                        filter: 'brightness(0) invert(1)',
+                                        opacity: 0.9
+                                    }}
+                                />
                             </div>
-                        </div>
 
-                        <Divider />
-
-                        {/* Información del Admin */}
-                        <Row gutter={[24, 24]}>
-                            <Col xs={24} md={12}>
-                                <Card
-                                    size="small"
-                                    title={
-                                        <span>
-                                            <IdcardOutlined style={{ marginRight: '8px', color: '#ff6b6b' }} />
-                                            Información Personal
-                                        </span>
-                                    }
-                                    style={{ height: '100%' }}
-                                >
-                                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                                        <div>
-                                            <Text strong style={{ color: '#666' }}>ID Usuario:</Text>
-                                            <br />
-                                            <Text style={{ fontSize: '16px', fontWeight: '500' }}>#{userProfile.usuario_id}</Text>
-                                        </div>
-
-                                        <div>
-                                            <Text strong style={{ color: '#666' }}>Nombre Completo:</Text>
-                                            <br />
-                                            <Text style={{ fontSize: '16px', fontWeight: '500' }}>
-                                                {userProfile.nombre} {userProfile.apellido}
-                                            </Text>
-                                        </div>
-
-                                        <div>
-                                            <Text strong style={{ color: '#666' }}>Usuario:</Text>
-                                            <br />
-                                            <Text style={{ fontSize: '16px', fontWeight: '500' }}>@{userProfile.usuario}</Text>
-                                        </div>
-
-                                        <div>
-                                            <Text strong style={{ color: '#666' }}>Nivel de Acceso:</Text>
-                                            <br />
-                                            <Tag
-                                                icon={<CrownOutlined />}
-                                                color="gold"
-                                                style={{ fontSize: '14px', padding: '4px 12px', marginTop: '4px' }}
-                                            >
-                                                ADMINISTRADOR COMPLETO
-                                            </Tag>
-                                        </div>
-                                    </Space>
-                                </Card>
-                            </Col>
-
-                            <Col xs={24} md={12}>
-                                <Card
-                                    size="small"
-                                    title={
-                                        <span>
-                                            <DashboardOutlined style={{ marginRight: '8px', color: '#ffd93d' }} />
-                                            Estadísticas Rápidas
-                                        </span>
-                                    }
-                                    style={{ height: '100%' }}
-                                >
-                                    <Row gutter={[16, 16]}>
-                                        <Col span={12}>
-                                            <Statistic
-                                                title="Usuarios Activos"
-                                                value={25}
-                                                prefix={<TeamOutlined />}
-                                                valueStyle={{ color: '#3f8600' }}
-                                            />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic
-                                                title="Sesiones Hoy"
-                                                value={8}
-                                                prefix={<UserOutlined />}
-                                                valueStyle={{ color: '#cf1322' }}
-                                            />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic
-                                                title="Configuraciones"
-                                                value={12}
-                                                prefix={<SettingOutlined />}
-                                                valueStyle={{ color: '#1890ff' }}
-                                            />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic
-                                                title="Alertas"
-                                                value={3}
-                                                prefix={<SafetyOutlined />}
-                                                valueStyle={{ color: '#faad14' }}
-                                            />
-                                        </Col>
-                                    </Row>
-                                </Card>
-                            </Col>
-                        </Row>
-
-                        <Divider />
-
-                        {/* Acciones de Admin */}
-                        <div>
-                            <Title level={4} style={{ marginBottom: '20px', color: '#1a1a1a' }}>
-                                <SettingOutlined style={{ marginRight: '8px' }} />
-                                Acciones de Administrador
+                            {/* Mensaje de bienvenida */}
+                            <Title level={1} style={{
+                                color: '#e8e8e8',
+                                fontSize: '48px',
+                                fontWeight: 400,
+                                margin: '0 0 16px 0',
+                                fontFamily: 'serif'
+                            }}>
+                                ¡{userProfile?.nombre}, Buenos días!
                             </Title>
-
-                            <Row gutter={[16, 16]}>
-                                <Col xs={24} sm={12} md={8}>
-                                    <Button
-                                        type="primary"
-                                        icon={<TeamOutlined />}
-                                        onClick={() => handleAdminAction('Gestión de Usuarios')}
-                                        block
-                                        size="large"
-                                        style={{
-                                            height: '50px',
-                                            borderRadius: '8px',
-                                            background: 'linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%)',
-                                            border: 'none'
-                                        }}
-                                    >
-                                        Gestionar Usuarios
-                                    </Button>
-                                </Col>
-
-                                <Col xs={24} sm={12} md={8}>
-                                    <Button
-                                        type="primary"
-                                        icon={<SettingOutlined />}
-                                        onClick={() => handleAdminAction('Configuración del Sistema')}
-                                        block
-                                        size="large"
-                                        style={{
-                                            height: '50px',
-                                            borderRadius: '8px',
-                                            background: 'linear-gradient(135deg, #ffd93d 0%, #6bcf7f 100%)',
-                                            border: 'none'
-                                        }}
-                                    >
-                                        Configuraciones
-                                    </Button>
-                                </Col>
-
-                                <Col xs={24} sm={12} md={8}>
-                                    <Button
-                                        type="primary"
-                                        icon={<SafetyOutlined />}
-                                        onClick={() => handleAdminAction('Seguridad')}
-                                        block
-                                        size="large"
-                                        style={{
-                                            height: '50px',
-                                            borderRadius: '8px',
-                                            background: 'linear-gradient(135deg, #6bcf7f 0%, #667eea 100%)',
-                                            border: 'none'
-                                        }}
-                                    >
-                                        Seguridad
-                                    </Button>
-                                </Col>
-
-                                <Col xs={24} sm={12}>
-                                    <Button
-                                        icon={<ReloadOutlined />}
-                                        onClick={handleRetry}
-                                        block
-                                        size="large"
-                                        style={{
-                                            height: '50px',
-                                            borderRadius: '8px',
-                                            border: '2px solid #ff6b6b',
-                                            color: '#ff6b6b'
-                                        }}
-                                    >
-                                        Actualizar Datos
-                                    </Button>
-                                </Col>
-
-                                <Col xs={24} sm={12}>
-                                    <Button
-                                        danger
-                                        icon={<LogoutOutlined />}
-                                        onClick={handleLogout}
-                                        block
-                                        size="large"
-                                        style={{
-                                            height: '50px',
-                                            borderRadius: '8px'
-                                        }}
-                                    >
-                                        Cerrar Sesión Admin
-                                    </Button>
-                                </Col>
-                            </Row>
                         </div>
-
-                    </Card>
-                </Col>
-
-            </Row>
-        </div>
+                    </div>
+                </Content>
+            </Layout>
+        </Layout>
     );
 };
 
