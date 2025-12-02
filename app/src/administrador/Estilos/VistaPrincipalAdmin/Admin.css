@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* Global Ant Design Overrides */
+.ant-layout {
+    background: #1a1a1a !important;
+}
+
+/* Loading State */
+.admin-loading-container {
+    min-height: 100vh;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.admin-loading-card {
+    text-align: center;
+    min-width: 300px;
+    background: #242424 !important;
+    border: 1px solid #2d2d2d !important;
+    border-radius: 12px;
+}
+
+.admin-loading-text {
+    margin-top: 16px;
+}
+
+.admin-loading-message {
+    color: #a0a0a0;
+    font-size: 16px;
+    font-family: 'Playfair Display', 'Georgia', serif;
+}
+
+/* Spinner global styles */
+.ant-spin-dot-item {
+    background-color: #5ebd8f !important;
+}
+
+.ant-card {
+    background: #242424 !important;
+    border: 1px solid #2d2d2d !important;
+}
+
+/* Error State */
+.admin-error-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.admin-error-card {
+    max-width: 500px;
+    width: 100%;
+}
+
+.admin-error-alert {
+    margin-bottom: 16px;
+}
+
+.admin-error-actions {
+    text-align: center;
+}
+
+.admin-retry-button {
+    margin-right: 8px;
+}
+
+/* Main Layout */
+.admin-layout {
+    min-height: 100vh;
+    background: #1a1a1a;
+}
+
+.admin-main-layout {
+    margin-left: 320px;
+    background: #1a1a1a;
+    width: calc(100% - 320px);
+}
+
+.admin-content {
+    background: #1a1a1a;
+    min-height: 100vh;
+    padding: 0;
+    width: 100%;
+}
+
+/* Welcome Section */
+.admin-welcome-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.admin-welcome-content {
+    text-align: center;
+    max-width: 800px;
+}
+
+.admin-welcome-logo {
+    margin-bottom: 32px;
+}
+
+.admin-logo-image {
+    width: 120px;
+    height: 120px;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.admin-welcome-title {
+    color: #e8e8e8 !important;
+    font-size: 48px !important;
+    font-weight: 400 !important;
+    margin: 0 0 16px 0 !important;
+    font-family: serif !important;
+}

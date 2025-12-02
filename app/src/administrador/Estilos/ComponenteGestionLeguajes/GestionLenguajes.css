@@ -1,0 +1,289 @@
+/* Container Principal */
+.gestion-lenguajes-container {
+    min-height: 100vh;
+    background: transparent;
+    padding: 40px;
+}
+
+.gestion-lenguajes-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header con botones */
+.gestion-lenguajes-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+/* Botón Volver */
+.btn-volver {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 8px;
+    background: #2b2b2b !important;
+    border: 1px solid #3d3d3d !important;
+    color: #e8e8e8 !important;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+    background: #2b2b2b !important;
+    border-color: #5ebd8f !important;
+    color: #5ebd8f !important;
+    transform: translateY(-1px);
+}
+
+.btn-volver .anticon {
+    font-size: 16px;
+}
+
+/* Botón Crear Lenguaje */
+.btn-crear-lenguaje {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 8px;
+    background: #5ebd8f !important;
+    border: 1px solid #5ebd8f !important;
+    color: #ffffff !important;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-crear-lenguaje:hover {
+    background: #4da87a !important;
+    border-color: #4da87a !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(94, 189, 143, 0.3);
+}
+
+.btn-crear-lenguaje .anticon {
+    font-size: 16px;
+}
+
+/* Tabla Card */
+.lenguajes-table-card {
+    background: #242424;
+    border-radius: 12px;
+    border: 1px solid #2d2d2d;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* Header de la tabla */
+.lenguajes-table-header {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr;
+    gap: 16px;
+    padding: 20px 24px;
+    background: #2b2b2b;
+    border-bottom: 2px solid #3d3d3d;
+}
+
+.lenguajes-table-header > div {
+    color: #e8e8e8;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-col-acciones {
+    text-align: center;
+}
+
+/* Body de la tabla */
+.lenguajes-table-body {
+    min-height: 400px;
+}
+
+.lenguajes-table-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #2d2d2d;
+    transition: all 0.2s ease;
+}
+
+.lenguajes-table-row:hover {
+    background: #2b2b2b;
+}
+
+.lenguajes-table-row:last-child {
+    border-bottom: none;
+}
+
+.lenguajes-table-row > div {
+    display: flex;
+    align-items: center;
+    color: #e8e8e8;
+    font-size: 14px;
+}
+
+.table-col-nombre {
+    font-weight: 500;
+}
+
+.table-col-extension {
+    color: #a0a0a0;
+    font-family: 'Courier New', monospace;
+}
+
+.table-col-acciones {
+    justify-content: center;
+    gap: 16px;
+}
+
+/* Botón Editar */
+.btn-editar {
+    color: #a0a0a0 !important;
+    font-size: 18px !important;
+    padding: 8px !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-editar:hover {
+    color: #5ebd8f !important;
+    background: rgba(94, 189, 143, 0.1) !important;
+}
+
+.btn-editar .anticon {
+    font-size: 18px;
+}
+
+/* Switch personalizado */
+.switch-activo {
+    background-color: #666 !important;
+}
+
+.switch-activo.ant-switch-checked {
+    background-color: #5ebd8f !important;
+}
+
+.switch-activo:hover {
+    opacity: 0.9;
+}
+
+/* Loading */
+.lenguajes-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.lenguajes-loading .ant-spin-dot-item {
+    background-color: #5ebd8f !important;
+}
+
+/* Modal */
+.modal-lenguaje .ant-modal-content {
+    background: #242424 !important;
+    border: 1px solid #2d2d2d !important;
+}
+
+.modal-lenguaje .ant-modal-header {
+    background: #2b2b2b !important;
+    border-bottom: 1px solid #3d3d3d !important;
+}
+
+.modal-lenguaje .ant-modal-title {
+    color: #e8e8e8 !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+.modal-lenguaje .ant-modal-close {
+    color: #a0a0a0 !important;
+}
+
+.modal-lenguaje .ant-modal-close:hover {
+    color: #e8e8e8 !important;
+}
+
+.modal-lenguaje .ant-form-item-label > label {
+    color: #e8e8e8 !important;
+}
+
+.modal-lenguaje .ant-input {
+    background: #2b2b2b !important;
+    border: 1px solid #3d3d3d !important;
+    color: #e8e8e8 !important;
+}
+
+.modal-lenguaje .ant-input:hover,
+.modal-lenguaje .ant-input:focus {
+    border-color: #5ebd8f !important;
+}
+
+.modal-lenguaje .ant-input::placeholder {
+    color: #666 !important;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 24px;
+    margin-bottom: 0 !important;
+}
+
+.form-actions .ant-form-item-control-input-content {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.form-actions button {
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.form-actions .btn-submit {
+    background: #5ebd8f !important;
+    border-color: #5ebd8f !important;
+}
+
+.form-actions .btn-submit:hover {
+    background: #4da87a !important;
+    border-color: #4da87a !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gestion-lenguajes-container {
+        padding: 20px;
+    }
+
+    .gestion-lenguajes-header {
+        flex-direction: column;
+    }
+
+    .lenguajes-table-header,
+    .lenguajes-table-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .table-col-acciones {
+        justify-content: flex-start;
+    }
+
+    .lenguajes-table-header .table-col-extension,
+    .lenguajes-table-header .table-col-acciones {
+        display: none;
+    }
+}
