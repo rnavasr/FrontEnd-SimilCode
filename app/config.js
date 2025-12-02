@@ -25,9 +25,10 @@ export const API_ENDPOINTS = {
   OBTENER_COMPARACION_INDIVIDUAL: '/app/usuarios/mostrar_datos_comparacion_individual',
   EJECUTAR_COMPARACION_IA: '/app/usuarios/crear_comparacion_ia',
   OBTENER_RESULTADO_COMPARACION_IA: '/app/usuarios/mostrar_resultados_similitud_individual/',
-  CREAR_LENGUAJE_ADMIN: '/app/administrador/listar_lenguajes/',
-  LISTAR_LENGUAJE_ADMIN: '/app/administrador/crear_lenguajes/',
-  EDITAR_LENGUAJE_ADMIN: '/app/administrador/editar_lenguajes/'
+  CREAR_LENGUAJE_ADMIN: '/app/administrador/crear_lenguajes/',
+  LISTAR_LENGUAJE_ADMIN: '/app/administrador/listar_lenguajes',  // ← SIN / al final
+  EDITAR_LENGUAJE_ADMIN: '/app/administrador/editar_lenguajes/',  // ← SIN / al final
+  CAMBIAR_ESTADO_LENGUAJE_ADMIN: '/app/administrador/cambiar_estado_lenguaje/'  // ← SIN / al final
 };
 
 // Función helper para construir URLs completas
@@ -163,4 +164,43 @@ export const saveToken = (token) => {
 // Función helper para eliminar el token
 export const removeToken = () => {
   localStorage.removeItem('token');
+};
+
+// Agregar al final de config.js
+export const getWithAuthAndParams = async (endpoint, params, token) => {
+  try {
+    // Construir la URL con parámetros
+    const url = params ? `${endpoint}/${params}` : endpoint;
+
+    const response = await fetch(buildApiUrl(url), {
+      method: 'GET',
+      headers: {
+        ...DEFAULT_HEADERS,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Error ${response.status}: ${response.statusText}`;
+
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.mensaje || errorData.message || errorMessage;
+      } catch (parseError) {
+        console.error('No se pudo parsear la respuesta de error:', parseError);
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+
+  } catch (error) {
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      throw new Error('Error de conexión. Verifica que el servidor esté ejecutándose y que CORS esté configurado correctamente.');
+    }
+
+    throw error;
+  }
 };
