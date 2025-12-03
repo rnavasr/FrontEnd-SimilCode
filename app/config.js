@@ -26,9 +26,9 @@ export const API_ENDPOINTS = {
   EJECUTAR_COMPARACION_IA: '/app/usuarios/crear_comparacion_ia',
   OBTENER_RESULTADO_COMPARACION_IA: '/app/usuarios/mostrar_resultados_similitud_individual/',
   CREAR_LENGUAJE_ADMIN: '/app/administrador/crear_lenguajes/',
-  LISTAR_LENGUAJE_ADMIN: '/app/administrador/listar_lenguajes/',
-  EDITAR_LENGUAJE_ADMIN: '/app/administrador/editar_lenguajes/',
-  CAMBIAR_ESTADO_LENGUAJE_ADMIN: '/app/administrador/cambiar_estado_lenguaje/'
+  LISTAR_LENGUAJE_ADMIN: '/app/administrador/listar_lenguajes',
+  EDITAR_LENGUAJE_ADMIN: '/app/administrador/editar_lenguajes',
+  CAMBIAR_ESTADO_LENGUAJE_ADMIN: '/app/administrador/cambiar_estado_lenguaje'
 };
 
 // Función helper para construir URLs completas

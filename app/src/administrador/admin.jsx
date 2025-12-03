@@ -49,6 +49,9 @@ const Admin = () => {
             const response = await getWithAuth(API_ENDPOINTS.PROFILE, token);
             setUserProfile(response);
 
+            // Guardar el perfil en localStorage para uso en otros componentes
+            localStorage.setItem('userProfile', JSON.stringify(response));
+
             // Verificar si realmente es admin
             if (response.rol !== 'admin') {
                 setError('Acceso denegado. No tienes permisos de administrador.');
@@ -62,6 +65,7 @@ const Admin = () => {
             // Si es error de autenticación, eliminar token
             if (error.message.includes('401') || error.message.includes('token')) {
                 removeToken();
+                localStorage.removeItem('userProfile');
                 message.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
             }
         } finally {
@@ -75,6 +79,7 @@ const Admin = () => {
 
     const handleLogout = () => {
         removeToken();
+        localStorage.removeItem('userProfile');
         message.success('Sesión de administrador cerrada exitosamente');
         window.location.reload();
     };
@@ -90,7 +95,12 @@ const Admin = () => {
     const renderContent = () => {
         switch (vistaActual) {
             case 'lenguajes':
-                return <GestionLenguajes onVolver={() => setVistaActual('inicio')} />;
+                return (
+                    <GestionLenguajes 
+                        onVolver={() => setVistaActual('inicio')} 
+                        userProfile={userProfile}
+                    />
+                );
             case 'usuarios':
                 return (
                     <div style={{ padding: '40px', textAlign: 'center' }}>
