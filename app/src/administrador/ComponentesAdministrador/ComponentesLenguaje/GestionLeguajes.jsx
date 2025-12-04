@@ -50,7 +50,7 @@ const GestionLenguajes = ({ onVolver, userProfile }) => {
             }
 
             // Construir URL: /app/administrador/listar_lenguajes/{usuario_id}
-            const url = buildApiUrl(`${API_ENDPOINTS.LISTAR_LENGUAJE_ADMIN}/${usuarioId}`);
+            const url = buildApiUrl(`${API_ENDPOINTS.LISTAR_LENGUAJE_ADMIN}/${usuarioId}/`);
 
             const response = await fetch(url, {
                 method: 'GET',
