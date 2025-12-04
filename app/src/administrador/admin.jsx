@@ -15,6 +15,7 @@ import {
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken } from '../../config';
 import AdminSidebar from './ComponentesAdministrador/VistaPrincipalAdmin/AdminSideBar';
 import GestionLenguajes from './ComponentesAdministrador/ComponentesLenguaje/GestionLeguajes';
+import GestionModelosIA from './ComponentesAdministrador/ComponentesModelosIA/GestionModelosIA';
 import '../administrador/Estilos/VistaPrincipalAdmin/Admin.css';
 import logoImage from '../img/logo.png';
 
@@ -97,6 +98,13 @@ const Admin = () => {
             case 'lenguajes':
                 return (
                     <GestionLenguajes 
+                        onVolver={() => setVistaActual('inicio')} 
+                        userProfile={userProfile}
+                    />
+                );
+            case 'modelos':
+                return (
+                    <GestionModelosIA 
                         onVolver={() => setVistaActual('inicio')} 
                         userProfile={userProfile}
                     />

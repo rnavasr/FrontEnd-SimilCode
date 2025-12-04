@@ -6,7 +6,8 @@ import {
 } from 'antd';
 import {
     UserOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    RobotOutlined
 } from '@ant-design/icons';
 import '../../Estilos/VistaPrincipalAdmin/AdminSideBar.css';
 import logoImage from '../../../img/logo.png';
@@ -62,6 +63,15 @@ const AdminSidebar = ({ userProfile, onLogout, onChangeVista, vistaActual }) => 
                                     <polyline points="8 6 2 12 8 18"></polyline>
                                 </svg>
                                 Lenguajes
+                            </Text>
+                        </div>
+                        <div 
+                            className={`admin-menu-item ${vistaActual === 'modelos' ? 'active' : ''}`}
+                            onClick={() => onChangeVista('modelos')}
+                        >
+                            <Text strong className="admin-menu-text">
+                                <RobotOutlined className="admin-menu-icon" />
+                                Modelos de IA
                             </Text>
                         </div>
                     </div>
