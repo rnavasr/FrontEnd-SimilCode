@@ -13,10 +13,11 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken, buildApiUrl } from '../../config';
 import logo from '../img/logo.png';
 import CodeComparisonView from './CompenentesDocente/ModuloDeComparacionIndividual/CodeComparisonView';
-import ModalSeleccionIA from '../usuarios/CompenentesDocente/ModalSeleccion';
-import DocenteSidebar from './CompenentesDocente/DocenteSidebar';
-import ChatManagerView from './CompenentesDocente/GestionDeComparaciones';
+import DocenteSidebar from './CompenentesDocente/VistaPrincipalDocente/DocenteSidebar';
+import ChatManagerView from './CompenentesDocente/VistaPrincipalDocente/GestionDeComparaciones';
+import ModalSeleccionIA from '../usuarios/CompenentesDocente/VistaPrincipalDocente/ModalSeleccion.jsx';
 import ComparisonDetailView from './CompenentesDocente/MostrarDatosComparacionesIndividualesCreadas/DetalleComparacion';
+import SettingsView from './CompenentesDocente/ModuloConfiguracionesDocente/ConfiguracionDocente.jsx';
 import './globalStyles.css';
 
 const { Content } = Layout;
@@ -30,8 +31,8 @@ const Usuario = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedModel, setSelectedModel] = useState(null);
     const [showChatManager, setShowChatManager] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
     
-    // Estado para manejar la comparación seleccionada
     const [selectedComparacion, setSelectedComparacion] = useState(null);
 
     const [comparacionesDestacadas, setComparacionesDestacadas] = useState([]);
@@ -148,6 +149,7 @@ const Usuario = () => {
         setIsModalVisible(false);
         setShowChatManager(false);
         setSelectedComparacion(null);
+        setShowSettings(false);
         message.success(`Modelo ${model.name} seleccionado`);
     };
 
@@ -155,12 +157,21 @@ const Usuario = () => {
         setSelectedModel(null);
         setShowChatManager(false);
         setSelectedComparacion(null);
+        setShowSettings(false);
         refreshComparaciones();
     };
 
     const handleSearchChats = () => {
         setShowChatManager(true);
         setSelectedModel(null);
+        setSelectedComparacion(null);
+        setShowSettings(false);
+    };
+
+    const handleOpenSettings = () => {
+        setShowSettings(true);
+        setSelectedModel(null);
+        setShowChatManager(false);
         setSelectedComparacion(null);
     };
 
@@ -169,6 +180,7 @@ const Usuario = () => {
         setSelectedComparacion(comparacion);
         setSelectedModel(null);
         setShowChatManager(false);
+        setShowSettings(false);
     };
 
     const marcarComoDestacado = async (comparacion) => {
@@ -248,7 +260,6 @@ const Usuario = () => {
                 setDeleteModalVisible(false);
                 setComparacionToDelete(null);
                 
-                // Si la comparación eliminada es la que está siendo vista, volver al home
                 if (selectedComparacion && selectedComparacion.id === comparacionToDelete.id) {
                     setSelectedComparacion(null);
                 }
@@ -357,6 +368,11 @@ const Usuario = () => {
         );
     }
 
+    // Si está mostrando configuraciones, renderizar en pantalla completa
+    if (showSettings) {
+        return <SettingsView userProfile={userProfile} onBack={handleBackToHome} />;
+    }
+
     return (
         <>
             <Layout style={{ minHeight: '100vh', background: '#1a1a1a' }}>
@@ -372,6 +388,7 @@ const Usuario = () => {
                     onMarcarReciente={marcarComoReciente}
                     onEliminar={confirmarEliminacion}
                     onSearchChats={handleSearchChats}
+                    onOpenSettings={handleOpenSettings}
                     onLogout={handleLogout}
                     formatFecha={formatFecha}
                 />
@@ -459,7 +476,7 @@ const Usuario = () => {
                                                 letterSpacing: '0.5px'
                                             }}
                                         >
-                                            ¡{userProfile.nombre}, {greeting}!
+                                            ¡{userProfile.nombres}, {greeting}!
                                         </Title>
                                     </div>
                                 </Space>

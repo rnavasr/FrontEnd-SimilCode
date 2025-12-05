@@ -15,7 +15,8 @@ import {
     ClockCircleOutlined,
     DeleteOutlined
 } from '@ant-design/icons';
-import '../Estilos/Css_Historial_Comparaciones/ComparisonManager.css';
+
+import '../../Estilos/Css_Historial_Comparaciones/ComparisonManager.css'
 
 const { Title, Text } = Typography;
 

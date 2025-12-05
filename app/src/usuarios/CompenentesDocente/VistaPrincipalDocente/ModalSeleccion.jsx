@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Card, Space, Typography, Button, Spin, message, Tag, Divider } from 'antd';
 import { CheckCircleOutlined, LoadingOutlined, StarFilled, UserOutlined, GlobalOutlined } from '@ant-design/icons';
-import { API_BASE_URL, API_ENDPOINTS } from '../../../config'; 
+import { API_BASE_URL, API_ENDPOINTS } from '../../../../config'; 
 
 const { Title, Text } = Typography;
 

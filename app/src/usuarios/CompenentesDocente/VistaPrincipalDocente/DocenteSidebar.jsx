@@ -1,11 +1,12 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
     Layout,
     Typography,
     Space,
     Button,
     Divider,
-    Spin
+    Spin,
+    Dropdown
 } from 'antd';
 import {
     UserOutlined,
@@ -14,11 +15,12 @@ import {
     MessageOutlined,
     StarOutlined,
     ClockCircleOutlined,
-    SearchOutlined
+    SearchOutlined,
+    SettingOutlined
 } from '@ant-design/icons';
-import logo from '../../img/logo.png';
+import logo from '../../../img/logo.png';
 import ComparacionDropdownMenu from './ComparacionDropdownMenu';
-import '../Estilos/Css_SideBar_Principal/CssSideBarDocente.css'
+import '../../Estilos/Css_SideBar_Principal/CssSideBarDocente.css';
 
 const { Sider } = Layout;
 const { Title, Text } = Typography;
@@ -36,25 +38,24 @@ const DocenteSidebar = ({
     onEliminar,
     onLogout,
     onSearchChats,
+    onOpenSettings,
     formatFecha
 }) => {
     const scrollContainerRef = useRef(null);
     const scrollTimeoutRef = useRef(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     useEffect(() => {
         const scrollContainer = scrollContainerRef.current;
         if (!scrollContainer) return;
 
         const handleScroll = () => {
-            // Agregar clase cuando se está scrolleando
             scrollContainer.classList.add('is-scrolling');
 
-            // Limpiar timeout anterior
             if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
             }
 
-            // Remover clase después de 1 segundo de inactividad
             scrollTimeoutRef.current = setTimeout(() => {
                 scrollContainer.classList.remove('is-scrolling');
             }, 1000);
@@ -69,6 +70,19 @@ const DocenteSidebar = ({
             }
         };
     }, []);
+
+    const userMenuItems = [
+        {
+            key: 'settings',
+            icon: <SettingOutlined />,
+            label: 'Configuraciones',
+            onClick: () => {
+                setDropdownOpen(false);
+                onOpenSettings();
+            }
+        }
+    ];
+
     const renderComparacionItem = (comparacion) => (
         <div
             key={`${comparacion.tipo}-${comparacion.id}`}
@@ -192,7 +206,6 @@ const DocenteSidebar = ({
                 </Space>
 
                 <div style={{ marginTop: '22px' }}>
-                    {/* Botón de Búsqueda */}
                     <Button
                         icon={<SearchOutlined style={{ color: '#6b6b6b' }} />}
                         onClick={onSearchChats}
@@ -282,25 +295,37 @@ const DocenteSidebar = ({
             {/* FOOTER FIJO */}
             <div className="sidebar-footer">
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                    <Button
-                        icon={<UserOutlined />}
-                        block
-                        style={{
-                            height: '40px',
+                    <Dropdown
+                        menu={{ items: userMenuItems }}
+                        trigger={['contextMenu']}
+                        open={dropdownOpen}
+                        onOpenChange={setDropdownOpen}
+                        overlayStyle={{
+                            background: '#2d2d2d',
                             borderRadius: '8px',
-                            background: 'transparent',
-                            border: '1px solid #3d3d3d',
-                            color: '#e8e8e8',
-                            fontSize: '14px',
-                            fontFamily: "'Playfair Display', 'Georgia', serif",
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            paddingLeft: '16px'
+                            padding: '4px'
                         }}
                     >
-                        {userProfile.usuario}
-                    </Button>
+                        <Button
+                            icon={<UserOutlined />}
+                            block
+                            style={{
+                                height: '40px',
+                                borderRadius: '8px',
+                                background: 'transparent',
+                                border: '1px solid #3d3d3d',
+                                color: '#e8e8e8',
+                                fontSize: '14px',
+                                fontFamily: "'Playfair Display', 'Georgia', serif",
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-start',
+                                paddingLeft: '16px'
+                            }}
+                        >
+                            {userProfile.nombres}
+                        </Button>
+                    </Dropdown>
 
                     <Button
                         icon={<LogoutOutlined />}
