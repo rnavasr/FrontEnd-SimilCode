@@ -1,169 +1,199 @@
-import React from 'react';
-import { Layout, Typography, Button, Card, Space, Divider } from 'antd';
-import { ArrowLeftOutlined, UserOutlined, BellOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Layout, Typography, Button, Card, Collapse } from 'antd';
+import { 
+    ArrowLeftOutlined, 
+    UserOutlined, 
+    LockOutlined, 
+    RobotOutlined,
+    CodeOutlined,
+    DownOutlined
+} from '@ant-design/icons';
+import '../../Estilos/Css_Cofiguracion_Docente/ConfiguracionDocente.css';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 
 const SettingsView = ({ userProfile, onBack }) => {
+    const [activeKeys, setActiveKeys] = useState([]);
+
+    const handleCollapseChange = (keys) => {
+        setActiveKeys(keys);
+    };
+
     return (
-        <Layout style={{ 
-            minHeight: '100vh', 
-            background: '#1a1a1a',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1000
-        }}>
-            <Content style={{
-                padding: '40px 80px',
-                maxWidth: '1200px',
-                margin: '0 auto',
-                width: '100%'
-            }}>
+        <Layout className="settings-view-layout">
+            <Content className="settings-view-content">
                 {/* Header */}
-                <div style={{ marginBottom: '40px' }}>
+                <div className="settings-header">
                     <Button
                         icon={<ArrowLeftOutlined />}
                         onClick={onBack}
-                        style={{
-                            background: 'transparent',
-                            border: '1px solid #3d3d3d',
-                            color: '#a0a0a0',
-                            height: '36px',
-                            borderRadius: '6px',
-                            marginBottom: '24px'
-                        }}
+                        className="settings-back-button"
                     >
                         Volver
                     </Button>
                     
-                    <Title 
-                        level={1} 
-                        style={{ 
-                            color: '#e8e8e8', 
-                            margin: 0,
-                            fontSize: '36px',
-                            fontFamily: "'Playfair Display', 'Georgia', serif"
-                        }}
-                    >
-                        Configuraciones
-                    </Title>
-                    <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
-                        Administra tu cuenta y preferencias
-                    </Text>
+                    <div className="settings-header-text">
+                        <Title level={1} className="settings-title">
+                            Configuraciones
+                        </Title>
+                        <Text className="settings-subtitle">
+                            Administra tu cuenta y preferencias
+                        </Text>
+                    </div>
                 </div>
 
-                {/* Secciones de configuración */}
-                <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                    {/* Perfil */}
-                    <Card
-                        style={{
-                            background: '#242424',
-                            border: '1px solid #2d2d2d',
-                            borderRadius: '12px'
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <UserOutlined style={{ fontSize: '20px', color: '#5ebd8f' }} />
-                            <Title level={4} style={{ color: '#e8e8e8', margin: 0 }}>
+                {/* Grid de configuraciones */}
+                <div className="settings-grid">
+                    {/* PERFIL DE USUARIO */}
+                    <Card className="settings-card settings-card-profile">
+                        <div className="settings-card-header">
+                            <div className="settings-card-icon-wrapper">
+                                <UserOutlined className="settings-card-icon" />
+                            </div>
+                            <Title level={4} className="settings-card-title">
                                 Información del Perfil
                             </Title>
                         </div>
-                        <Divider style={{ borderColor: '#3d3d3d', margin: '16px 0' }} />
                         
-                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                            <div>
-                                <Text style={{ color: '#a0a0a0', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
-                                    Nombre
-                                </Text>
-                                <Text style={{ color: '#e8e8e8', fontSize: '15px' }}>
-                                    {userProfile.nombres}
-                                </Text>
+                        <div className="settings-card-divider" />
+                        
+                        <div className="settings-info-grid">
+                            {/* Columna Izquierda */}
+                            <div className="settings-info-column">
+                                {/* Institución */}
+                                <div className="settings-field">
+                                    <Text className="settings-field-label">Institución</Text>
+                                    <Text className="settings-field-value">
+                                        {userProfile.institucion || 'No especificada'}
+                                    </Text>
+                                </div>
+
+                                {/* Facultad/Área */}
+                                <div className="settings-field">
+                                    <Text className="settings-field-label">Facultad / Área</Text>
+                                    <Text className="settings-field-value">
+                                        {userProfile.facultad_area || 'No especificada'}
+                                    </Text>
+                                </div>
                             </div>
-                            
-                            <div>
-                                <Text style={{ color: '#a0a0a0', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
-                                    Correo electrónico
-                                </Text>
-                                <Text style={{ color: '#e8e8e8', fontSize: '15px' }}>
-                                    {userProfile.correo_electronico}
-                                </Text>
+
+                            {/* Columna Derecha */}
+                            <div className="settings-info-column">
+                                {/* Nombre Completo */}
+                                <div className="settings-field">
+                                    <Text className="settings-field-label">Nombre Completo</Text>
+                                    <Text className="settings-field-value">
+                                        {`${userProfile.nombres} ${userProfile.apellidos}`}
+                                    </Text>
+                                </div>
+                                
+                                {/* Email */}
+                                <div className="settings-field">
+                                    <Text className="settings-field-label">Correo electrónico</Text>
+                                    <Text className="settings-field-value">
+                                        {userProfile.email || 'No especificado'}
+                                    </Text>
+                                </div>
                             </div>
-
-                            <div>
-                                <Text style={{ color: '#a0a0a0', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
-                                    Rol
-                                </Text>
-                                <Text style={{ color: '#e8e8e8', fontSize: '15px' }}>
-                                    {userProfile.rol === 'docente' ? 'Docente' : 'Usuario'}
-                                </Text>
-                            </div>
-                        </Space>
-                    </Card>
-
-                    {/* Notificaciones */}
-                    <Card
-                        style={{
-                            background: '#242424',
-                            border: '1px solid #2d2d2d',
-                            borderRadius: '12px'
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <BellOutlined style={{ fontSize: '20px', color: '#5ebd8f' }} />
-                            <Title level={4} style={{ color: '#e8e8e8', margin: 0 }}>
-                                Notificaciones
-                            </Title>
                         </div>
-                        <Divider style={{ borderColor: '#3d3d3d', margin: '16px 0' }} />
-                        <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
-                            Próximamente podrás configurar tus preferencias de notificaciones
-                        </Text>
                     </Card>
 
-                    {/* Seguridad */}
-                    <Card
-                        style={{
-                            background: '#242424',
-                            border: '1px solid #2d2d2d',
-                            borderRadius: '12px'
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <LockOutlined style={{ fontSize: '20px', color: '#5ebd8f' }} />
-                            <Title level={4} style={{ color: '#e8e8e8', margin: 0 }}>
-                                Seguridad y Privacidad
-                            </Title>
-                        </div>
-                        <Divider style={{ borderColor: '#3d3d3d', margin: '16px 0' }} />
-                        <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
-                            Gestiona la seguridad de tu cuenta y preferencias de privacidad
-                        </Text>
-                    </Card>
+                    {/* COLLAPSE SECTIONS */}
+                    <div className="settings-collapse-container">
+                        <Collapse 
+                            ghost
+                            activeKey={activeKeys}
+                            onChange={handleCollapseChange}
+                            expandIconPosition="end"
+                            expandIcon={({ isActive }) => (
+                                <DownOutlined 
+                                    className="settings-collapse-arrow"
+                                    rotate={isActive ? 180 : 0} 
+                                />
+                            )}
+                        >
+                            {/* SEGURIDAD */}
+                            <Panel 
+                                header={
+                                    <div className="settings-collapse-header">
+                                        <div className="settings-card-icon-wrapper">
+                                            <LockOutlined className="settings-card-icon" />
+                                        </div>
+                                        <Title level={4} className="settings-card-title">
+                                            Seguridad
+                                        </Title>
+                                    </div>
+                                }
+                                key="1"
+                                className="settings-collapse-panel"
+                            >
+                                <div className="settings-placeholder">
+                                    <LockOutlined className="settings-placeholder-icon" />
+                                    <Text className="settings-placeholder-text">
+                                        Aquí podrás cambiar tu contraseña
+                                    </Text>
+                                    <Text className="settings-placeholder-subtext">
+                                        Funcionalidad próximamente disponible
+                                    </Text>
+                                </div>
+                            </Panel>
 
-                    {/* Preferencias */}
-                    <Card
-                        style={{
-                            background: '#242424',
-                            border: '1px solid #2d2d2d',
-                            borderRadius: '12px'
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <GlobalOutlined style={{ fontSize: '20px', color: '#5ebd8f' }} />
-                            <Title level={4} style={{ color: '#e8e8e8', margin: 0 }}>
-                                Preferencias Generales
-                            </Title>
-                        </div>
-                        <Divider style={{ borderColor: '#3d3d3d', margin: '16px 0' }} />
-                        <Text style={{ color: '#a0a0a0', fontSize: '14px' }}>
-                            Personaliza tu experiencia en la plataforma
-                        </Text>
-                    </Card>
-                </Space>
+                            {/* MODELOS IA */}
+                            <Panel 
+                                header={
+                                    <div className="settings-collapse-header">
+                                        <div className="settings-card-icon-wrapper">
+                                            <RobotOutlined className="settings-card-icon" />
+                                        </div>
+                                        <Title level={4} className="settings-card-title">
+                                            Modelos de IA
+                                        </Title>
+                                    </div>
+                                }
+                                key="2"
+                                className="settings-collapse-panel"
+                            >
+                                <div className="settings-placeholder">
+                                    <RobotOutlined className="settings-placeholder-icon" />
+                                    <Text className="settings-placeholder-text">
+                                        Gestiona tus modelos de inteligencia artificial
+                                    </Text>
+                                    <Text className="settings-placeholder-subtext">
+                                        Funcionalidad próximamente disponible
+                                    </Text>
+                                </div>
+                            </Panel>
+
+                            {/* LENGUAJES */}
+                            <Panel 
+                                header={
+                                    <div className="settings-collapse-header">
+                                        <div className="settings-card-icon-wrapper">
+                                            <CodeOutlined className="settings-card-icon" />
+                                        </div>
+                                        <Title level={4} className="settings-card-title">
+                                            Lenguajes de Programación
+                                        </Title>
+                                    </div>
+                                }
+                                key="3"
+                                className="settings-collapse-panel"
+                            >
+                                <div className="settings-placeholder">
+                                    <CodeOutlined className="settings-placeholder-icon" />
+                                    <Text className="settings-placeholder-text">
+                                        Administra los lenguajes de programación
+                                    </Text>
+                                    <Text className="settings-placeholder-subtext">
+                                        Funcionalidad próximamente disponible
+                                    </Text>
+                                </div>
+                            </Panel>
+                        </Collapse>
+                    </div>
+                </div>
             </Content>
         </Layout>
     );
