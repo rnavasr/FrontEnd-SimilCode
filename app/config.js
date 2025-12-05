@@ -44,6 +44,8 @@ export const API_ENDPOINTS = {
   LISTAR_MODELOS_IA: '/app/administrador/listar_modelos_usuario/',
   CAMBIAR_ESTADO_MODELO: '/app/administrador/cambiar_estado_modelo',    // Usar con /{id_modelo}/
   MARCAR_MODELO_RECOMENDADO: '/app/administrador/marcar_modelo_recomendado', // Usar con /{id_modelo}/
+  LISTAR_COMPARACIONES: '/app/administrador/listar_comparaciones/',
+  CAMBIAR_ESTADO_COMPARACION: '/app/administrador/cambiar_estado_comparacion' // Usar con /{id_comparacion}/
 };
 
 // Función helper para construir URLs completas

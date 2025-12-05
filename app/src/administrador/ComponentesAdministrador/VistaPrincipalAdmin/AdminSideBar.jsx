@@ -7,7 +7,8 @@ import {
 import {
     UserOutlined,
     LogoutOutlined,
-    RobotOutlined
+    RobotOutlined,
+    FileTextOutlined
 } from '@ant-design/icons';
 import '../../Estilos/VistaPrincipalAdmin/AdminSideBar.css';
 import logoImage from '../../../img/logo.png';
@@ -65,6 +66,7 @@ const AdminSidebar = ({ userProfile, onLogout, onChangeVista, vistaActual }) => 
                                 Lenguajes
                             </Text>
                         </div>
+
                         <div 
                             className={`admin-menu-item ${vistaActual === 'modelos' ? 'active' : ''}`}
                             onClick={() => onChangeVista('modelos')}
@@ -72,6 +74,16 @@ const AdminSidebar = ({ userProfile, onLogout, onChangeVista, vistaActual }) => 
                             <Text strong className="admin-menu-text">
                                 <RobotOutlined className="admin-menu-icon" />
                                 Modelos de IA
+                            </Text>
+                        </div>
+
+                        <div 
+                            className={`admin-menu-item ${vistaActual === 'comparaciones' ? 'active' : ''}`}
+                            onClick={() => onChangeVista('comparaciones')}
+                        >
+                            <Text strong className="admin-menu-text">
+                                <FileTextOutlined className="admin-menu-icon" />
+                                Comparaciones
                             </Text>
                         </div>
                     </div>
@@ -82,9 +94,9 @@ const AdminSidebar = ({ userProfile, onLogout, onChangeVista, vistaActual }) => 
                     <div className="admin-user-button">
                         <UserOutlined className="admin-user-icon" />
                         <Text className="admin-user-name">
-                            {userProfile?.nombre && userProfile?.apellido 
-                                ? `${userProfile.nombre} ${userProfile.apellido}`
-                                : userProfile?.nombre || 'admin'}
+                            {userProfile?.nombres && userProfile?.apellidos 
+                                ? `${userProfile.nombres} ${userProfile.apellidos}`
+                                : userProfile?.nombres || 'admin'}
                         </Text>
                     </div>
 

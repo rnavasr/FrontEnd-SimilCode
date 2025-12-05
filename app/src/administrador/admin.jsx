@@ -16,6 +16,7 @@ import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken } from '../../c
 import AdminSidebar from './ComponentesAdministrador/VistaPrincipalAdmin/AdminSideBar';
 import GestionLenguajes from './ComponentesAdministrador/ComponentesLenguaje/GestionLeguajes';
 import GestionModelosIA from './ComponentesAdministrador/ComponentesModelosIA/GestionModelosIA';
+import GestionComparaciones from './ComponentesAdministrador/ComponentesComparaciones/GestionComparaciones';
 import '../administrador/Estilos/VistaPrincipalAdmin/Admin.css';
 import logoImage from '../img/logo.png';
 
@@ -26,7 +27,7 @@ const Admin = () => {
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [vistaActual, setVistaActual] = useState('inicio'); // 'inicio', 'lenguajes', 'usuarios'
+    const [vistaActual, setVistaActual] = useState('inicio'); // 'inicio', 'lenguajes', 'usuarios', 'comparaciones', 'modelos'
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -109,6 +110,13 @@ const Admin = () => {
                         userProfile={userProfile}
                     />
                 );
+            case 'comparaciones':
+                return (
+                    <GestionComparaciones 
+                        onVolver={() => setVistaActual('inicio')} 
+                        userProfile={userProfile}
+                    />
+                );
             case 'usuarios':
                 return (
                     <div style={{ padding: '40px', textAlign: 'center' }}>
@@ -134,7 +142,7 @@ const Admin = () => {
                             </div>
 
                             <Title level={1} className="admin-welcome-title">
-                                ¡{userProfile?.nombre}, {getGreeting()}!
+                                ¡{userProfile?.nombres}, {getGreeting()}!
                             </Title>
                         </div>
                     </div>
