@@ -33,14 +33,10 @@ export const API_ENDPOINTS = {
   CREAR_MODELO_DEEPSEEK: '/app/administrador/crear_modelo_deepseek/',
   CREAR_MODELO_GEMINI: '/app/administrador/crear_modelo_gemini/',
   CREAR_MODELO_OPENAI: '/app/administrador/crear_modelo_openai/',
-  
-  // Editar modelos por proveedor (4 endpoints)
-  EDITAR_MODELO_CLAUDE: '/app/administrador/editar_modelo_claude',      // Usar con /{id_modelo}/
+  EDITAR_MODELO_CLAUDE: '/app/administrador/editar_modelo_claude',
   EDITAR_MODELO_DEEPSEEK: '/app/administrador/editar_modelo_deepseek',  // Usar con /{id_modelo}/
   EDITAR_MODELO_GEMINI: '/app/administrador/editar_modelo_gemini',      // Usar con /{id_modelo}/
   EDITAR_MODELO_OPENAI: '/app/administrador/editar_modelo_openai',      // Usar con /{id_modelo}/
-  
-  // Listar, cambiar estado y marcar recomendado (3 endpoints)
   LISTAR_MODELOS_IA: '/app/administrador/listar_modelos_usuario/',
   CAMBIAR_ESTADO_MODELO: '/app/administrador/cambiar_estado_modelo',    // Usar con /{id_modelo}/
   MARCAR_MODELO_RECOMENDADO: '/app/administrador/marcar_modelo_recomendado', // Usar con /{id_modelo}/
