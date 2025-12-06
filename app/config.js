@@ -41,7 +41,11 @@ export const API_ENDPOINTS = {
   CAMBIAR_ESTADO_MODELO: '/app/administrador/cambiar_estado_modelo',    // Usar con /{id_modelo}/
   MARCAR_MODELO_RECOMENDADO: '/app/administrador/marcar_modelo_recomendado', // Usar con /{id_modelo}/
   LISTAR_COMPARACIONES: '/app/administrador/listar_comparaciones/',
-  CAMBIAR_ESTADO_COMPARACION: '/app/administrador/cambiar_estado_comparacion' // Usar con /{id_comparacion}/
+  CAMBIAR_ESTADO_COMPARACION: '/app/administrador/cambiar_estado_comparacion', // Usar con /{id_comparacion}/
+  CREAR_LENGUAJE_DOCENTE: '/app/usuarios/crear_lenguaje_docente/',
+  LISTAR_LENGUAJES_DOCENTE: '/app/usuarios/listar_lenguajes_docente/',
+  EDITAR_LENGUAJE_DOCENTE: '/app/usuarios/editar_lenguaje_docente',      // Usar con /${lenguaje_id}/
+  CAMBIAR_ESTADO_LENGUAJE_DOCENTE: '/app/usuarios/cambiar_estado_lenguaje_docente',  // Usar con /${lenguaje_id}/
 };
 
 // Función helper para construir URLs completas

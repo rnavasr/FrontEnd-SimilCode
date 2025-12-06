@@ -1,5 +1,5 @@
 /* ============================================
-   SETTINGS VIEW - ESTILOS PREMIUM
+   SETTINGS VIEW - CONFIGURACIÓN DOCENTE
    ============================================ */
 
 .settings-view-layout {
@@ -41,6 +41,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -97,7 +98,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  padding-bottom: 40px;
+  padding-bottom: 80px;
 }
 
 @keyframes fadeInUp {
@@ -105,6 +106,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -112,7 +114,7 @@
 }
 
 /* ============================================
-   CARDS
+   CARDS - PERFIL
    ============================================ */
 
 .settings-card {
@@ -137,6 +139,88 @@
 
 .settings-card .ant-card-body {
   padding: 32px !important;
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.settings-card-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(94, 189, 143, 0.15) 0%, rgba(94, 189, 143, 0.05) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.settings-card:hover .settings-card-icon-wrapper {
+  background: linear-gradient(135deg, rgba(94, 189, 143, 0.25) 0%, rgba(94, 189, 143, 0.1) 100%);
+  transform: scale(1.05);
+}
+
+.settings-card-icon {
+  font-size: 20px;
+  color: #5ebd8f;
+}
+
+.settings-card-title {
+  color: #e8e8e8 !important;
+  margin: 0 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.2px;
+}
+
+.settings-card-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  margin-bottom: 24px;
+}
+
+/* ============================================
+   INFORMACIÓN DEL PERFIL
+   ============================================ */
+
+.settings-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.settings-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-field-label {
+  color: #a0a0a0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.05px;
+  text-transform: uppercase;
+  display: block;
+}
+
+.settings-field-value {
+  color: #e8e8e8;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.1px;
+  display: block;
+  padding: 8px 0;
 }
 
 /* ============================================
@@ -212,177 +296,8 @@
   transform: scale(1.1);
 }
 
-/* Card Header */
-.settings-card-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-.settings-card-icon-wrapper {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(94, 189, 143, 0.15) 0%, rgba(94, 189, 143, 0.05) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.settings-card:hover .settings-card-icon-wrapper {
-  background: linear-gradient(135deg, rgba(94, 189, 143, 0.25) 0%, rgba(94, 189, 143, 0.1) 100%);
-  transform: scale(1.05);
-}
-
-.settings-card-icon {
-  font-size: 20px;
-  color: #5ebd8f;
-}
-
-.settings-card-title {
-  color: #e8e8e8 !important;
-  margin: 0 !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.2px;
-}
-
-.settings-card-divider {
-  height: 1px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-  margin-bottom: 24px;
-}
-
 /* ============================================
-   FIELDS
-   ============================================ */
-
-.settings-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-}
-
-.settings-info-column {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.settings-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.settings-field-label {
-  color: #a0a0a0;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: -0.05px;
-  text-transform: uppercase;
-  display: block;
-}
-
-.settings-field-value {
-  color: #e8e8e8;
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: -0.1px;
-  display: block;
-  padding: 8px 0;
-}
-
-/* Edit Button */
-.settings-edit-button {
-  color: #909090 !important;
-  height: 28px !important;
-  width: 28px !important;
-  min-width: 28px !important;
-  padding: 0 !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease !important;
-}
-
-.settings-edit-button:hover {
-  color: #5ebd8f !important;
-  background: rgba(94, 189, 143, 0.1) !important;
-  transform: scale(1.1);
-}
-
-/* Field Edit Mode */
-.settings-field-edit {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.settings-input {
-  background: rgba(40, 40, 40, 0.6) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 10px !important;
-  height: 44px !important;
-  padding: 10px 16px !important;
-  color: #e8e8e8 !important;
-  font-size: 15px !important;
-  transition: all 0.3s ease !important;
-}
-
-.settings-input:hover {
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  background: rgba(50, 50, 50, 0.7) !important;
-}
-
-.settings-input:focus {
-  border-color: rgba(94, 189, 143, 0.5) !important;
-  box-shadow: 0 0 0 3px rgba(94, 189, 143, 0.1) !important;
-  background: rgba(50, 50, 50, 0.8) !important;
-}
-
-.settings-input::placeholder {
-  color: #6b6b6b !important;
-}
-
-/* Field Actions */
-.settings-field-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.settings-save-button {
-  color: #5ebd8f !important;
-  height: 36px !important;
-  border-radius: 8px !important;
-  padding: 0 16px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-}
-
-.settings-save-button:hover {
-  background: rgba(94, 189, 143, 0.15) !important;
-  transform: scale(1.02);
-}
-
-.settings-cancel-button {
-  color: #909090 !important;
-  height: 36px !important;
-  border-radius: 8px !important;
-  padding: 0 16px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-}
-
-.settings-cancel-button:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: #b0b0b0 !important;
-  transform: scale(1.02);
-}
-
-/* ============================================
-   PLACEHOLDER
+   PLACEHOLDER (Próximamente)
    ============================================ */
 
 .settings-placeholder {
@@ -411,9 +326,12 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -437,6 +355,293 @@
 }
 
 /* ============================================
+   SECCIÓN LENGUAJES - HEADER
+   ============================================ */
+
+.settings-lenguajes-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-lenguajes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.settings-lenguajes-description {
+  color: #a0a0a0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.settings-add-button {
+  background: linear-gradient(135deg, #5ebd8f 0%, #4a9d73 100%) !important;
+  border: none !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 8px rgba(94, 189, 143, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.settings-add-button:hover {
+  background: linear-gradient(135deg, #6ed3a3 0%, #5ebd8f 100%) !important;
+  box-shadow: 0 4px 12px rgba(94, 189, 143, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   TABLA DE LENGUAJES - ANT DESIGN TABLE
+   ============================================ */
+
+.settings-table {
+  background: transparent !important;
+}
+
+.settings-table .ant-table {
+  background: transparent !important;
+  color: #e8e8e8 !important;
+}
+
+.settings-table .ant-table-thead>tr>th {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #a0a0a0 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 20px 16px !important;
+}
+
+.settings-table .ant-table-tbody>tr {
+  background: transparent !important;
+  transition: none !important;
+}
+
+.settings-table .ant-table-tbody>tr:hover {
+  background: transparent !important;
+}
+
+.settings-table .ant-table-tbody>tr:hover>td {
+  background: transparent !important;
+}
+
+.settings-table .ant-table-tbody>tr.ant-table-row:hover>td {
+  background-color: transparent !important;
+}
+
+.settings-table .ant-table-tbody>tr.ant-table-row-hover>td {
+  background-color: transparent !important;
+}
+
+.settings-table .ant-table-tbody>tr>td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #e8e8e8 !important;
+  padding: 20px 16px !important;
+  font-size: 15px !important;
+  background: transparent !important;
+}
+
+.settings-table .ant-table-placeholder {
+  background: transparent !important;
+}
+
+.settings-table .ant-empty-description {
+  color: #6b6b6b !important;
+}
+
+/* Paginación */
+.settings-table .ant-pagination {
+  margin-top: 16px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.settings-table .ant-pagination-item {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.settings-table .ant-pagination-item a {
+  color: #a0a0a0 !important;
+}
+
+.settings-table .ant-pagination-item-active {
+  background: rgba(94, 189, 143, 0.15) !important;
+  border-color: #5ebd8f !important;
+}
+
+.settings-table .ant-pagination-item-active a {
+  color: #5ebd8f !important;
+}
+
+
+/* ============================================
+   BOTONES DE ACCIÓN EN LA TABLA
+   ============================================ */
+
+.settings-action-button {
+  color: #707070 !important;
+  font-size: 18px !important;
+  padding: 8px !important;
+  height: auto !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.settings-action-button:hover {
+  color: #a0a0a0 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.settings-action-button .anticon {
+  font-size: 18px;
+}
+
+/* ============================================
+   SWITCH CON ICONOS
+   ============================================ */
+
+.settings-table .ant-switch {
+  min-width: 48px !important;
+  height: 24px !important;
+  background-color: #3d3d3d !important;
+  border-radius: 12px !important;
+}
+
+.settings-table .ant-switch-checked {
+  background-color: #5ebd8f !important;
+}
+
+.settings-table .ant-switch:hover {
+  opacity: 0.9;
+}
+
+.settings-table .ant-switch .ant-switch-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.settings-table .ant-switch .ant-switch-inner-checked,
+.settings-table .ant-switch .ant-switch-inner-unchecked {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+.settings-table .ant-switch .ant-switch-handle {
+  width: 20px !important;
+  height: 20px !important;
+  top: 2px !important;
+}
+
+.settings-table .ant-switch-checked .ant-switch-handle {
+  inset-inline-start: calc(100% - 22px) !important;
+}
+
+/* ============================================
+   MODAL - CREAR/EDITAR LENGUAJE
+   ============================================ */
+
+.settings-modal .ant-modal-content {
+  background: rgba(30, 30, 30, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(20px);
+}
+
+.settings-modal .ant-modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 24px !important;
+}
+
+.settings-modal .ant-modal-body {
+  padding: 24px !important;
+}
+
+.settings-modal .ant-modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 16px 24px !important;
+  background: transparent !important;
+}
+
+.settings-modal-ok-button {
+  background: linear-gradient(135deg, #5ebd8f 0%, #4a9d73 100%) !important;
+  border: none !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+}
+
+.settings-modal-ok-button:hover {
+  background: linear-gradient(135deg, #6ed3a3 0%, #5ebd8f 100%) !important;
+  transform: translateY(-1px);
+}
+
+.settings-modal-cancel-button {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #a0a0a0 !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+}
+
+.settings-modal-cancel-button:hover {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #b0b0b0 !important;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+
+.settings-form .ant-form-item-label>label {
+  color: #a0a0a0 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+.settings-form .ant-form-item-explain-error {
+  color: #ff6b6b !important;
+  font-size: 12px !important;
+}
+
+.settings-input {
+  background: rgba(40, 40, 40, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  height: 44px !important;
+  padding: 10px 16px !important;
+  color: #e8e8e8 !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+}
+
+.settings-input:hover {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(50, 50, 50, 0.7) !important;
+}
+
+.settings-input:focus {
+  border-color: rgba(94, 189, 143, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(94, 189, 143, 0.1) !important;
+  background: rgba(50, 50, 50, 0.8) !important;
+}
+
+.settings-input::placeholder {
+  color: #6b6b6b !important;
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 
@@ -444,11 +649,11 @@
   .settings-view-content {
     padding: 40px 60px 140px 60px;
   }
-  
+
   .settings-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .settings-card.settings-card-profile {
     grid-column: span 1;
   }
@@ -494,6 +699,16 @@
 
   .settings-collapse-panel .ant-collapse-content-box {
     padding: 0 24px 24px 24px !important;
+  }
+
+  .settings-lenguajes-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-add-button {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -541,7 +756,7 @@
 }
 
 /* ============================================
-   ANT DESIGN OVERRIDES
+   UTILIDADES Y OVERRIDES
    ============================================ */
 
 .settings-view-layout .ant-layout {
