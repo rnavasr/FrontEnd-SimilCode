@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CodeComparisonResults from './ResultadoCompacionSimilitud';
 import CodeComparisonInput from './ComparacionDeCodigoEntrada';
+import AnalisisEficiencia from './AnalisisEficiencia';
 /**
  * Wrapper que coordina los dos componentes
  * - CodeComparisonInput: Entrada de código (~ 300 líneas)
@@ -32,6 +33,10 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
                         result={result}
                         model={model}
                         isLocked={isLocked}
+                    />
+                    <AnalisisEficiencia
+                        comparacionId={result.id}
+                        model={model}
                     />
                 </div>
             )}

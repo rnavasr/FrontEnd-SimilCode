@@ -46,6 +46,8 @@ export const API_ENDPOINTS = {
   LISTAR_LENGUAJES_DOCENTE: '/app/usuarios/listar_lenguajes_docente/',
   EDITAR_LENGUAJE_DOCENTE: '/app/usuarios/editar_lenguaje_docente',      // Usar con /${lenguaje_id}/
   CAMBIAR_ESTADO_LENGUAJE_DOCENTE: '/app/usuarios/cambiar_estado_lenguaje_docente',  // Usar con /${lenguaje_id}/
+  ANALIZAR_EFICIENCIA_INDIVIDUAL: '/app/usuarios/analisis_big_o_individual',  // Usar con /${comparacion_id}/
+  CREAR_COMENTARIO_EFICIENCIA: '/app/usuarios/crear_comentario_eficiencia_individual',  // Usar con /${id_resultado_eficiencia}/
 };
 
 // Función helper para construir URLs completas

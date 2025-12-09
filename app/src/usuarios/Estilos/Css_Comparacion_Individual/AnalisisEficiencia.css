@@ -1,0 +1,391 @@
+/* ============================================
+   ANÁLISIS DE EFICIENCIA - ESTILOS
+   ============================================ */
+
+.analisis-eficiencia-container {
+  width: 100%;
+  padding: 32px;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   BOTÓN TRIGGER INICIAL
+   ============================================ */
+.analisis-trigger-section {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.analisis-trigger-button {
+  min-width: 300px;
+  height: 48px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.analisis-trigger-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+.analisis-loading,
+.analisis-ia-loading {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(30, 30, 30, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.analisis-loading-text,
+.analisis-ia-loading-text {
+  margin-top: 24px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #c0c0c0;
+}
+
+.analisis-loading-subtext,
+.analisis-ia-loading-subtext {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #909090;
+}
+
+/* ============================================
+   RESULTADOS SECTION
+   ============================================ */
+.analisis-resultados-section {
+  animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.analisis-section-title {
+  margin-bottom: 24px !important;
+  color: #d0d0d0 !important;
+  font-weight: 600 !important;
+  font-size: 24px !important;
+  letter-spacing: -0.3px;
+}
+
+/* ============================================
+   TARJETA GANADOR
+   ============================================ */
+.analisis-ganador-card {
+  margin-bottom: 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.analisis-ganador-card .ant-card-body {
+  padding: 32px;
+}
+
+.analisis-ganador-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: center;
+}
+
+.analisis-ganador-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analisis-ganador-label {
+  font-size: 16px;
+  color: #a0a0a0;
+  font-weight: 500;
+}
+
+.analisis-ganador-nombre {
+  color: #ffd700 !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================
+   GRID DE COMPARACIÓN
+   ============================================ */
+.analisis-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.analisis-codigo-card {
+  background: rgba(30, 30, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.analisis-codigo-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.analisis-codigo-card .ant-card-body {
+  padding: 24px;
+}
+
+.analisis-codigo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   COMPLEJIDAD SECTION
+   ============================================ */
+.analisis-complejidad-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.analisis-complejidad-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.analisis-complejidad-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.analisis-complejidad-label {
+  font-size: 14px;
+  color: #a0a0a0;
+  font-weight: 500;
+}
+
+.analisis-complejidad-tag {
+  border: none !important;
+  border-radius: 6px !important;
+  font-family: 'Courier New', monospace !important;
+}
+
+/* ============================================
+   DETALLES
+   ============================================ */
+.analisis-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.analisis-detalle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.analisis-detalle-label {
+  font-size: 13px;
+  color: #909090;
+  font-weight: 500;
+}
+
+.analisis-detalle-value {
+  font-size: 14px;
+  color: #c0c0c0;
+  font-weight: 600;
+}
+
+/* Patrones */
+.analisis-patrones,
+.analisis-estructuras {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+
+.analisis-patrones-title,
+.analisis-estructuras-title {
+  display: block;
+  font-size: 13px;
+  color: #a0a0a0;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.analisis-patron-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.analisis-patron-item:last-child {
+  margin-bottom: 0;
+}
+
+.analisis-patron-complejidad {
+  font-size: 12px;
+  color: #808080;
+  font-family: 'Courier New', monospace;
+}
+
+.analisis-estructuras-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Confianza */
+.analisis-confianza {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 8px;
+}
+
+.analisis-confianza-label {
+  font-size: 13px;
+  color: #909090;
+  font-weight: 500;
+}
+
+/* ============================================
+   COMENTARIO IA
+   ============================================ */
+.analisis-ia-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.analisis-ia-card .ant-card-body {
+  padding: 32px;
+}
+
+.analisis-ia-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.analisis-ia-content {
+  margin-bottom: 20px;
+}
+
+.analisis-ia-comentario {
+  font-size: 15px;
+  color: #c0c0c0;
+  line-height: 1.8;
+  display: block;
+  white-space: pre-wrap;
+}
+
+.analisis-ia-footer {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .analisis-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .analisis-eficiencia-container {
+    padding: 20px 16px;
+  }
+
+  .analisis-trigger-button {
+    min-width: 100%;
+  }
+
+  .analisis-ganador-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .analisis-ganador-nombre {
+    font-size: 24px !important;
+  }
+
+  .analisis-ia-header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ============================================
+   ANT DESIGN OVERRIDES
+   ============================================ */
+.analisis-eficiencia-container .ant-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.analisis-eficiencia-container .ant-tag {
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.analisis-eficiencia-container .ant-spin-dot-item {
+  background-color: #667eea;
+}
