@@ -32,7 +32,7 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                 throw new Error(data.error || 'Error al analizar eficiencia');
             }
 
-            console.log('📊 Respuesta del análisis:', data); // ← DEBUG
+            console.log('📊 Respuesta del análisis:', data);
 
             setAnalisisBigO(data);
 
@@ -65,19 +65,17 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
         setLoadingComentario(true);
         try {
             const token = getStoredToken();
-
-            // ← USAR el resultado_id que viene de la respuesta
             const resultadoId = analisisData.resultado_id;
-
-            console.log('🤖 Generando comentario para resultado ID:', resultadoId); // ← DEBUG
-
+            
+            console.log('🤖 Generando comentario para resultado ID:', resultadoId);
+            
             if (!resultadoId) {
                 throw new Error('No se recibió el ID del resultado de eficiencia');
             }
-
+            
             const url = buildApiUrl(`${API_ENDPOINTS.CREAR_COMENTARIO_EFICIENCIA}/${resultadoId}/`);
-
-            console.log('📡 URL del comentario:', url); // ← DEBUG
+            
+            console.log('📡 URL del comentario:', url);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -92,6 +90,9 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
             if (!response.ok) {
                 throw new Error(data.error || 'Error al generar comentario');
             }
+
+            console.log('🤖 RESPUESTA COMPLETA DE IA:', data); // ← AGREGAR ESTE LOG
+            console.log('📝 Campos disponibles:', Object.keys(data)); // ← VER QUÉ CAMPOS HAY
 
             setComentarioIA(data);
 
@@ -134,6 +135,260 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
             return <TrophyOutlined style={{ color: '#ffd700', fontSize: '24px', marginLeft: '8px' }} />;
         }
         return null;
+    };
+
+    // Componente para renderizar el comentario de IA con formato Markdown
+    const renderComentarioIA = (texto) => {
+        if (!texto) return null;
+
+        const lineas = texto.split('\n');
+        const elementos = [];
+        let enBloqueCode = false;
+        let codigoActual = [];
+        
+        for (let idx = 0; idx < lineas.length; idx++) {
+            const linea = lineas[idx];
+            
+            // Detectar bloques de código
+            if (linea.trim().startsWith('```')) {
+                if (!enBloqueCode) {
+                    enBloqueCode = true;
+                    codigoActual = [];
+                } else {
+                    // Fin del bloque de código
+                    elementos.push(
+                        <pre key={`code-${idx}`} style={{
+                            background: '#1e1e1e',
+                            padding: '16px',
+                            borderRadius: '8px',
+                            overflowX: 'auto',
+                            margin: '16px 0',
+                            border: '1px solid #404040'
+                        }}>
+                            <code style={{
+                                color: '#d4d4d4',
+                                fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                                fontSize: '13px',
+                                lineHeight: '1.5'
+                            }}>
+                                {codigoActual.join('\n')}
+                            </code>
+                        </pre>
+                    );
+                    enBloqueCode = false;
+                    codigoActual = [];
+                }
+                continue;
+            }
+            
+            // Si estamos dentro de un bloque de código, acumular
+            if (enBloqueCode) {
+                codigoActual.push(linea);
+                continue;
+            }
+            
+            // Detectar headers
+            if (linea.startsWith('### ')) {
+                elementos.push(
+                    <h4 key={idx} style={{ 
+                        color: '#c0c0c0', 
+                        marginTop: '24px', 
+                        marginBottom: '12px',
+                        fontSize: '16px',
+                        fontWeight: '600'
+                    }}>
+                        {linea.replace('### ', '')}
+                    </h4>
+                );
+                continue;
+            }
+            
+            if (linea.startsWith('## ')) {
+                elementos.push(
+                    <h3 key={idx} style={{ 
+                        color: '#e0e0e0', 
+                        marginTop: '28px', 
+                        marginBottom: '14px',
+                        fontSize: '18px',
+                        fontWeight: '600'
+                    }}>
+                        {linea.replace('## ', '')}
+                    </h3>
+                );
+                continue;
+            }
+            
+            if (linea.startsWith('# ')) {
+                elementos.push(
+                    <h2 key={idx} style={{ 
+                        color: '#ffffff', 
+                        marginTop: '32px', 
+                        marginBottom: '16px',
+                        fontSize: '20px',
+                        fontWeight: '700'
+                    }}>
+                        {linea.replace('# ', '')}
+                    </h2>
+                );
+                continue;
+            }
+            
+            // Detectar listas con bullet points
+            if (linea.trim().startsWith('• ')) {
+                const contenido = linea.trim().substring(2);
+                elementos.push(
+                    <div key={idx} style={{ 
+                        marginLeft: '24px', 
+                        marginBottom: '10px', 
+                        display: 'flex',
+                        alignItems: 'flex-start'
+                    }}>
+                        <span style={{ 
+                            color: '#667eea', 
+                            marginRight: '12px',
+                            marginTop: '2px',
+                            fontSize: '18px'
+                        }}>•</span>
+                        <span style={{ color: '#b0b0b0', flex: 1, lineHeight: '1.6' }}>
+                            {renderInlineFormat(contenido)}
+                        </span>
+                    </div>
+                );
+                continue;
+            }
+            
+            // Detectar listas con * o -
+            if (linea.trim().startsWith('* ') || linea.trim().startsWith('- ')) {
+                const contenido = linea.replace(/^[\s]*[\*\-]\s/, '');
+                elementos.push(
+                    <div key={idx} style={{ 
+                        marginLeft: '24px', 
+                        marginBottom: '10px',
+                        display: 'flex',
+                        alignItems: 'flex-start'
+                    }}>
+                        <span style={{ 
+                            color: '#667eea', 
+                            marginRight: '12px',
+                            marginTop: '2px'
+                        }}>•</span>
+                        <span style={{ color: '#b0b0b0', flex: 1, lineHeight: '1.6' }}>
+                            {renderInlineFormat(contenido)}
+                        </span>
+                    </div>
+                );
+                continue;
+            }
+            
+            // Líneas vacías
+            if (linea.trim() === '') {
+                elementos.push(<div key={idx} style={{ height: '8px' }} />);
+                continue;
+            }
+            
+            // Líneas separadoras
+            if (linea.trim() === '---') {
+                elementos.push(
+                    <hr key={idx} style={{ 
+                        border: 'none', 
+                        borderTop: '1px solid #404040', 
+                        margin: '24px 0' 
+                    }} />
+                );
+                continue;
+            }
+            
+            // Texto normal (párrafo)
+            elementos.push(
+                <p key={idx} style={{ 
+                    color: '#a0a0a0', 
+                    marginBottom: '12px', 
+                    lineHeight: '1.7',
+                    textAlign: 'justify'
+                }}>
+                    {renderInlineFormat(linea)}
+                </p>
+            );
+        }
+        
+        return <div className="analisis-ia-markdown">{elementos}</div>;
+    };
+
+    // Función para renderizar formato inline (negrita, código, etc.)
+    const renderInlineFormat = (texto) => {
+        const elementos = [];
+        let key = 0;
+        
+        // Patrón mejorado para capturar: **negrita**, `código`, *cursiva*
+        // Usamos lookahead y lookbehind para evitar solapamientos
+        const regex = /(\*\*[^*]+?\*\*|`[^`]+?`|\*[^*\s][^*]*?\*(?!\*))/g;
+        let ultimoIndice = 0;
+        let match;
+        
+        // Reset regex
+        regex.lastIndex = 0;
+        
+        while ((match = regex.exec(texto)) !== null) {
+            // Agregar texto antes del formato
+            if (match.index > ultimoIndice) {
+                elementos.push(
+                    <span key={`text-${key++}`}>
+                        {texto.substring(ultimoIndice, match.index)}
+                    </span>
+                );
+            }
+            
+            const captura = match[0];
+            
+            // Detectar tipo de formato
+            if (captura.startsWith('**') && captura.endsWith('**')) {
+                // Negrita
+                const contenido = captura.slice(2, -2);
+                elementos.push(
+                    <strong key={`bold-${key++}`} style={{ color: '#e0e0e0', fontWeight: '600' }}>
+                        {contenido}
+                    </strong>
+                );
+            } else if (captura.startsWith('`') && captura.endsWith('`')) {
+                // Código inline
+                const contenido = captura.slice(1, -1);
+                elementos.push(
+                    <code key={`code-${key++}`} style={{ 
+                        background: '#2d2d2d', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px', 
+                        color: '#ffa657',
+                        fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                        fontSize: '13px',
+                        border: '1px solid #404040',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        {contenido}
+                    </code>
+                );
+            } else if (captura.startsWith('*') && captura.endsWith('*') && !captura.startsWith('**')) {
+                // Cursiva (solo si no es negrita)
+                const contenido = captura.slice(1, -1);
+                elementos.push(
+                    <em key={`italic-${key++}`} style={{ color: '#c0c0c0', fontStyle: 'italic' }}>
+                        {contenido}
+                    </em>
+                );
+            }
+            
+            ultimoIndice = regex.lastIndex;
+        }
+        
+        // Agregar texto restante
+        if (ultimoIndice < texto.length) {
+            elementos.push(
+                <span key={`text-end-${key++}`}>
+                    {texto.substring(ultimoIndice)}
+                </span>
+            );
+        }
+        
+        return elementos.length > 0 ? <>{elementos}</> : texto;
     };
 
     return (
@@ -380,7 +635,7 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                     )}
 
                     {comentarioIA && (
-                        <Card className="analisis-ia-card">
+                        <Card className="analisis-ia-card" style={{ maxHeight: 'none' }}>
                             <div className="analisis-ia-header">
                                 <RobotOutlined style={{ fontSize: '32px', color: '#667eea' }} />
                                 <div>
@@ -393,10 +648,8 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                                 </div>
                             </div>
 
-                            <div className="analisis-ia-content">
-                                <Text className="analisis-ia-comentario">
-                                    {comentarioIA.comentario_preview || 'Análisis completado exitosamente'}
-                                </Text>
+                            <div className="analisis-ia-content" style={{ maxHeight: 'none', overflow: 'visible' }}>
+                                {renderComentarioIA(comentarioIA.comentario || comentarioIA.comentario_preview || comentarioIA.texto)}
                             </div>
 
                             <div className="analisis-ia-footer">

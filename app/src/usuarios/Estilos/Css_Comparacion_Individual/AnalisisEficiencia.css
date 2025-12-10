@@ -389,3 +389,82 @@
 .analisis-eficiencia-container .ant-spin-dot-item {
   background-color: #667eea;
 }
+
+/* Agregar estos estilos a tu archivo AnalisisEficiencia.css */
+
+.analisis-ia-card {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    border-radius: 12px !important;
+    margin-top: 32px !important;
+}
+
+.analisis-ia-content {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 20px 0;
+}
+
+.analisis-ia-markdown {
+    width: 100%;
+}
+
+/* Mejoras para código inline */
+.analisis-ia-markdown code {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Mejoras para bloques de código */
+.analisis-ia-markdown pre {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.analisis-ia-markdown pre code {
+    display: block;
+    white-space: pre;
+}
+
+/* Espaciado entre elementos */
+.analisis-ia-markdown h2,
+.analisis-ia-markdown h3,
+.analisis-ia-markdown h4 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+.analisis-ia-markdown p {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    font-size: 14px;
+}
+
+/* Listas con mejor espaciado */
+.analisis-ia-markdown ul,
+.analisis-ia-markdown ol {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+.analisis-ia-markdown li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+}
+
+/* Scrollbar personalizada para bloques de código */
+.analisis-ia-markdown pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.analisis-ia-markdown pre::-webkit-scrollbar-track {
+    background: #0a0a0a;
+    border-radius: 4px;
+}
+
+.analisis-ia-markdown pre::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+}
+
+.analisis-ia-markdown pre::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}
