@@ -25,6 +25,7 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
     const [languages, setLanguages] = useState([]);
     const [loadingLanguages, setLoadingLanguages] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [loadingStage, setLoadingStage] = useState('');
     const [comparisonName, setComparisonName] = useState('');
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [dragOver1, setDragOver1] = useState(false);
@@ -255,7 +256,7 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
         }
     };
 
-    // Manejar comparación
+    // Manejar comparación COMPLETA (similitud + eficiencia + IA)
     const handleCompare = async () => {
         if (!languageId) {
             notification.warning({
@@ -294,7 +295,11 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
         try {
             const token = getStoredToken();
 
-            // Paso 1: Crear la comparación
+            // ==========================================
+            // PASO 1: Crear la comparación
+            // ==========================================
+            setLoadingStage('Creando comparación...');
+            
             const formData = new FormData();
             formData.append('usuario_id', userProfile.usuario_id);
             formData.append('modelo_ia_id', model.id);
@@ -322,16 +327,13 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
             }
 
             const comparacionId = createData.id;
+            console.log('✅ Comparación creada con ID:', comparacionId);
 
-            notification.success({
-                message: '¡Comparación creada!',
-                description: `La comparación "${finalName}" se ha creado. Ejecutando análisis con IA...`,
-                placement: 'topRight',
-                duration: 3,
-                icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
-            });
+            // ==========================================
+            // PASO 2: Análisis de similitud con IA
+            // ==========================================
+            setLoadingStage('Analizando similitud con IA...');
 
-            // Paso 2: Ejecutar el análisis con la IA
             const executeUrl = buildApiUrl(`${API_ENDPOINTS.EJECUTAR_COMPARACION_IA}/${comparacionId}/`);
 
             const executeResponse = await fetch(executeUrl, {
@@ -348,16 +350,81 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
                 throw new Error(executeData.error || 'Error al ejecutar el análisis de IA');
             }
 
-            // Procesar los resultados de la IA
-            const iaResult = {
+            console.log('✅ Análisis de similitud completado');
+
+            // ==========================================
+            // PASO 3: Análisis Big O de eficiencia
+            // ==========================================
+            setLoadingStage('Analizando complejidad algorítmica...');
+
+            const eficienciaUrl = buildApiUrl(`${API_ENDPOINTS.ANALIZAR_EFICIENCIA_INDIVIDUAL}/${comparacionId}/`);
+
+            const eficienciaResponse = await fetch(eficienciaUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const eficienciaData = await eficienciaResponse.json();
+
+            if (!eficienciaResponse.ok) {
+                throw new Error(eficienciaData.error || 'Error al analizar eficiencia');
+            }
+
+            console.log('✅ Análisis Big O completado:', eficienciaData);
+
+            // ==========================================
+            // PASO 4: Generar comentario con IA
+            // ==========================================
+            setLoadingStage('Generando comentario detallado con IA...');
+
+            const resultadoId = eficienciaData.resultado_id;
+            
+            if (!resultadoId) {
+                throw new Error('No se recibió el ID del resultado de eficiencia');
+            }
+            
+            const comentarioUrl = buildApiUrl(`${API_ENDPOINTS.CREAR_COMENTARIO_EFICIENCIA}/${resultadoId}/`);
+
+            const comentarioResponse = await fetch(comentarioUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const comentarioData = await comentarioResponse.json();
+
+            if (!comentarioResponse.ok) {
+                throw new Error(comentarioData.error || 'Error al generar comentario');
+            }
+
+            console.log('✅ Comentario IA completado:', comentarioData);
+
+            // ==========================================
+            // CONSTRUIR RESULTADO COMPLETO
+            // ==========================================
+            const resultadoCompleto = {
                 id: comparacionId,
                 nombre_comparacion: finalName,
+                
+                // Datos de similitud
                 similarity: {
                     similarity_score: executeData.porcentaje_similitud || 0,
                     explanation: executeData.respuesta_ia || 'No se pudo obtener explicación',
                     plagiarism_likelihood: executeData.porcentaje_similitud >= 80 ? 'alto' :
                         executeData.porcentaje_similitud >= 60 ? 'medio' : 'bajo'
                 },
+                
+                // Datos de eficiencia
+                eficiencia: {
+                    ...eficienciaData,
+                    comentarioIA: comentarioData
+                },
+                
+                // Metadata
                 metadata: {
                     provider: executeData.proveedor || model.name,
                     model_name: executeData.model_name || 'Desconocido',
@@ -367,41 +434,35 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
             };
 
             setIsLocked(true);
-            console.log('🔒 isLocked establecido a true');
 
             notification.success({
-                message: '¡Análisis completado!',
-                description: `El análisis se completó exitosamente en ${iaResult.metadata.tiempo_respuesta}s`,
+                message: '¡Análisis completo exitoso!',
+                description: 'Se completaron todos los análisis: similitud, eficiencia y comentarios de IA',
                 placement: 'topRight',
                 duration: 4,
                 icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
             });
 
-            console.log('🔄 Llamando refreshComparaciones');
             if (refreshComparaciones) {
                 refreshComparaciones();
             }
 
-            // Llamar al callback para pasar el resultado al componente padre
-            console.log('📤 onAnalysisComplete existe?', !!onAnalysisComplete);
-            console.log('📦 iaResult:', iaResult);
             if (onAnalysisComplete) {
-                console.log('✅ Enviando resultado al componente padre:', iaResult);
-                onAnalysisComplete(iaResult);
-            } else {
-                console.error('❌ onAnalysisComplete NO ESTÁ DEFINIDO');
+                console.log('📤 Enviando resultado completo al padre:', resultadoCompleto);
+                onAnalysisComplete(resultadoCompleto);
             }
 
         } catch (error) {
-            console.error('Error:', error);
+            console.error('❌ Error en el proceso:', error);
             notification.error({
-                message: 'Error al comparar códigos',
-                description: error.message || 'Ocurrió un error al comparar los códigos. Por favor, intenta nuevamente.',
+                message: 'Error en el análisis',
+                description: error.message || 'Ocurrió un error durante el análisis. Por favor, intenta nuevamente.',
                 placement: 'topRight',
                 duration: 5
             });
         } finally {
             setLoading(false);
+            setLoadingStage('');
         }
     };
 
@@ -659,7 +720,7 @@ const CodeComparisonInput = ({ model, onBack, userProfile, refreshComparaciones,
                     <Spin size="large" />
                     <div className="loading-message-icon">🤖</div>
                     <div className="loading-message-text">
-                        Analizando códigos con {model.name}...
+                        {loadingStage || 'Procesando análisis...'}
                     </div>
                     <div className="loading-message-subtext">
                         Esto puede tomar unos segundos

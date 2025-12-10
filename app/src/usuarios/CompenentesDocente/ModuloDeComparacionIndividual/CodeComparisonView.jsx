@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import CodeComparisonResults from './ResultadoCompacionSimilitud';
 import CodeComparisonInput from './ComparacionDeCodigoEntrada';
 import AnalisisEficiencia from './AnalisisEficiencia';
+
 /**
- * Wrapper que coordina los dos componentes
- * - CodeComparisonInput: Entrada de código (~ 300 líneas)
- * - CodeComparisonResults: Muestra resultados (~ 200 líneas)
+ * Wrapper que coordina los tres componentes:
+ * - CodeComparisonInput: Entrada de código y ejecución completa del análisis
+ * - CodeComparisonResults: Muestra resultados de similitud
+ * - AnalisisEficiencia: Muestra análisis de eficiencia Big O y comentarios IA
  */
 const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }) => {
     const [result, setResult] = useState(null);
     const [isLocked, setIsLocked] = useState(false);
 
     const handleAnalysisComplete = (analysisResult) => {
-        console.log('✅ Resultado recibido en wrapper:', analysisResult);
+        console.log('✅ Resultado completo recibido en wrapper:', analysisResult);
         setResult(analysisResult);
         setIsLocked(true);
     };
@@ -28,16 +30,24 @@ const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }
             />
 
             {result && (
-                <div style={{ marginTop: '-60px' }}> {/* Ajusta este valor */}
+                <div style={{ marginTop: '-60px' }}>
+                    {/* Resultados de similitud */}
                     <CodeComparisonResults
                         result={result}
                         model={model}
                         isLocked={isLocked}
                     />
-                    <AnalisisEficiencia
-                        comparacionId={result.id}
-                        model={model}
-                    />
+                    
+                    {/* Análisis de eficiencia - pasamos los datos desde result.eficiencia */}
+                    {result.eficiencia && (
+                        <AnalisisEficiencia
+                            eficienciaData={{
+                                analisisBigO: result.eficiencia,
+                                comentarioIA: result.eficiencia.comentarioIA
+                            }}
+                            model={model}
+                        />
+                    )}
                 </div>
             )}
         </div>
