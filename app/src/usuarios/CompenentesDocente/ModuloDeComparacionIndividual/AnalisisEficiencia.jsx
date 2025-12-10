@@ -32,6 +32,8 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                 throw new Error(data.error || 'Error al analizar eficiencia');
             }
 
+            console.log('📊 Respuesta del análisis:', data); // ← DEBUG
+
             setAnalisisBigO(data);
 
             notification.success({
@@ -63,12 +65,19 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
         setLoadingComentario(true);
         try {
             const token = getStoredToken();
-            
-            // Necesitamos el ID del resultado de eficiencia que acabamos de crear
-            // Asumiendo que el backend retorna el ID en la respuesta
-            const resultadoId = analisisData.resultado_id || comparacionId; // Ajusta según tu backend
-            
+
+            // ← USAR el resultado_id que viene de la respuesta
+            const resultadoId = analisisData.resultado_id;
+
+            console.log('🤖 Generando comentario para resultado ID:', resultadoId); // ← DEBUG
+
+            if (!resultadoId) {
+                throw new Error('No se recibió el ID del resultado de eficiencia');
+            }
+
             const url = buildApiUrl(`${API_ENDPOINTS.CREAR_COMENTARIO_EFICIENCIA}/${resultadoId}/`);
+
+            console.log('📡 URL del comentario:', url); // ← DEBUG
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -178,8 +187,8 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                             <div className="analisis-ganador-text">
                                 <Text className="analisis-ganador-label">Código más eficiente:</Text>
                                 <Title level={2} className="analisis-ganador-nombre" style={{ margin: 0 }}>
-                                    {analisisBigO.ganador === 'codigo_1' ? 'Código 1' : 
-                                     analisisBigO.ganador === 'codigo_2' ? 'Código 2' : 'Empate'}
+                                    {analisisBigO.ganador === 'codigo_1' ? 'Código 1' :
+                                        analisisBigO.ganador === 'codigo_2' ? 'Código 2' : 'Empate'}
                                 </Title>
                             </div>
                         </div>
@@ -199,9 +208,9 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                             <div className="analisis-complejidad-section">
                                 <div className="analisis-complejidad-item">
                                     <Text className="analisis-complejidad-label">Complejidad Temporal</Text>
-                                    <Tag 
+                                    <Tag
                                         className="analisis-complejidad-tag"
-                                        style={{ 
+                                        style={{
                                             background: getComplejidadColor(analisisBigO.codigo_1.complejidad_temporal),
                                             color: '#1a1a1a',
                                             fontSize: '18px',
@@ -215,9 +224,9 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
 
                                 <div className="analisis-complejidad-item">
                                     <Text className="analisis-complejidad-label">Complejidad Espacial</Text>
-                                    <Tag 
+                                    <Tag
                                         className="analisis-complejidad-tag"
-                                        style={{ 
+                                        style={{
                                             background: getComplejidadColor(analisisBigO.codigo_1.complejidad_espacial),
                                             color: '#1a1a1a',
                                             fontSize: '18px',
@@ -263,7 +272,7 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                                     <Text className="analisis-confianza-label">Confianza del análisis:</Text>
                                     <Tag color={
                                         analisisBigO.codigo_1.confianza_analisis === 'Alta' ? 'green' :
-                                        analisisBigO.codigo_1.confianza_analisis === 'Media' ? 'orange' : 'red'
+                                            analisisBigO.codigo_1.confianza_analisis === 'Media' ? 'orange' : 'red'
                                     }>
                                         {analisisBigO.codigo_1.confianza_analisis}
                                     </Tag>
@@ -283,9 +292,9 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                             <div className="analisis-complejidad-section">
                                 <div className="analisis-complejidad-item">
                                     <Text className="analisis-complejidad-label">Complejidad Temporal</Text>
-                                    <Tag 
+                                    <Tag
                                         className="analisis-complejidad-tag"
-                                        style={{ 
+                                        style={{
                                             background: getComplejidadColor(analisisBigO.codigo_2.complejidad_temporal),
                                             color: '#1a1a1a',
                                             fontSize: '18px',
@@ -299,9 +308,9 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
 
                                 <div className="analisis-complejidad-item">
                                     <Text className="analisis-complejidad-label">Complejidad Espacial</Text>
-                                    <Tag 
+                                    <Tag
                                         className="analisis-complejidad-tag"
-                                        style={{ 
+                                        style={{
                                             background: getComplejidadColor(analisisBigO.codigo_2.complejidad_espacial),
                                             color: '#1a1a1a',
                                             fontSize: '18px',
@@ -347,7 +356,7 @@ const AnalisisEficiencia = ({ comparacionId, model }) => {
                                     <Text className="analisis-confianza-label">Confianza del análisis:</Text>
                                     <Tag color={
                                         analisisBigO.codigo_2.confianza_analisis === 'Alta' ? 'green' :
-                                        analisisBigO.codigo_2.confianza_analisis === 'Media' ? 'orange' : 'red'
+                                            analisisBigO.codigo_2.confianza_analisis === 'Media' ? 'orange' : 'red'
                                     }>
                                         {analisisBigO.codigo_2.confianza_analisis}
                                     </Tag>
