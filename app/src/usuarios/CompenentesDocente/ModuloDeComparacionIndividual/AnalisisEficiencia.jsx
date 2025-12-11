@@ -279,7 +279,7 @@ const AnalisisEficiencia = ({ eficienciaData, model }) => {
     };
 
     return (
-        <div className="analisis-eficiencia-container">
+        <div className="analisis-eficiencia-container" style={{ paddingTop: '0' }}>
             <div className="analisis-resultados-section">
                 <Title level={3} className="analisis-section-title">
                     Análisis de Eficiencia Algorítmica
