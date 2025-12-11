@@ -106,8 +106,8 @@ const CodeComparisonResults = ({ result, model, isLocked }) => {
     const parsedSections = parseIAResponse(result.similarity.explanation);
 
     return (
-        <div className="results-container" style={{ padding: '0 32px 32px 32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="results-container" style={{ padding: '0 32px 16px 32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <Title level={3} className="results-title" style={{ margin: 0 }}>
                     Resultados del Análisis
                 </Title>
