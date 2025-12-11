@@ -279,9 +279,9 @@ const AnalisisEficiencia = ({ eficienciaData, model }) => {
     };
 
     return (
-        <div className="analisis-eficiencia-container" style={{ paddingTop: '0' }}>
+        <div className="analisis-eficiencia-container" style={{ padding: '0 32px 16px 32px' }}>
             <div className="analisis-resultados-section">
-                <Title level={3} className="analisis-section-title">
+                <Title level={3} className="analisis-section-title" style={{ marginTop: '0', marginBottom: '0px' }}>
                     Análisis de Eficiencia Algorítmica
                 </Title>
 
@@ -479,19 +479,11 @@ const AnalisisEficiencia = ({ eficienciaData, model }) => {
                                 <Title level={4} style={{ margin: 0, color: '#c0c0c0' }}>
                                     Análisis Detallado con IA
                                 </Title>
-                                <Text style={{ color: '#909090', fontSize: '13px' }}>
-                                    Generado por {comentarioIA.proveedor} • {comentarioIA.tiempo_respuesta_segundos}s
-                                </Text>
                             </div>
                         </div>
 
-                        <div className="analisis-ia-content" style={{ maxHeight: 'none', overflow: 'visible' }}>
+                        <div className="analisis-ia-content" style={{ maxHeight: '0', overflow: 'visible' }}>
                             {renderComentarioIA(comentarioIA.comentario || comentarioIA.comentario_preview || comentarioIA.texto)}
-                        </div>
-
-                        <div className="analisis-ia-footer">
-                            <Tag color="blue">Tokens usados: {comentarioIA.tokens_usados}</Tag>
-                            <Tag color="green">{comentarioIA.model_name}</Tag>
                         </div>
                     </Card>
                 )}
