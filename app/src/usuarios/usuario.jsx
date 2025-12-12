@@ -13,6 +13,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { API_ENDPOINTS, getWithAuth, getStoredToken, removeToken, buildApiUrl } from '../../config';
 import logo from '../img/logo.png';
 import CodeComparisonView from './CompenentesDocente/ModuloDeComparacionIndividual/CodeComparisonView';
+import CodeComparisonGroupView from './CompenentesDocente/ModuloComparacionGrupal/CodeComparisonGroupView.jsx';
 import DocenteSidebar from './CompenentesDocente/VistaPrincipalDocente/DocenteSidebar';
 import ChatManagerView from './CompenentesDocente/VistaPrincipalDocente/GestionDeComparaciones';
 import ModalSeleccionIA from '../usuarios/CompenentesDocente/VistaPrincipalDocente/ModalSeleccion.jsx';
@@ -29,6 +30,7 @@ const Usuario = () => {
     const [error, setError] = useState(null);
     const [greeting, setGreeting] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [tipoComparacion, setTipoComparacion] = useState(null);
     const [selectedModel, setSelectedModel] = useState(null);
     const [showChatManager, setShowChatManager] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -137,20 +139,22 @@ const Usuario = () => {
     };
 
     const handleNewIndividualComparison = () => {
+        setTipoComparacion('individual');
         setIsModalVisible(true);
     };
 
     const handleNewGroupComparison = () => {
-        message.info('Comparación grupal - Funcionalidad por implementar');
+        setTipoComparacion('grupal');
+        setIsModalVisible(true);
     };
 
     const handleModelSelect = (model) => {
-        setSelectedModel(model);
+        setSelectedModel({ ...model, tipoComparacion });
         setIsModalVisible(false);
         setShowChatManager(false);
         setSelectedComparacion(null);
         setShowSettings(false);
-        message.success(`Modelo ${model.name} seleccionado`);
+        message.success(`Modelo ${model.name} seleccionado para comparación ${tipoComparacion}`);
     };
 
     const handleBackToHome = () => {
@@ -368,7 +372,6 @@ const Usuario = () => {
         );
     }
 
-    // Si está mostrando configuraciones, renderizar en pantalla completa
     if (showSettings) {
         return <SettingsView userProfile={userProfile} onBack={handleBackToHome} />;
     }
@@ -439,12 +442,21 @@ const Usuario = () => {
                                 display: 'flex',
                                 flexDirection: 'column'
                             }}>
-                                <CodeComparisonView
-                                    model={selectedModel}
-                                    onBack={handleBackToHome}
-                                    userProfile={userProfile}
-                                    refreshComparaciones={refreshComparaciones}
-                                />
+                                {selectedModel.tipoComparacion === 'individual' ? (
+                                    <CodeComparisonView
+                                        model={selectedModel}
+                                        onBack={handleBackToHome}
+                                        userProfile={userProfile}
+                                        refreshComparaciones={refreshComparaciones}
+                                    />
+                                ) : (
+                                    <CodeComparisonGroupView
+                                        model={selectedModel}
+                                        onBack={handleBackToHome}
+                                        userProfile={userProfile}
+                                        refreshComparaciones={refreshComparaciones}
+                                    />
+                                )}
                             </div>
                         ) : (
                             <div style={{
