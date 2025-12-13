@@ -278,7 +278,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         }
     };
 
-    // Manejar comparación grupal (solo crear, sin análisis IA)
+    // Manejar comparación grupal CON análisis de IA
     const handleCompare = async () => {
         if (!languageId) {
             notification.warning({
@@ -319,7 +319,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         try {
             const token = getStoredToken();
 
-            // Crear la comparación grupal
+            // PASO 1: Crear la comparación grupal
             setLoadingStage('Creando comparación grupal...');
             
             const formData = new FormData();
@@ -358,40 +358,81 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             console.log('✅ Comparación grupal creada con ID:', comparacionId);
             console.log('📊 Total códigos:', createData.total_codigos);
 
-            // Construir resultado completo
+            // PASO 2: Obtener resultados de la IA
+            setLoadingStage('Analizando códigos con IA...');
+
+            const iaUrl = buildApiUrl(`${API_ENDPOINTS.OBTENER_RESULTADO_COMPARACION_IA_GRUPAL}${comparacionId}/`);
+
+            const iaResponse = await fetch(iaUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const iaData = await iaResponse.json();
+
+            if (!iaResponse.ok) {
+                throw new Error(iaData.error || 'Error al obtener resultados de IA');
+            }
+
+            console.log('✅ Resultados de IA obtenidos:', iaData);
+
+            // Construir resultado completo con respuesta de IA
             const resultadoCompleto = {
                 id: comparacionId,
                 nombre_comparacion: finalName,
                 total_codigos: createData.total_codigos,
                 codigos: createData.codigos,
-                lenguaje: createData.lenguaje,
-                fecha_creacion: createData.fecha_creacion
+                lenguaje: iaData.lenguaje,
+                fecha_creacion: createData.fecha_creacion,
+                // Datos de la IA
+                respuesta_ia: iaData.respuesta_ia,
+                tokens_usados: iaData.tokens_usados,
+                tiempo_respuesta_segundos: iaData.tiempo_respuesta_segundos,
+                modelo_usado: iaData.modelo_usado,
+                proveedor: iaData.proveedor,
+                model_name: iaData.model_name,
+                prompt_usado: iaData.prompt_usado,
+                codigos_comparados: iaData.codigos_comparados,
+                resultado_id: iaData.resultado_id
             };
+
+            console.log('📦 Resultado completo construido:', resultadoCompleto);
 
             setIsLocked(true);
 
             notification.success({
-                message: '¡Comparación grupal creada exitosamente!',
-                description: `Se guardaron ${createData.total_codigos} códigos correctamente`,
+                message: '¡Análisis completado exitosamente!',
+                description: `Se analizaron ${createData.total_codigos} códigos con ${iaData.modelo_usado}`,
                 placement: 'topRight',
                 duration: 4,
                 icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
             });
 
             if (refreshComparaciones) {
+                console.log('🔄 Refrescando lista de comparaciones');
                 refreshComparaciones();
             }
 
             if (onAnalysisComplete) {
-                console.log('📤 Enviando resultado grupal al padre:', resultadoCompleto);
+                console.log('📤 Llamando a onAnalysisComplete con resultado:', {
+                    id: resultadoCompleto.id,
+                    tiene_respuesta_ia: !!resultadoCompleto.respuesta_ia,
+                    tokens: resultadoCompleto.tokens_usados
+                });
                 onAnalysisComplete(resultadoCompleto);
+                console.log('✅ onAnalysisComplete ejecutado');
+            } else {
+                console.warn('⚠️ onAnalysisComplete NO está definido');
             }
 
         } catch (error) {
             console.error('❌ Error en el proceso:', error);
             notification.error({
-                message: 'Error al crear la comparación',
-                description: error.message || 'Ocurrió un error durante la creación.',
+                message: 'Error en el análisis',
+                description: error.message || 'Ocurrió un error durante el análisis.',
                 placement: 'topRight',
                 duration: 5
             });
@@ -618,7 +659,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                             borderRadius: '10px'
                         }}
                     >
-                        Guardar {filledCodesCount} Códigos
+                        Analizar {filledCodesCount} Códigos con IA
                     </Button>
                 </div>
             )}
@@ -626,12 +667,16 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             {loading && (
                 <div className="loading-message">
                     <Spin size="large" />
-                    <div className="loading-message-icon">💾</div>
+                    <div className="loading-message-icon">
+                        {loadingStage.includes('Analizando') ? '🤖' : '💾'}
+                    </div>
                     <div className="loading-message-text">
-                        {loadingStage || 'Guardando comparación grupal...'}
+                        {loadingStage || 'Procesando comparación grupal...'}
                     </div>
                     <div className="loading-message-subtext">
-                        Esto puede tomar unos segundos
+                        {loadingStage.includes('Analizando') 
+                            ? 'La IA está analizando los códigos...' 
+                            : 'Esto puede tomar unos segundos'}
                     </div>
                 </div>
             )}

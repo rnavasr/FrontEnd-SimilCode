@@ -1,24 +1,40 @@
 import React, { useState } from 'react';
 import CodeComparisonGroupInput from './ComparacionGrupalEntrada';
+import CodeComparisonGroupResults from './ResultadosComparacionGrupalIA';
 
 /**
  * Wrapper para comparaciones grupales (3+ códigos)
- * Solo guarda los códigos sin mostrar pantalla de resultados
+ * Muestra los editores Y los resultados debajo cuando están listos
  */
 const CodeComparisonGroupView = ({ model, onBack, userProfile, refreshComparaciones }) => {
-    const handleAnalysisComplete = (analysisResult) => {
-        console.log('✅ Comparación grupal guardada:', analysisResult);
-        // No hacemos nada más, los editores quedan bloqueados y eso es todo
+    const [analysisResult, setAnalysisResult] = useState(null);
+
+    const handleAnalysisComplete = (result) => {
+        console.log('✅ Análisis grupal completado en wrapper:', result);
+        setAnalysisResult(result);
     };
 
     return (
-        <CodeComparisonGroupInput
-            model={model}
-            onBack={onBack}
-            userProfile={userProfile}
-            refreshComparaciones={refreshComparaciones}
-            onAnalysisComplete={handleAnalysisComplete}
-        />
+        <div>
+            {/* Siempre mostrar los editores */}
+            <CodeComparisonGroupInput
+                model={model}
+                onBack={onBack}
+                userProfile={userProfile}
+                refreshComparaciones={refreshComparaciones}
+                onAnalysisComplete={handleAnalysisComplete}
+            />
+
+            {/* Mostrar resultados debajo cuando existan */}
+            {analysisResult && (
+                <CodeComparisonGroupResults 
+                    result={analysisResult}
+                    model={model}
+                    userProfile={userProfile}
+                    loading={false}
+                />
+            )}
+        </div>
     );
 };
 

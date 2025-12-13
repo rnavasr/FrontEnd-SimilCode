@@ -50,7 +50,8 @@ export const API_ENDPOINTS = {
   CREAR_COMENTARIO_EFICIENCIA: '/app/usuarios/crear_comentario_eficiencia_individual',  // Usar con /${id_resultado_eficiencia}/
   MOSTRAR_RESULTADOS_EFICIENCIA_INDIVIDUAL: '/app/usuarios/mostrar_resultados_eficiencia_individual/',
   MOSTRAR_COMENTARIOS_EFICIENCIA_INDIVIDUAL: '/app/usuarios/mostrar_comentarios_eficiencia_individual/',
-  CREAR_COMPARACION_GRUPAL: '/app/usuarios/crear_comparaciones_grupales/'
+  CREAR_COMPARACION_GRUPAL: '/app/usuarios/crear_comparaciones_grupales/',
+  OBTENER_RESULTADO_COMPARACION_IA_GRUPAL: '/app/usuarios/crear_comparacion_grupal_ia/'
 };
 
 // Función helper para construir URLs completas
