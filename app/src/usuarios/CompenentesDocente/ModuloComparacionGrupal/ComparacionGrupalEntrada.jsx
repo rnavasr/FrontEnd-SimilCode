@@ -278,7 +278,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         }
     };
 
-    // Manejar comparación grupal
+    // Manejar comparación grupal (solo crear, sin análisis IA)
     const handleCompare = async () => {
         if (!languageId) {
             notification.warning({
@@ -319,7 +319,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         try {
             const token = getStoredToken();
 
-            // PASO 1: Crear la comparación grupal
+            // Crear la comparación grupal
             setLoadingStage('Creando comparación grupal...');
             
             const formData = new FormData();
@@ -358,54 +358,21 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             console.log('✅ Comparación grupal creada con ID:', comparacionId);
             console.log('📊 Total códigos:', createData.total_codigos);
 
-            // PASO 2: Análisis de similitud con IA
-            setLoadingStage('Analizando similitud entre códigos...');
-
-            const executeUrl = buildApiUrl(`${API_ENDPOINTS.EJECUTAR_COMPARACION_IA}/${comparacionId}/`);
-
-            const executeResponse = await fetch(executeUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const executeData = await executeResponse.json();
-
-            if (!executeResponse.ok) {
-                throw new Error(executeData.error || 'Error al ejecutar el análisis de IA');
-            }
-
-            console.log('✅ Análisis de similitud completado');
-
             // Construir resultado completo
             const resultadoCompleto = {
                 id: comparacionId,
                 nombre_comparacion: finalName,
                 total_codigos: createData.total_codigos,
                 codigos: createData.codigos,
-                
-                similarity: {
-                    similarity_score: executeData.porcentaje_similitud || 0,
-                    explanation: executeData.respuesta_ia || 'No se pudo obtener explicación',
-                    plagiarism_likelihood: executeData.porcentaje_similitud >= 80 ? 'alto' :
-                        executeData.porcentaje_similitud >= 60 ? 'medio' : 'bajo'
-                },
-                
-                metadata: {
-                    provider: executeData.proveedor || model.name,
-                    model_name: executeData.model_name || 'Desconocido',
-                    tiempo_respuesta: executeData.tiempo_respuesta_segundos || 0,
-                    tokens_usados: executeData.tokens_usados || 0
-                }
+                lenguaje: createData.lenguaje,
+                fecha_creacion: createData.fecha_creacion
             };
 
             setIsLocked(true);
 
             notification.success({
-                message: '¡Comparación grupal exitosa!',
-                description: `Se analizaron ${createData.total_codigos} códigos correctamente`,
+                message: '¡Comparación grupal creada exitosamente!',
+                description: `Se guardaron ${createData.total_codigos} códigos correctamente`,
                 placement: 'topRight',
                 duration: 4,
                 icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
@@ -423,8 +390,8 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         } catch (error) {
             console.error('❌ Error en el proceso:', error);
             notification.error({
-                message: 'Error en el análisis',
-                description: error.message || 'Ocurrió un error durante el análisis.',
+                message: 'Error al crear la comparación',
+                description: error.message || 'Ocurrió un error durante la creación.',
                 placement: 'topRight',
                 duration: 5
             });
@@ -651,7 +618,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                             borderRadius: '10px'
                         }}
                     >
-                        Comparar {filledCodesCount} Códigos
+                        Guardar {filledCodesCount} Códigos
                     </Button>
                 </div>
             )}
@@ -659,9 +626,9 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             {loading && (
                 <div className="loading-message">
                     <Spin size="large" />
-                    <div className="loading-message-icon">🤖</div>
+                    <div className="loading-message-icon">💾</div>
                     <div className="loading-message-text">
-                        {loadingStage || 'Procesando análisis grupal...'}
+                        {loadingStage || 'Guardando comparación grupal...'}
                     </div>
                     <div className="loading-message-subtext">
                         Esto puede tomar unos segundos
