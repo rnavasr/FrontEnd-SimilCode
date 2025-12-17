@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CodeComparisonGroupInput from './ComparacionGrupalEntrada';
 import CodeComparisonGroupResults from './ResultadosComparacionGrupalIA';
+import AnalisisEficienciaGrupal from './AnalisisEficienciaBigO';
 
 /**
  * Wrapper para comparaciones grupales (3+ códigos)
@@ -11,11 +12,17 @@ const CodeComparisonGroupView = ({ model, onBack, userProfile, refreshComparacio
 
     const handleAnalysisComplete = (result) => {
         console.log('✅ Análisis grupal completado en wrapper:', result);
+        console.log('📊 Datos de eficiencia recibidos:', result.analisis_eficiencia);
         setAnalysisResult(result);
     };
 
     return (
-        <div>
+        <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            height: '100%',
+            overflow: 'auto'
+        }}>
             {/* Siempre mostrar los editores */}
             <CodeComparisonGroupInput
                 model={model}
@@ -27,12 +34,21 @@ const CodeComparisonGroupView = ({ model, onBack, userProfile, refreshComparacio
 
             {/* Mostrar resultados debajo cuando existan */}
             {analysisResult && (
-                <CodeComparisonGroupResults 
-                    result={analysisResult}
-                    model={model}
-                    userProfile={userProfile}
-                    loading={false}
-                />
+                <>
+                    {/* Análisis de IA */}
+                    <CodeComparisonGroupResults
+                        result={analysisResult}
+                        model={model}
+                        userProfile={userProfile}
+                    />
+
+                    {/* Análisis de Eficiencia */}
+                    {analysisResult.analisis_eficiencia && (
+                        <AnalisisEficienciaGrupal 
+                            eficienciaData={analysisResult.analisis_eficiencia}
+                        />
+                    )}
+                </>
             )}
         </div>
     );

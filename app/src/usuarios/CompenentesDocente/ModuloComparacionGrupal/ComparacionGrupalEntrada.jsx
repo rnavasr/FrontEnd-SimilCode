@@ -114,7 +114,6 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             const files = Array.from(e.dataTransfer.files);
 
             if (files.length > 0) {
-                // Encontrar espacios vacíos o agregar nuevos editores
                 let fileIndex = 0;
                 const newCodes = [...codes];
 
@@ -125,13 +124,11 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                     }
                 }
 
-                // Si aún quedan archivos, agregar nuevos editores
                 while (fileIndex < files.length) {
                     const newId = Math.max(...codes.map(c => c.id)) + 1;
                     const newCode = { id: newId, content: '', fileName: '' };
                     setCodes(prev => [...prev, newCode]);
                     
-                    // Pequeño delay para que el estado se actualice
                     await new Promise(resolve => setTimeout(resolve, 100));
                     await loadFileToIndex(files[fileIndex], codes.length + (fileIndex - codes.filter(c => !c.content.trim()).length));
                     fileIndex++;
@@ -278,7 +275,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         }
     };
 
-    // Manejar comparación grupal CON análisis de IA
+    // Manejar comparación grupal CON análisis de IA Y eficiencia algorítmica
     const handleCompare = async () => {
         if (!languageId) {
             notification.warning({
@@ -379,7 +376,34 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
 
             console.log('✅ Resultados de IA obtenidos:', iaData);
 
-            // Construir resultado completo con respuesta de IA
+            // PASO 3: Analizar eficiencia algorítmica (Big O)
+            setLoadingStage('Analizando eficiencia algorítmica...');
+
+            const eficienciaUrl = buildApiUrl(`${API_ENDPOINTS.ANALIZAR_EFICIENCIA_GRUPAL}/${comparacionId}/`);
+
+            const eficienciaResponse = await fetch(eficienciaUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const eficienciaData = await eficienciaResponse.json();
+
+            if (!eficienciaResponse.ok) {
+                console.warn('⚠️ Error al analizar eficiencia:', eficienciaData.error);
+                notification.warning({
+                    message: 'Análisis de eficiencia no disponible',
+                    description: 'La comparación se completó pero no se pudo analizar la eficiencia.',
+                    placement: 'topRight',
+                    duration: 4
+                });
+            } else {
+                console.log('✅ Análisis de eficiencia completado:', eficienciaData);
+            }
+
+            // Construir resultado completo con respuesta de IA Y eficiencia
             const resultadoCompleto = {
                 id: comparacionId,
                 nombre_comparacion: finalName,
@@ -396,7 +420,9 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 model_name: iaData.model_name,
                 prompt_usado: iaData.prompt_usado,
                 codigos_comparados: iaData.codigos_comparados,
-                resultado_id: iaData.resultado_id
+                resultado_id: iaData.resultado_id,
+                // Datos de eficiencia algorítmica
+                analisis_eficiencia: eficienciaResponse.ok ? eficienciaData : null
             };
 
             console.log('📦 Resultado completo construido:', resultadoCompleto);
@@ -420,6 +446,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 console.log('📤 Llamando a onAnalysisComplete con resultado:', {
                     id: resultadoCompleto.id,
                     tiene_respuesta_ia: !!resultadoCompleto.respuesta_ia,
+                    tiene_analisis_eficiencia: !!resultadoCompleto.analisis_eficiencia,
                     tokens: resultadoCompleto.tokens_usados
                 });
                 onAnalysisComplete(resultadoCompleto);
@@ -668,14 +695,17 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 <div className="loading-message">
                     <Spin size="large" />
                     <div className="loading-message-icon">
-                        {loadingStage.includes('Analizando') ? '🤖' : '💾'}
+                        {loadingStage.includes('Analizando códigos') ? '🤖' : 
+                         loadingStage.includes('eficiencia') ? '📊' : '💾'}
                     </div>
                     <div className="loading-message-text">
                         {loadingStage || 'Procesando comparación grupal...'}
                     </div>
                     <div className="loading-message-subtext">
-                        {loadingStage.includes('Analizando') 
+                        {loadingStage.includes('Analizando códigos') 
                             ? 'La IA está analizando los códigos...' 
+                            : loadingStage.includes('eficiencia')
+                            ? 'Calculando complejidad algorítmica...'
                             : 'Esto puede tomar unos segundos'}
                     </div>
                 </div>
