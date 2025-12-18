@@ -11,7 +11,7 @@ import {
     CloseOutlined
 } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
-import { API_ENDPOINTS, getStoredToken, buildApiUrl } from '../../../../config';
+import { API_ENDPOINTS, getStoredToken, buildApiUrl, buildApiUrlWithId } from '../../../../config';
 import '../../Estilos/Css_Comparacion_Individual/CodeComparisonView.css';
 
 const { Text } = Typography;
@@ -275,7 +275,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
         }
     };
 
-    // Manejar comparación grupal CON análisis de IA Y eficiencia algorítmica
+    // Manejar comparación grupal CON TODOS LOS ANÁLISIS EN SECUENCIA
     const handleCompare = async () => {
         if (!languageId) {
             notification.warning({
@@ -352,10 +352,9 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             }
 
             const comparacionId = createData.id;
-            console.log('✅ Comparación grupal creada con ID:', comparacionId);
-            console.log('📊 Total códigos:', createData.total_codigos);
+            console.log('✅ PASO 1: Comparación grupal creada con ID:', comparacionId);
 
-            // PASO 2: Obtener resultados de la IA
+            // PASO 2: Obtener resultados de la IA (análisis de similitud)
             setLoadingStage('Analizando códigos con IA...');
 
             const iaUrl = buildApiUrl(`${API_ENDPOINTS.OBTENER_RESULTADO_COMPARACION_IA_GRUPAL}${comparacionId}/`);
@@ -374,10 +373,10 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 throw new Error(iaData.error || 'Error al obtener resultados de IA');
             }
 
-            console.log('✅ Resultados de IA obtenidos:', iaData);
+            console.log('✅ PASO 2: Análisis de similitud con IA completado');
 
             // PASO 3: Analizar eficiencia algorítmica (Big O)
-            setLoadingStage('Analizando eficiencia algorítmica...');
+            setLoadingStage('Analizando eficiencia algorítmica (Big O)...');
 
             const eficienciaUrl = buildApiUrl(`${API_ENDPOINTS.ANALIZAR_EFICIENCIA_GRUPAL}/${comparacionId}/`);
 
@@ -392,18 +391,63 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             const eficienciaData = await eficienciaResponse.json();
 
             if (!eficienciaResponse.ok) {
-                console.warn('⚠️ Error al analizar eficiencia:', eficienciaData.error);
-                notification.warning({
-                    message: 'Análisis de eficiencia no disponible',
-                    description: 'La comparación se completó pero no se pudo analizar la eficiencia.',
-                    placement: 'topRight',
-                    duration: 4
-                });
+                console.warn('⚠️ Error al analizar eficiencia Big O:', eficienciaData.error);
             } else {
-                console.log('✅ Análisis de eficiencia completado:', eficienciaData);
+                console.log('✅ PASO 3: Análisis Big O completado:', eficienciaData);
+            console.log('🔍 Claves disponibles en eficienciaData:', Object.keys(eficienciaData));
+            console.log('🔍 Estructura completa:', JSON.stringify(eficienciaData, null, 2));
             }
 
-            // Construir resultado completo con respuesta de IA Y eficiencia
+            // PASO 4: Análisis de eficiencia con IA (solo si el paso 3 fue exitoso)
+            let analisisEficienciaIA = null;
+            
+            console.log('🔍 VERIFICANDO PASO 4...');
+            console.log('eficienciaResponse.ok:', eficienciaResponse.ok);
+            console.log('eficienciaData completo:', eficienciaData);
+            console.log('resultado_id:', eficienciaData?.resultado_id);
+            
+            if (eficienciaResponse.ok && eficienciaData?.resultado_id) {
+                setLoadingStage('Generando análisis de eficiencia con IA...');
+                
+                const eficienciaIAUrl = buildApiUrlWithId(
+                    API_ENDPOINTS.CREAR_COMENTARIO_EFICIENCIA_GRUPAL, 
+                    eficienciaData.resultado_id
+                );
+
+                console.log('🔍 URL para análisis IA:', eficienciaIAUrl);
+                console.log('🔑 ID resultado eficiencia:', eficienciaData.resultado_id);
+
+                try {
+                    const eficienciaIAResponse = await fetch(eficienciaIAUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    console.log('📡 Respuesta del servidor PASO 4:', eficienciaIAResponse.status);
+
+                    if (eficienciaIAResponse.ok) {
+                        analisisEficienciaIA = await eficienciaIAResponse.json();
+                        console.log('✅ PASO 4: Análisis de eficiencia con IA completado!');
+                        console.log('📦 Datos recibidos del análisis IA:', analisisEficienciaIA);
+                    } else {
+                        const errorData = await eficienciaIAResponse.json();
+                        console.error('❌ Error HTTP en PASO 4:', eficienciaIAResponse.status);
+                        console.error('❌ Detalles del error:', errorData);
+                    }
+                } catch (error) {
+                    console.error('❌ Excepción en PASO 4:', error);
+                }
+            } else {
+                console.warn('⚠️ PASO 4 OMITIDO - Razones:');
+                console.warn('- eficienciaResponse.ok:', eficienciaResponse.ok);
+                console.warn('- tiene resultado_id:', !!eficienciaData?.resultado_id);
+                console.warn('📊 eficienciaData completo:', eficienciaData);
+            }
+
+            // Construir resultado completo con TODOS los análisis
             const resultadoCompleto = {
                 id: comparacionId,
                 nombre_comparacion: finalName,
@@ -411,7 +455,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 codigos: createData.codigos,
                 lenguaje: iaData.lenguaje,
                 fecha_creacion: createData.fecha_creacion,
-                // Datos de la IA
+                // Datos del análisis de similitud con IA
                 respuesta_ia: iaData.respuesta_ia,
                 tokens_usados: iaData.tokens_usados,
                 tiempo_respuesta_segundos: iaData.tiempo_respuesta_segundos,
@@ -421,38 +465,34 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 prompt_usado: iaData.prompt_usado,
                 codigos_comparados: iaData.codigos_comparados,
                 resultado_id: iaData.resultado_id,
-                // Datos de eficiencia algorítmica
-                analisis_eficiencia: eficienciaResponse.ok ? eficienciaData : null
+                // Datos de eficiencia algorítmica (Big O)
+                analisis_eficiencia: eficienciaResponse.ok ? eficienciaData : null,
+                // Datos del análisis de eficiencia con IA
+                analisis_eficiencia_ia: analisisEficienciaIA
             };
 
-            console.log('📦 Resultado completo construido:', resultadoCompleto);
+            console.log('📦 Resultado completo con TODOS los análisis:', resultadoCompleto);
+            console.log('🧠 analisis_eficiencia_ia en resultado:', resultadoCompleto.analisis_eficiencia_ia);
+            console.log('🧠 ¿Es null?', resultadoCompleto.analisis_eficiencia_ia === null);
+            console.log('🧠 ¿Es undefined?', resultadoCompleto.analisis_eficiencia_ia === undefined);
 
             setIsLocked(true);
 
             notification.success({
                 message: '¡Análisis completado exitosamente!',
-                description: `Se analizaron ${createData.total_codigos} códigos con ${iaData.modelo_usado}`,
+                description: `Se analizaron ${createData.total_codigos} códigos con todos los análisis disponibles`,
                 placement: 'topRight',
                 duration: 4,
                 icon: <CheckCircleFilled style={{ color: '#5ebd8f' }} />
             });
 
             if (refreshComparaciones) {
-                console.log('🔄 Refrescando lista de comparaciones');
                 refreshComparaciones();
             }
 
             if (onAnalysisComplete) {
-                console.log('📤 Llamando a onAnalysisComplete con resultado:', {
-                    id: resultadoCompleto.id,
-                    tiene_respuesta_ia: !!resultadoCompleto.respuesta_ia,
-                    tiene_analisis_eficiencia: !!resultadoCompleto.analisis_eficiencia,
-                    tokens: resultadoCompleto.tokens_usados
-                });
+                console.log('📤 Enviando resultado completo al wrapper');
                 onAnalysisComplete(resultadoCompleto);
-                console.log('✅ onAnalysisComplete ejecutado');
-            } else {
-                console.warn('⚠️ onAnalysisComplete NO está definido');
             }
 
         } catch (error) {
@@ -696,16 +736,19 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                     <Spin size="large" />
                     <div className="loading-message-icon">
                         {loadingStage.includes('Analizando códigos') ? '🤖' : 
-                         loadingStage.includes('eficiencia') ? '📊' : '💾'}
+                         loadingStage.includes('Big O') ? '📊' : 
+                         loadingStage.includes('eficiencia con IA') ? '🧠' : '💾'}
                     </div>
                     <div className="loading-message-text">
                         {loadingStage || 'Procesando comparación grupal...'}
                     </div>
                     <div className="loading-message-subtext">
                         {loadingStage.includes('Analizando códigos') 
-                            ? 'La IA está analizando los códigos...' 
-                            : loadingStage.includes('eficiencia')
+                            ? 'La IA está analizando similitudes...' 
+                            : loadingStage.includes('Big O')
                             ? 'Calculando complejidad algorítmica...'
+                            : loadingStage.includes('eficiencia con IA')
+                            ? 'Generando análisis detallado de eficiencia...'
                             : 'Esto puede tomar unos segundos'}
                     </div>
                 </div>

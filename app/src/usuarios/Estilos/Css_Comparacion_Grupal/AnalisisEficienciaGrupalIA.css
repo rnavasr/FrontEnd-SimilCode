@@ -1,0 +1,307 @@
+/* AnalisisEficienciaGrupal.css */
+
+.analisis-grupal-container {
+  padding: 32px;
+}
+
+.analisis-grupal-card {
+  background: #1a1a1a;
+  border: 1px solid #303030;
+}
+
+.analisis-grupal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.analisis-grupal-title {
+  color: #c0c0c0;
+  margin: 0;
+}
+
+.analisis-grupal-subtitle {
+  color: #808080;
+}
+
+.analisis-grupal-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.analisis-grupal-mejor-codigo {
+  background: #1a1a1a;
+  border: 2px solid #52c41a;
+}
+
+.analisis-grupal-peor-codigo {
+  background: #1a1a1a;
+  border: 2px solid #ff4d4f;
+}
+
+.analisis-grupal-codigo-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.analisis-grupal-codigo-icon {
+  font-size: 48px;
+}
+
+.analisis-grupal-codigo-icon.mejor {
+  color: #ffd700;
+}
+
+.analisis-grupal-codigo-icon.peor {
+  color: #ff4d4f;
+}
+
+.analisis-grupal-codigo-label {
+  color: #808080;
+  display: block;
+}
+
+.analisis-grupal-codigo-numero {
+  margin: 0;
+}
+
+.analisis-grupal-codigo-numero.mejor {
+  color: #52c41a;
+}
+
+.analisis-grupal-codigo-numero.peor {
+  color: #ff4d4f;
+}
+
+.analisis-grupal-codigo-razon {
+  color: #a0a0a0;
+  font-size: 14px;
+}
+
+.analisis-grupal-ranking-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.analisis-grupal-ranking-tag {
+  padding: 8px 16px;
+  font-size: 16px;
+  background: #2a2a2a;
+  border: 1px solid #404040;
+  color: #c0c0c0;
+}
+
+.analisis-grupal-section-title {
+  color: #c0c0c0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.analisis-grupal-section-icon {
+  margin-right: 8px;
+}
+
+.analisis-grupal-section-icon.ia {
+  color: #667eea;
+}
+
+.analisis-grupal-resumen-content {
+  color: #a0a0a0;
+  line-height: 1.8;
+}
+
+.analisis-grupal-patrones-card {
+  background: #1a1a1a;
+  border: 1px solid #303030;
+}
+
+.analisis-grupal-patron-item {
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.analisis-grupal-patron-eficiente {
+  background: #0f2711;
+  border-left: 3px solid #52c41a;
+}
+
+.analisis-grupal-patron-ineficiente {
+  background: #2b1111;
+  border-left: 3px solid #ff4d4f;
+}
+
+.analisis-grupal-patron-text {
+  color: #b0b0b0;
+}
+
+.analisis-grupal-recomendacion-item {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.analisis-grupal-recomendacion-text {
+  color: #b0b0b0;
+}
+
+.analisis-grupal-collapse-panel {
+  background: #0a0a0a;
+  margin-bottom: 8px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+}
+
+.analisis-grupal-collapse-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.analisis-grupal-collapse-filename {
+  color: #c0c0c0;
+  font-size: 16px;
+}
+
+.analisis-grupal-collapse-nota {
+  margin-left: auto;
+}
+
+.analisis-grupal-detalle-section {
+  padding: 16px;
+}
+
+.analisis-grupal-detalle-title {
+  color: #c0c0c0;
+}
+
+.analisis-grupal-detalle-parrafo {
+  color: #a0a0a0;
+  margin-bottom: 16px;
+}
+
+.analisis-grupal-punto-item {
+  margin-bottom: 8px;
+  padding-left: 16px;
+}
+
+.analisis-grupal-punto-fuerte {
+  border-left: 3px solid #52c41a;
+}
+
+.analisis-grupal-punto-debil {
+  border-left: 3px solid #ff4d4f;
+}
+
+.analisis-grupal-punto-recomendacion {
+  border-left: 3px solid #faad14;
+}
+
+.analisis-grupal-punto-text {
+  color: #b0b0b0;
+}
+
+/* Estado inicial - sin análisis */
+.analisis-grupal-inicial {
+  padding: 32px;
+  text-align: center;
+}
+
+.analisis-grupal-inicial-icon {
+  font-size: 64px;
+  color: #667eea;
+  margin-bottom: 24px;
+}
+
+.analisis-grupal-inicial-title {
+  color: #c0c0c0;
+  margin-bottom: 16px;
+}
+
+.analisis-grupal-inicial-desc {
+  color: #808080;
+  margin-bottom: 24px;
+  font-size: 16px;
+}
+
+.analisis-grupal-btn-generar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  height: 48px;
+  font-size: 16px;
+  padding: 0 32px;
+}
+
+/* Formato de texto inline */
+.analisis-grupal-text-bold {
+  color: #e0e0e0;
+  font-weight: 600;
+}
+
+.analisis-grupal-text-code {
+  background: #2d2d2d;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #ffa657;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  font-size: 13px;
+  border: 1px solid #404040;
+}
+
+.analisis-grupal-text-italic {
+  color: #c0c0c0;
+  font-style: italic;
+}
+
+/* Headers en contenido */
+.analisis-grupal-h4 {
+  color: #c0c0c0;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.analisis-grupal-h3 {
+  color: #e0e0e0;
+  margin-top: 28px;
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Lista con bullets */
+.analisis-grupal-lista-item {
+  margin-left: 24px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.analisis-grupal-lista-bullet {
+  color: #667eea;
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.analisis-grupal-lista-text {
+  color: #b0b0b0;
+  flex: 1;
+  line-height: 1.6;
+}
+
+.analisis-grupal-spacer {
+  height: 8px;
+}
+
+.analisis-grupal-parrafo {
+  color: #a0a0a0;
+  margin-bottom: 12px;
+  line-height: 1.7;
+}

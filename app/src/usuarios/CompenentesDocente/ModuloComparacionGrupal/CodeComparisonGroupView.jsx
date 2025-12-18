@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import CodeComparisonGroupInput from './ComparacionGrupalEntrada';
 import CodeComparisonGroupResults from './ResultadosComparacionGrupalIA';
 import AnalisisEficienciaGrupal from './AnalisisEficienciaBigO';
+import AnalisisEficienciaIA from './AnalisisEficienciaIA';
 
-/**
- * Wrapper para comparaciones grupales (3+ códigos)
- * Muestra los editores Y los resultados debajo cuando están listos
- */
 const CodeComparisonGroupView = ({ model, onBack, userProfile, refreshComparaciones }) => {
     const [analysisResult, setAnalysisResult] = useState(null);
 
     const handleAnalysisComplete = (result) => {
         console.log('✅ Análisis grupal completado en wrapper:', result);
-        console.log('📊 Datos de eficiencia recibidos:', result.analisis_eficiencia);
+        console.log('📊 Datos de eficiencia Big O:', result.analisis_eficiencia);
+        console.log('🧠 Datos de eficiencia IA:', result.analisis_eficiencia_ia);
         setAnalysisResult(result);
     };
 
@@ -35,18 +33,27 @@ const CodeComparisonGroupView = ({ model, onBack, userProfile, refreshComparacio
             {/* Mostrar resultados debajo cuando existan */}
             {analysisResult && (
                 <>
-                    {/* Análisis de IA */}
+                    {/* Análisis de Similitud con IA */}
                     <CodeComparisonGroupResults
                         result={analysisResult}
                         model={model}
                         userProfile={userProfile}
                     />
 
-                    {/* Análisis de Eficiencia */}
+                    {/* Análisis de Eficiencia Big O */}
                     {analysisResult.analisis_eficiencia && (
                         <AnalisisEficienciaGrupal 
                             eficienciaData={analysisResult.analisis_eficiencia}
                         />
+                    )}
+
+                    {/* Análisis de Eficiencia con IA - DIRECTAMENTE con los datos */}
+                    {analysisResult.analisis_eficiencia_ia && (
+                        <div style={{ marginTop: '24px' }}>
+                            <AnalisisEficienciaIA 
+                                analisisData={analysisResult.analisis_eficiencia_ia}
+                            />
+                        </div>
                     )}
                 </>
             )}
