@@ -1,0 +1,399 @@
+/* ===== CONTAINER PRINCIPAL ===== */
+.results-container {
+    padding: 0 32px 32px 32px;
+    max-width: 100%;
+}
+
+/* ===== CARDS GENERALES ===== */
+.results-card {
+    background: #1a1a1a !important;
+    border-radius: 12px !important;
+    margin-top: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid #2a2a2a !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.results-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.results-card .ant-card-body {
+    padding: 24px !important;
+}
+
+/* ===== HEADERS DE CARDS ===== */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.card-title {
+    color: #e0e0e0 !important;
+    margin: 0 !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+/* ===== RESUMEN GENERAL ===== */
+.resumen-card {
+    border-left: 4px solid #5ebd8f;
+}
+
+.resumen-text {
+    color: #c0c0c0 !important;
+    font-size: 15px !important;
+    line-height: 1.8 !important;
+    margin: 0 !important;
+}
+
+/* ===== CÓDIGOS MÁS SIMILARES ===== */
+.similares-card {
+    border-left: 4px solid #f5222d;
+}
+
+.similares-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.similar-item-card {
+    background: #252525 !important;
+    border: 1px solid #333 !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+}
+
+.similar-item-card:hover {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    transform: translateX(4px);
+}
+
+.similar-item-card .ant-card-body {
+    padding: 16px !important;
+}
+
+.similar-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.similar-item-info {
+    flex: 1;
+}
+
+.similar-par {
+    color: #5ebd8f !important;
+    font-size: 15px !important;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.similar-razon {
+    color: #c0c0c0 !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+    line-height: 1.6;
+}
+
+.similar-tag-wrapper {
+    flex-shrink: 0;
+}
+
+/* ===== ALERT DE NO SIMILITUDES ===== */
+.no-similitudes-alert {
+    background: #252525 !important;
+    border: 1px solid #333 !important;
+}
+
+.no-similitudes-alert .ant-alert-message,
+.no-similitudes-alert .ant-alert-description {
+    color: #c0c0c0 !important;
+}
+
+/* ===== MATRIZ DE SIMILITUD ===== */
+.matriz-card {
+    border-left: 4px solid #1890ff;
+}
+
+/* ===== LEYENDA ===== */
+.legend-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.legend-tag {
+    font-size: 13px !important;
+    padding: 4px 12px !important;
+    border-radius: 6px !important;
+    font-weight: 500;
+}
+
+/* ===== WRAPPER DE TABLA ===== */
+.table-wrapper {
+    background: #252525;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 700px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 5px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 5px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* ===== TABLA DE MATRIZ ===== */
+.matriz-similitud-table {
+    background: transparent !important;
+}
+
+.matriz-similitud-table .ant-table {
+    background: transparent !important;
+    color: #e0e0e0 !important;
+}
+
+.matriz-similitud-table .ant-table-container {
+    border-radius: 8px;
+    border: 1px solid #444 !important;
+}
+
+.matriz-similitud-table table {
+    border-spacing: 0 !important;
+    border-collapse: collapse !important;
+    width: 100%;
+}
+
+/* Eliminar row de medición de Ant Design */
+.matriz-similitud-table .ant-table-measure-row,
+.matriz-similitud-table .ant-table-measure-row td {
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* ===== HEADERS DE TABLA ===== */
+.matriz-similitud-table .ant-table-thead > tr > th {
+    background: #1f1f1f !important;
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+    border-bottom: 1px solid #444 !important;
+    border-right: 1px solid #444 !important;
+    padding: 12px 8px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.matriz-similitud-table .ant-table-thead > tr > th:first-child {
+    background: #2a2a2a !important;
+    color: #5ebd8f !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    text-align: left !important;
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 3 !important;
+}
+
+/* ===== COLUMNA DE CÓDIGO ===== */
+.codigo-cell {
+    padding: 8px;
+}
+
+.codigo-name {
+    color: #5ebd8f !important;
+    font-size: 13px !important;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+/* ===== CELDAS DEL BODY ===== */
+.matriz-similitud-table .ant-table-tbody > tr > td {
+    background: #252525 !important;
+    border-right: 1px solid #444 !important;
+    border-bottom: 1px solid #444 !important;
+    border-top: none !important;
+    padding: 8px !important;
+    transition: all 0.2s ease;
+    color: #e0e0e0 !important;
+}
+
+.matriz-similitud-table .ant-table-tbody > tr > td:first-child {
+    background: #2a2a2a !important;
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 2 !important;
+    border-right: 2px solid #444 !important;
+}
+
+.matriz-similitud-table .ant-table-tbody > tr:hover > td {
+    background: #2d2d2d !important;
+}
+
+.matriz-similitud-table .ant-table-tbody > tr:hover > td:first-child {
+    background: #333 !important;
+}
+
+/* ===== CELDAS DE SIMILITUD ===== */
+.similarity-cell {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+}
+
+.similarity-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.similarity-cell.diagonal {
+    background: #1f1f1f !important;
+    border: none !important;
+}
+
+.diagonal-text {
+    color: #666 !important;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.similarity-value {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+
+/* Niveles de similitud con bordes */
+.similarity-cell.muy_alta {
+    border-left-width: 4px !important;
+}
+
+.similarity-cell.alta {
+    border-left-width: 3px !important;
+}
+
+.similarity-cell.media,
+.similarity-cell.baja,
+.similarity-cell.muy_baja {
+    border-left-width: 2px !important;
+}
+
+/* ===== LOADING MESSAGE ===== */
+.loading-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.loading-message-icon {
+    font-size: 48px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.loading-message-text {
+    color: #e0e0e0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.loading-message-subtext {
+    color: #999;
+    font-size: 14px;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 0.8; 
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .results-container {
+        padding: 0 16px 16px 16px;
+    }
+    
+    .results-card .ant-card-body {
+        padding: 16px !important;
+    }
+    
+    .similar-item-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .similar-tag-wrapper {
+        align-self: flex-start;
+    }
+    
+    .legend-container {
+        gap: 8px;
+    }
+    
+    .legend-tag {
+        font-size: 11px !important;
+        padding: 2px 8px !important;
+    }
+    
+    .matriz-similitud-table .ant-table-thead > tr > th {
+        font-size: 10px !important;
+        padding: 8px 4px !important;
+    }
+    
+    .codigo-name {
+        font-size: 11px !important;
+    }
+    
+    .similarity-value {
+        font-size: 13px !important;
+    }
+}

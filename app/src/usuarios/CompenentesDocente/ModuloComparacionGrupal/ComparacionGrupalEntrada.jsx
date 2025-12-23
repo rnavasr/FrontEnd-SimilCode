@@ -374,6 +374,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             }
 
             console.log('✅ PASO 2: Análisis de similitud con IA completado');
+            console.log('📊 Datos recibidos de la IA:', iaData);
 
             // PASO 3: Analizar eficiencia algorítmica (Big O)
             setLoadingStage('Analizando eficiencia algorítmica (Big O)...');
@@ -394,8 +395,7 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 console.warn('⚠️ Error al analizar eficiencia Big O:', eficienciaData.error);
             } else {
                 console.log('✅ PASO 3: Análisis Big O completado:', eficienciaData);
-            console.log('🔍 Claves disponibles en eficienciaData:', Object.keys(eficienciaData));
-            console.log('🔍 Estructura completa:', JSON.stringify(eficienciaData, null, 2));
+                console.log('🔍 Claves disponibles en eficienciaData:', Object.keys(eficienciaData));
             }
 
             // PASO 4: Análisis de eficiencia con IA (solo si el paso 3 fue exitoso)
@@ -403,7 +403,6 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
             
             console.log('🔍 VERIFICANDO PASO 4...');
             console.log('eficienciaResponse.ok:', eficienciaResponse.ok);
-            console.log('eficienciaData completo:', eficienciaData);
             console.log('resultado_id:', eficienciaData?.resultado_id);
             
             if (eficienciaResponse.ok && eficienciaData?.resultado_id) {
@@ -444,7 +443,6 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 console.warn('⚠️ PASO 4 OMITIDO - Razones:');
                 console.warn('- eficienciaResponse.ok:', eficienciaResponse.ok);
                 console.warn('- tiene resultado_id:', !!eficienciaData?.resultado_id);
-                console.warn('📊 eficienciaData completo:', eficienciaData);
             }
 
             // Construir resultado completo con TODOS los análisis
@@ -453,28 +451,34 @@ const CodeComparisonGroupInput = ({ model, onBack, userProfile, refreshComparaci
                 nombre_comparacion: finalName,
                 total_codigos: createData.total_codigos,
                 codigos: createData.codigos,
-                lenguaje: iaData.lenguaje,
                 fecha_creacion: createData.fecha_creacion,
-                // Datos del análisis de similitud con IA
-                respuesta_ia: iaData.respuesta_ia,
+                
+                // ✅ NUEVA ESTRUCTURA - Datos del análisis de similitud con IA
+                resumen_general: iaData.resumen_general,
+                codigos_mas_similares: iaData.codigos_mas_similares,
+                matriz_similitud: iaData.matriz_similitud,
+                matriz_tabla: iaData.matriz_tabla,
+                
+                // Metadatos del análisis
                 tokens_usados: iaData.tokens_usados,
                 tiempo_respuesta_segundos: iaData.tiempo_respuesta_segundos,
                 modelo_usado: iaData.modelo_usado,
                 proveedor: iaData.proveedor,
-                model_name: iaData.model_name,
-                prompt_usado: iaData.prompt_usado,
-                codigos_comparados: iaData.codigos_comparados,
+                lenguaje: iaData.lenguaje,
                 resultado_id: iaData.resultado_id,
+                
                 // Datos de eficiencia algorítmica (Big O)
                 analisis_eficiencia: eficienciaResponse.ok ? eficienciaData : null,
+                
                 // Datos del análisis de eficiencia con IA
                 analisis_eficiencia_ia: analisisEficienciaIA
             };
 
             console.log('📦 Resultado completo con TODOS los análisis:', resultadoCompleto);
-            console.log('🧠 analisis_eficiencia_ia en resultado:', resultadoCompleto.analisis_eficiencia_ia);
-            console.log('🧠 ¿Es null?', resultadoCompleto.analisis_eficiencia_ia === null);
-            console.log('🧠 ¿Es undefined?', resultadoCompleto.analisis_eficiencia_ia === undefined);
+            console.log('🔍 resumen_general:', resultadoCompleto.resumen_general);
+            console.log('🔍 codigos_mas_similares:', resultadoCompleto.codigos_mas_similares);
+            console.log('🔍 matriz_similitud:', resultadoCompleto.matriz_similitud);
+            console.log('🔍 matriz_tabla:', resultadoCompleto.matriz_tabla);
 
             setIsLocked(true);
 
