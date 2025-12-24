@@ -53,7 +53,11 @@ export const API_ENDPOINTS = {
   CREAR_COMPARACION_GRUPAL: '/app/usuarios/crear_comparaciones_grupales/',
   OBTENER_RESULTADO_COMPARACION_IA_GRUPAL: '/app/usuarios/crear_comparacion_grupal_ia/',
   ANALIZAR_EFICIENCIA_GRUPAL: '/app/usuarios/analisis_big_o_grupal',
-  CREAR_COMENTARIO_EFICIENCIA_GRUPAL: '/app/usuarios/crear_comentario_eficiencia_grupal'
+  CREAR_COMENTARIO_EFICIENCIA_GRUPAL: '/app/usuarios/crear_comentario_eficiencia_grupal',
+  OBTENER_COMPARACION_GRUPAL: '/app/usuarios/mostrar_datos_comparacion_grupal',  // Usar con /${comparacion_grupal_id}/
+  OBTENER_RESULTADO_SIMILITUD_GRUPAL: '/app/usuarios/mostrar_resultados_similitud_grupal_ia',  // Usar con /${comparacion_grupal_id}/
+  OBTENER_RESULTADO_EFICIENCIA_GRUPAL: '/app/usuarios/mostrar_resultados_notacion_big_o_grupal',  // Usar con /${comparacion_grupal_id}/
+  OBTENER_COMENTARIOS_EFICIENCIA_GRUPAL: '/app/usuarios/mostrar_resultados_comentarios_eficiencia_grupal_ia',  // Usar con /${comparacion_grupal_id}/
 };
 
 // Función helper para construir URLs completas
