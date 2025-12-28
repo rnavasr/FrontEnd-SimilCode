@@ -20,6 +20,7 @@ import ModalSeleccionIA from '../usuarios/CompenentesDocente/VistaPrincipalDocen
 import ComparisonDetailView from './CompenentesDocente/MostrarDatosComparacionesIndividualesCreadas/DetalleComparacion';
 import CodeComparisonGroupDetail from './CompenentesDocente/MostrarDatosComparacionesGrupales/ComparacionGrupalDetalleCodigo.jsx';
 import SettingsView from './CompenentesDocente/ModuloConfiguracionesDocente/ConfiguracionDocente.jsx';
+import ComparacionGrupalDetalle from './CompenentesDocente/MostrarDatosComparacionesGrupales/ComparacionGrupalDetalle.jsx';
 import './globalStyles.css';
 
 const { Content } = Layout;
@@ -426,7 +427,7 @@ const Usuario = () => {
                                         onBack={handleBackToHome}
                                     />
                                 ) : selectedComparacion.tipo === 'grupal' ? (
-                                    <CodeComparisonGroupDetail
+                                    <ComparacionGrupalDetalle
                                         comparacionId={selectedComparacion.id}
                                         model={selectedModel || { 
                                             name: selectedComparacion.modelo_ia?.nombre || 'IA', 
