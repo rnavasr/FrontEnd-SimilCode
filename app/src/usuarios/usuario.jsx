@@ -18,6 +18,7 @@ import DocenteSidebar from './CompenentesDocente/VistaPrincipalDocente/DocenteSi
 import ChatManagerView from './CompenentesDocente/VistaPrincipalDocente/GestionDeComparaciones';
 import ModalSeleccionIA from '../usuarios/CompenentesDocente/VistaPrincipalDocente/ModalSeleccion.jsx';
 import ComparisonDetailView from './CompenentesDocente/MostrarDatosComparacionesIndividualesCreadas/DetalleComparacion';
+import CodeComparisonGroupDetail from './CompenentesDocente/MostrarDatosComparacionesGrupales/ComparacionGrupalDetalleCodigo.jsx';
 import SettingsView from './CompenentesDocente/ModuloConfiguracionesDocente/ConfiguracionDocente.jsx';
 import './globalStyles.css';
 
@@ -419,10 +420,22 @@ const Usuario = () => {
                                 display: 'flex',
                                 flexDirection: 'column'
                             }}>
-                                <ComparisonDetailView
-                                    comparacionId={selectedComparacion.id}
-                                    onBack={handleBackToHome}
-                                />
+                                {selectedComparacion.tipo === 'individual' ? (
+                                    <ComparisonDetailView
+                                        comparacionId={selectedComparacion.id}
+                                        onBack={handleBackToHome}
+                                    />
+                                ) : selectedComparacion.tipo === 'grupal' ? (
+                                    <CodeComparisonGroupDetail
+                                        comparacionId={selectedComparacion.id}
+                                        model={selectedModel || { 
+                                            name: selectedComparacion.modelo_ia?.nombre || 'IA', 
+                                            icon: '🤖',
+                                            color: '#5ebd8f'
+                                        }}
+                                        onBack={handleBackToHome}
+                                    />
+                                ) : null}
                             </div>
                         ) : showChatManager ? (
                             <ChatManagerView
