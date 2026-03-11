@@ -3,12 +3,6 @@ import CodeComparisonResults from './ResultadoCompacionSimilitud';
 import CodeComparisonInput from './ComparacionDeCodigoEntrada';
 import AnalisisEficiencia from './AnalisisEficiencia';
 
-/**
- * Wrapper que coordina los tres componentes:
- * - CodeComparisonInput: Entrada de código y ejecución completa del análisis
- * - CodeComparisonResults: Muestra resultados de similitud
- * - AnalisisEficiencia: Muestra análisis de eficiencia Big O y comentarios IA
- */
 const CodeComparisonView = ({ model, onBack, userProfile, refreshComparaciones }) => {
     const [result, setResult] = useState(null);
     const [isLocked, setIsLocked] = useState(false);
