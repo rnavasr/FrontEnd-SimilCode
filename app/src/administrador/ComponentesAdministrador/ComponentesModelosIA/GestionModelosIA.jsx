@@ -476,10 +476,9 @@ const GestionModelos = ({ onVolver, userProfile }) => {
                             <Form.Item
                                 label="API Key"
                                 name="api_key"
-                                rules={[{ 
-                                    required: !editingModelo, 
-                                    message: 'Por favor ingrese la API key' 
-                                }]}
+                                extra={'Cada instalacion aporta su propia clave. '
+                                    + 'Si se deja vacia, el servidor usara la '
+                                    + 'variable de entorno del proveedor.'}
                             >
                                 <Input.Password placeholder="sk-..." />
                             </Form.Item>

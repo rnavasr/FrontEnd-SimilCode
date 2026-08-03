@@ -99,8 +99,13 @@ const ModalSeleccionIA = ({ isVisible, onClose, onModelSelect, usuarioId = null 
             const idsUsuario = new Set(modelsUsuario.map(m => m.id));
             const modelsAdminFiltrados = modelsAdmin.filter(m => !idsUsuario.has(m.id));
 
-            setModelosUsuario(modelsUsuario);
-            setModelosAdmin(modelsAdminFiltrados);
+            // El modelo recomendado es el validado para uso en produccion:
+            // se presenta en primer lugar dentro de cada grupo.
+            const recomendadoPrimero = (a, b) =>
+                (b.isRecommended === true) - (a.isRecommended === true);
+
+            setModelosUsuario([...modelsUsuario].sort(recomendadoPrimero));
+            setModelosAdmin([...modelsAdminFiltrados].sort(recomendadoPrimero));
 
             if (modelsUsuario.length === 0 && modelsAdminFiltrados.length === 0) {
                 message.info('No hay modelos de IA disponibles');
